@@ -25,6 +25,7 @@
 		width: 1.5rem;
 		max-width: 10px;
 		min-width: 1.5rem;
+		opacity: .40;
 
 	//Never put this inline-block, it breaks td width and row sizing
 	//	display: inline-block;
@@ -92,6 +93,9 @@
 	<div class="col-sm">
 		<button class="btn btn-rounded" onclick="generateBlankBoard()">Generate Blank Board</button>
 	</div>
+	<div class="col-sm">
+		<button class="btn btn-rounded" onclick="backupTable('U'); showBoard();">Undo</button>
+	</div>
 <!--	<div class="col-sm">
 		<button class="btn btn-rounded" onclick="alert(LastLocation)">Error Location</button>
 	</div>
@@ -152,13 +156,40 @@ Exiting: When you've cleared all of the lair, return to the stairs. But you'll f
 var LastLocation=0;
 var roomCount=0;
 var gameBoard=new Array(19);
+var gameBoardBackup=new Array(19);
 for(i=0;i<gameBoard.length;i++){
 	gameBoard[i]=new Array(26);
+	gameBoardBackup[i]=new Array(26);
 	for(j=0;j<gameBoard[0].length;j++){
 		gameBoard[i][j]=new Array(8).fill(0);
+		gameBoardBackup[i][j]=new Array(8).fill(0);
 	}
 }
-
+function backupTable(MU="M"){
+	//MU is for move or undo.
+	//This makes a copy of the table before a move(if M) or recopies old copy into active table (U)
+	//alert("backupTable");
+	//alert(MU);
+	if(MU=="M"){
+		for(a=0;a<19;a++){
+			for(b=0;b<26;b++){
+				for(c=0;c<8;c++){
+					gameBoardBackup[a][b][c]=gameBoard[a][b][c];
+				}
+			}
+		}
+	}else{
+	//	alert("Undo");
+		for(a=0;a<19;a++){
+			for(b=0;b<26;b++){
+				for(c=0;c<8;c++){
+					gameBoard[a][b][c]=gameBoardBackup[a][b][c];
+				}
+			}
+		}
+	}
+	//alert("backupTable Completed");
+}
 function getMonster(isWandering=0, questLevel=0, isHall=0){
 	//This will return a monster. Has option for wandering monster so it'll know not to give Dread Warrior or Gargoyle and has a lower chance of being a goblin or skeleton.
 
@@ -168,11 +199,16 @@ function getMonster(isWandering=0, questLevel=0, isHall=0){
 	let creatureType=0;
 	creatureType=Math.floor(Math.random()*109)-10;
 
-	//alert(questLevel);
-	if(questLevel<10){
+	if(questLevel==0){
+		 questLevel=(parseInt(document.getElementById("questLevel").value,10));
+	};
+
+	if(questLevel<5){
 		//Had to wrap this in this if statement or else you'd get a larger amount of goblins in every quest before 10;
 		creatureType+=(questLevel-10);
 	}
+
+
 
 	if(isWandering==1){
 		if(creatureType<20){
@@ -189,8 +225,8 @@ function getMonster(isWandering=0, questLevel=0, isHall=0){
 		case (creatureType<20):
 			//When I added the Ghoul trap I also added the Ghoul here. It seemed reasonable it should replace about 1/4 of the goblins.
 			randomChance=Math.floor(Math.random()*4);
-			if (randomChance==1){
-				retVal+="Ghoul(0 attack, 3 defense. 3 body, 3 mind -- When the hero the ghoul focuses on moves, they are bumped off of their ending space and must backtrack along their path the number of spaces equal to the roll of one die. Ghoul refocuses each turn by rolling a die to randomly select a hero within their line of site.)";
+			if (randomChance==1||(randomChance<2&&questLevel>5)){
+				retVal+="Ghoul(0 attack, 3 defense. 3 body, 3 mind -- When the ghould first appears, it bumps the first hero it sees in a random direction one space. When the hero the ghoul focuses on moves, they are bumped off of their ending space and must backtrack along their path the number of spaces equal to the roll of one die. The ghoul refocuses each turn by rolling a die to randomly select a hero within their line of site, and bumps that character by one space in a random direction immediately.)";
 			}else{
 				retVal+="Goblin";
 			}
@@ -207,7 +243,7 @@ function getMonster(isWandering=0, questLevel=0, isHall=0){
 			case (creatureType<77):
 				retVal+="Abomination";
 				break;
-		case (creatureType>86):
+		case (creatureType<86):
 			retVal="Gorgon(2 attack, 4 defend, 2 body, 1 mind, 5 move -- Each turn a gorgon can attack or put someone to sleep. If they put a hero to sleep, the hero remains asleep until rolling a 6. On each turn, a hero may roll 1 die for each mind point. A hero who is asleep may not attack, defend, move, or perform any action. If a hero awakens at the beginning of their turn, they may continue the turn as normal.)"
 			break;
 		case (creatureType<99):
@@ -798,8 +834,27 @@ function generateBlankBoard(){
 		}
 		row+=1
 	}
-
+	createStartRoom();
 	showBoard();
+}
+function createStartRoom(){
+	//This will set up the basic start we use in this type of game.
+
+	//Place stairs @ 12,9. Treat like furniture, because essentially they are
+	gameBoard[9][12][1]="^2^2^Stairs(furniture)";
+	gameBoard[9][13][1]="@Stairs(furniture)";
+	gameBoard[10][12][1]="@Stairs(furniture)";
+	gameBoard[10][13][1]="@Stairs(furniture)";
+	gameBoard[6][12][5]=2;
+	gameBoard[7][12][4]=2;
+	gameBoard[11][13][5]=2;
+	gameBoard[12][13][4]=2;
+	gameBoard[9][9][3]=2;
+	gameBoard[9][10][2]=2;
+	gameBoard[9][15][3]=2;
+	gameBoard[9][16][2]=2;
+	//This part will mark entire room as in use
+	gameBoard[7][10][7]=1;
 }
 function colorBoard(){
 	//This will just loop through and color the squares appropriately and set their room number for the future.
@@ -1080,6 +1135,21 @@ function showBoardOld(){
 	newGameBoard+="</table>";
 	document.getElementById("gameBoard").innerHTML=newGameBoard;
 }
+function roomInUse(roomNum){
+	//Returns true if room is in use, false otherwise
+	var inUse=false;
+	var startRow=getStartRow(roomNum);
+	var startCol=getStartCol(roomNum);
+
+	if(gameBoard[startRow][startCol][7]==0){
+		return false;
+	}else{
+		return true;
+	}
+
+
+	return inUse;
+}
 function showBoard(){
 	var newGameBoard="<table>";
 	var row=0;
@@ -1163,6 +1233,11 @@ function showBoard(){
 				var tempText=gameBoard[row][col][1]+" ";
 				if(tempText.includes("@")==true||tempText.includes("^")==true){
 					newGameBoard+="border-bottom-width:0px;border-top-width:0px;border-left-width:0px;border-right-width:0px;";
+				}
+
+				//Set background opacity to full for rooms that have been used;
+				if(roomInUse(gameBoard[row][col][0])==true){
+					newGameBoard+="opacity: 1;";
 				}
 
 				newGameBoard+="'>";
@@ -1829,8 +1904,7 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 		return;
 	}
 
-	LastLocation=.1;
-	//document.getElementById("statusCode").innerHTML=LastLocation;
+
 
 
 	if(isLastRoom==0&&roomNum<21){ //Can still be hall or exit room
@@ -1845,36 +1919,39 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 		}
 	}
 
-	LastLocation=.2;
-	//document.getElementById("statusCode").innerHTML=LastLocation;
+
+
+
 
 	startRow=getStartRow(roomNum);
 	startCol=getStartCol(roomNum);
 	numCols=getRoomCols(roomNum);
 	numRows=getRoomRows(roomNum);
 
-	LastLocation=.3;
-	//document.getElementById("statusCode").innerHTML=LastLocation;
+
 
 	//Now check to see if this room is already marked as being in use
-	if(gameBoard[startRow][startCol][7]!=0){
+	if(gameBoard[startRow][startCol][7]!=0&&isLastRoom==0){
 		//Room is already in use, so refresh board and exit this function
 		showBoard();
 		return;
 	}else{
 		//It is not already in use, so mark it
 		//Actually only needs first cell marked, really.
-		gameBoard[startRow][startCol][7]=1;
+	//	gameBoard[startRow][startCol][7]=1;
+		//I moved this to the end of the function. Now it will only be marked as in use if it successfully completes this function.
 	}
 
+	backupTable("M");
 
-	LastLocation=1;
-	//document.getElementById("statusCode").innerHTML=LastLocation;
 
-	//Place Doors in the room
-	numItems=Math.floor(Math.random()*4)+1;
-	//Up to 4 doors in a room, one on each side
-	while(numItems>0){
+
+	if(isLastRoom==0){
+	//Last room (exit) gets no doors because it is already open
+		//Place Doors in the room
+		numItems=Math.floor(Math.random()*4)+1;
+		//Up to 4 doors in a room, one on each side
+		while(numItems>0){
 		//Find out which side of the room we're trying to place this on
 		randomChance=Math.floor(Math.random()*4);
 		//This is to take care of hallways--can't place a door on the outside edge of the Board
@@ -1985,558 +2062,544 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 		}
 		showBoard();
 		numItems--;
+		}
 	}
 
-	LastLocation=2;
-	//document.getElementById("statusCode").innerHTML=LastLocation;
-	//Place Furniture in the room
-	switch(true){
-		case(roomNum>21):
-			//This is a hall, so no furniture
-			break;
-		default:
-			//Place furniture
-			randomChance=Math.floor(Math.random()*21);
-			switch(randomChance){
-				case 0:
-				case 1:
-				case 2:
-				case 3:
-				case 4:
-				case 5:
-					numItems=1;
-					break;
-				case 6:
-				case 7:
-				case 8:
-				case 9:
-				case 10:
-				case 11:
-					numItems=2;
-					break;
-				case 12:
-				case 13:
-				case 14:
-				case 15:
-				case 16:
-				case 17:
-					numItems=3;
-					break;
-				case 18:
-				case 19:
-					numItems=4;
-					break;
-				default:
-					numItems=0;
-					break;
-			}
 
 
-			while(numItems>0){
-				isBlocked=false;
-				tempFurn=getFurniture();
-				tempFurnWidth=getFurnitureWidth(tempFurn);
-				tempFurnHeight=getFurnitureLength(tempFurn);
-				furnArea=tempFurnWidth*tempFurnHeight;
+	if(isLastRoom==0){
+	//Exit room gets no additional furniture
+		//Place Furniture in the room
+		switch(true){
+			case(roomNum>21):
+				//This is a hall, so no furniture
+				break;
+			default:
+				//Place furniture
+				randomChance=Math.floor(Math.random()*21);
+				switch(randomChance){
+					case 0:
+					case 1:
+					case 2:
+					case 3:
+					case 4:
+					case 5:
+						numItems=1;
+						break;
+					case 6:
+					case 7:
+					case 8:
+					case 9:
+					case 10:
+					case 11:
+						numItems=2;
+						break;
+					case 12:
+					case 13:
+					case 14:
+					case 15:
+					case 16:
+					case 17:
+						numItems=3;
+						break;
+					case 18:
+					case 19:
+						numItems=4;
+						break;
+					default:
+						numItems=0;
+						break;
+				}
 
 
-				placeFurniture:{
+				while(numItems>0){
+					isBlocked=false;
+					tempFurn=getFurniture();
+					tempFurnWidth=getFurnitureWidth(tempFurn);
+					tempFurnHeight=getFurnitureLength(tempFurn);
+					furnArea=tempFurnWidth*tempFurnHeight;
 
-					if(furnArea>=((numRows*numCols))){
-						//Item has to be skipped, this room is too small
-						break placeFurniture;
-					}else{
-						if((tempFurnWidth>numCols && tempFurnWidth>numRows)||(tempFurnHeight>numCols && tempFurnHeight>numRows)||(tempFurnHeight<numCols && tempFurnWidth>numRows)||(tempFurnWidth>numCols && tempFurnHeight>numRows)){
-							//Still won't fit, so skip it
+
+					placeFurniture:{
+
+						if(furnArea>=((numRows*numCols))){
+							//Item has to be skipped, this room is too small
 							break placeFurniture;
 						}else{
-							//Now try to place it and see if it'll fit with existing items, doors, etc.
-							//With furniture it makes sense to place it against walls? Allow items to stick into room, though.
-
-							if(furnArea>=6){
-								largeItemCount++;
-								if(largeItemCount>1){
-									//Limit 1 big item (table, alchemist bench, etc) per room
-									break placeFurniture;
-								}
+							if((tempFurnWidth>numCols && tempFurnWidth>numRows)||(tempFurnHeight>numCols && tempFurnHeight>numRows)||(tempFurnHeight<numCols && tempFurnWidth>numRows)||(tempFurnWidth>numCols && tempFurnHeight>numRows)){
+								//Still won't fit, so skip it
+								break placeFurniture;
 							}else{
-								if(furnArea>=3){
-									medItemCount++;
+								//Now try to place it and see if it'll fit with existing items, doors, etc.
+								//With furniture it makes sense to place it against walls? Allow items to stick into room, though.
+
+								if(furnArea>=6){
+									largeItemCount++;
+									if(largeItemCount>1){
+										//Limit 1 big item (table, alchemist bench, etc) per room
+										break placeFurniture;
+									}
+								}else{
+									if(furnArea>=3){
+										medItemCount++;
+									}
 								}
-							}
 
-							//First, randomly decide whether to swap direction of furniture item
-							randomChance=Math.floor(Math.random()*2);
+								//First, randomly decide whether to swap direction of furniture item
+								randomChance=Math.floor(Math.random()*2);
 
 
-							//I changed to picking a random wall, then a random row or col along that wall--it just makes sense that most furniture will be along the walls
-							randomChance=Math.floor(Math.random()*4);
-							switch(randomChance){
-								case 0:
-									//Along left side, so set randomColto startCol and select a row based on the same procedure above
-										randomCol=startCol;
-										randomRow=(Math.floor(Math.random()*numRows))+startRow;
-										//Make sure first attemp sets furniture long side to lay along the wall that it sits, if possible.
-										if(tempFurnHeight<tempFurnWidth&&tempFurnWidth<numRows){
+								//I changed to picking a random wall, then a random row or col along that wall--it just makes sense that most furniture will be along the walls
+								randomChance=Math.floor(Math.random()*4);
+								switch(randomChance){
+									case 0:
+										//Along left side, so set randomColto startCol and select a row based on the same procedure above
+											randomCol=startCol;
+											randomRow=(Math.floor(Math.random()*numRows))+startRow;
+											//Make sure first attemp sets furniture long side to lay along the wall that it sits, if possible.
+											if(tempFurnHeight<tempFurnWidth&&tempFurnWidth<numRows){
+												randomChance=tempFurnWidth;
+												tempFurnWidth=tempFurnHeight;
+												tempFurnHeight=randomChance;
+											}
+											break;
+									case 1:
+										//Along right side, so set randomColto startCol+numCols-1 and select a row based on the same procedure above
+											randomCol=startCol+numCols-1;
+											randomRow=(Math.floor(Math.random()*numRows))+startRow;
+											if(tempFurnHeight<tempFurnWidth&&tempFurnWidth<numRows){
+												randomChance=tempFurnWidth;
+												tempFurnWidth=tempFurnHeight;
+												tempFurnHeight=randomChance;
+											}
+											break;
+									case 2:
+										//Along top side, so set randomRow to startRow and select a Col based on the same procedure above
+										randomRow=startRow;
+										randomCol=(Math.floor(Math.random()*numCols))+startCol;
+										if(tempFurnWidth<tempFurnHeight&&tempFurnHeight<numRows){
 											randomChance=tempFurnWidth;
 											tempFurnWidth=tempFurnHeight;
 											tempFurnHeight=randomChance;
 										}
 										break;
-								case 1:
-									//Along right side, so set randomColto startCol+numCols-1 and select a row based on the same procedure above
-										randomCol=startCol+numCols-1;
-										randomRow=(Math.floor(Math.random()*numRows))+startRow;
-										if(tempFurnHeight<tempFurnWidth&&tempFurnWidth<numRows){
+									default:
+										//Along top side, so set randomRow to startRow and select a Col based on the same procedure above
+										randomRow=startRow+numRows-1;
+										randomCol=(Math.floor(Math.random()*numCols))+startCol;
+										if(tempFurnWidth<tempFurnHeight&&tempFurnHeight<numRows){
 											randomChance=tempFurnWidth;
 											tempFurnWidth=tempFurnHeight;
 											tempFurnHeight=randomChance;
 										}
 										break;
-								case 2:
-									//Along top side, so set randomRow to startRow and select a Col based on the same procedure above
-									randomRow=startRow;
-									randomCol=(Math.floor(Math.random()*numCols))+startCol;
-									if(tempFurnWidth<tempFurnHeight&&tempFurnHeight<numRows){
-										randomChance=tempFurnWidth;
-										tempFurnWidth=tempFurnHeight;
-										tempFurnHeight=randomChance;
-									}
-									break;
-								default:
-									//Along top side, so set randomRow to startRow and select a Col based on the same procedure above
-									randomRow=startRow+numRows-1;
-									randomCol=(Math.floor(Math.random()*numCols))+startCol;
-									if(tempFurnWidth<tempFurnHeight&&tempFurnHeight<numRows){
-										randomChance=tempFurnWidth;
-										tempFurnWidth=tempFurnHeight;
-										tempFurnHeight=randomChance;
-									}
-									break;
-							}
+								}
 
 
 
 
-							if((tempFurnWidth>=numCols&&tempFurnHeight<numCols)||(tempFurnHeight>=numRows&&tempFurnWidth<numRows)){
-								//Swap the directions of the furniture so it won't go all the way across the roomMax
-								randomChance=tempFurnWidth;
-								tempFurnWidth=tempFurnHeight;
-								tempFurnHeight=randomChance;
-							}
+								if((tempFurnWidth>=numCols&&tempFurnHeight<numCols)||(tempFurnHeight>=numRows&&tempFurnWidth<numRows)){
+									//Swap the directions of the furniture so it won't go all the way across the roomMax
+									randomChance=tempFurnWidth;
+									tempFurnWidth=tempFurnHeight;
+									tempFurnHeight=randomChance;
+								}
 
-							for(let myTries=0; myTries<=1; myTries++){
-							//First try starting from this position extending to the right and down and move right until we hit the wall
+								for(let myTries=0; myTries<=1; myTries++){
+								//First try starting from this position extending to the right and down and move right until we hit the wall
 
-								tryFirstDirection:{
-									checkRow=randomRow;
-									checkCol=randomCol;
+									tryFirstDirection:{
+										checkRow=randomRow;
+										checkCol=randomCol;
 
 
-									while(((checkCol-startCol)+tempFurnWidth)<=numCols&&((checkRow-startRow)+tempFurnHeight)<=numRows){
-										checkLocationOne:{
-											for(let x=0;x<tempFurnHeight;x++){
-												for(let y=0;y<tempFurnWidth;y+=1){
-													if(furnArea>=3){
-														if(nextToMedOrLarge(checkRow+x,checkCol+y)==true){
-															//This checks to see if a large item of furniture is next to another large item.
+										while(((checkCol-startCol)+tempFurnWidth)<=numCols&&((checkRow-startRow)+tempFurnHeight)<=numRows){
+											checkLocationOne:{
+												for(let x=0;x<tempFurnHeight;x++){
+													for(let y=0;y<tempFurnWidth;y+=1){
+														if(furnArea>=3){
+															if(nextToMedOrLarge(checkRow+x,checkCol+y)==true){
+																//This checks to see if a large item of furniture is next to another large item.
+																break checkLocationOne;
+															}
+														}
+														if(gameBoard[checkRow+x][checkCol+y][1]==2||gameBoard[checkRow+x][checkCol+y][2]==2||gameBoard[checkRow+x][checkCol+y][3]==2||gameBoard[checkRow+x][checkCol+y][4]==2||gameBoard[checkRow+x][checkCol+y][5]==2||(checkCol-startCol)>numCols||(checkRow-startRow)>numRows||gameBoard[checkRow+x][checkCol+y][1]!=0||gameBoard[checkRow+x][checkCol+y][0]!=roomNum){
+											  			//This space either has something on it, or it has a door... and furniture can't block doors
+															//It may also extend through wall
+															//This is not possible, so go to next attempt
 															break checkLocationOne;
 														}
 													}
-													if(gameBoard[checkRow+x][checkCol+y][1]==2||gameBoard[checkRow+x][checkCol+y][2]==2||gameBoard[checkRow+x][checkCol+y][3]==2||gameBoard[checkRow+x][checkCol+y][4]==2||gameBoard[checkRow+x][checkCol+y][5]==2||(checkCol-startCol)>numCols||(checkRow-startRow)>numRows||gameBoard[checkRow+x][checkCol+y][1]!=0||gameBoard[checkRow+x][checkCol+y][0]!=roomNum){
-										  			//This space either has something on it, or it has a door... and furniture can't block doors
-														//It may also extend through wall
-														//This is not possible, so go to next attempt
-														break checkLocationOne;
-													}
 												}
-											}
-											//If we get here, this part actually fits. Place it here and exit placeFurniture
-											//Which is actually going to be a very similar loop
-											for(let x=0;x<tempFurnHeight;x++){
-												//I don't need to check here if this row is open in the room because the next part will do that.
-												for(let y=0;y<tempFurnWidth;y+=1){
-													gameBoard[checkRow+x][checkCol+y][1]=tempFurn +" (furniture)";//Added furniture tag so I can check to see if this is when placing doors later on other side
-													if(tempFurnWidth!=1||tempFurnHeight!=1){
-														if(x==0&&y==0){
-															LastLocation=2.1;
-														//	document.getElementById("furnitureCode").innerHTML=LastLocation;
-															gameBoard[checkRow+x][checkCol+y][1]="^"+tempFurnHeight+"^"+tempFurnWidth+"^"+tempFurn+" (big furniture)";
-														}else{
-															LastLocation=2.11;
-															//document.getElementById("furnitureCode").innerHTML=LastLocation;
-															gameBoard[checkRow+x][checkCol+y][1]="@"+tempFurn+" (big furniture)";
+												//If we get here, this part actually fits. Place it here and exit placeFurniture
+												//Which is actually going to be a very similar loop
+												for(let x=0;x<tempFurnHeight;x++){
+													//I don't need to check here if this row is open in the room because the next part will do that.
+													for(let y=0;y<tempFurnWidth;y+=1){
+														gameBoard[checkRow+x][checkCol+y][1]=tempFurn +" (furniture)";//Added furniture tag so I can check to see if this is when placing doors later on other side
+														if(tempFurnWidth!=1||tempFurnHeight!=1){
+															if(x==0&&y==0){
+
+																gameBoard[checkRow+x][checkCol+y][1]="^"+tempFurnHeight+"^"+tempFurnWidth+"^"+tempFurn+" (big furniture)";
+															}else{
+
+																gameBoard[checkRow+x][checkCol+y][1]="@"+tempFurn+" (big furniture)";
+															}
 														}
 													}
 												}
+												break placeFurniture;
 											}
-											break placeFurniture;
+											checkCol++;
 										}
-										checkCol++;
 									}
-								}
 
-								//That didn't work, so now let's try moving from the start position down.
-								trySecondDirection:{
-									checkRow=randomRow;
-									checkCol=randomCol;
+									//That didn't work, so now let's try moving from the start position down.
+									trySecondDirection:{
+										checkRow=randomRow;
+										checkCol=randomCol;
 
 
-									while(((checkCol-startCol)+tempFurnWidth)<=numCols&&((checkRow-startRow)+tempFurnHeight)<=numRows){
-										checkLocationTwo:{
-											for(let x=0;x<tempFurnHeight;x++){
-												for(let y=0;y<tempFurnWidth;y+=1){
-													if(furnArea>=3){
-														if(nextToMedOrLarge(checkRow+x,checkCol+y)==true){
-															//This checks to see if a large item of furniture is next to another large item.
+										while(((checkCol-startCol)+tempFurnWidth)<=numCols&&((checkRow-startRow)+tempFurnHeight)<=numRows){
+											checkLocationTwo:{
+												for(let x=0;x<tempFurnHeight;x++){
+													for(let y=0;y<tempFurnWidth;y+=1){
+														if(furnArea>=3){
+															if(nextToMedOrLarge(checkRow+x,checkCol+y)==true){
+																//This checks to see if a large item of furniture is next to another large item.
+																break checkLocationTwo;
+															}
+														}
+														if(gameBoard[checkRow+x][checkCol+y][1]==2||gameBoard[checkRow+x][checkCol+y][2]==2||gameBoard[checkRow+x][checkCol+y][3]==2||gameBoard[checkRow+x][checkCol+y][4]==2||gameBoard[checkRow+x][checkCol+y][5]==2||(checkCol-startCol)>numCols||(checkRow-startRow)>numRows||gameBoard[checkRow+x][checkCol+y][1]!=0||gameBoard[checkRow+x][checkCol+y][0]!=roomNum){
+											  			//This space either has something on it, or it has a door... and furniture can't block doors
+															//It may also extend through wall
+															//This is not possible, so go to next attempt
 															break checkLocationTwo;
 														}
 													}
-													if(gameBoard[checkRow+x][checkCol+y][1]==2||gameBoard[checkRow+x][checkCol+y][2]==2||gameBoard[checkRow+x][checkCol+y][3]==2||gameBoard[checkRow+x][checkCol+y][4]==2||gameBoard[checkRow+x][checkCol+y][5]==2||(checkCol-startCol)>numCols||(checkRow-startRow)>numRows||gameBoard[checkRow+x][checkCol+y][1]!=0||gameBoard[checkRow+x][checkCol+y][0]!=roomNum){
-										  			//This space either has something on it, or it has a door... and furniture can't block doors
-														//It may also extend through wall
-														//This is not possible, so go to next attempt
-														break checkLocationTwo;
-													}
 												}
-											}
-											//If we get here, this part actually fits. Place it here and exit placeFurniture
-											//Which is actually going to be a very similar loop
-											for(let x=0;x<tempFurnHeight;x++){
-												//I don't need to check here if this row is open in the room because the next part will do that.
-												for(let y=0;y<tempFurnWidth;y+=1){
-													gameBoard[checkRow+x][checkCol+y][1]=tempFurn+" (furniture)";//Added furniture tag so I can check to see if this is when placing doors later on other side
-													if(tempFurnWidth!=1||tempFurnHeight!=1){
-														if(x==0&&y==0){
-															LastLocation=2.2;
-														//	document.getElementById("furnitureCode").innerHTML=LastLocation;
-															gameBoard[checkRow+x][checkCol+y][1]="^"+tempFurnHeight+"^"+tempFurnWidth+"^"+tempFurn+" (big furniture)";
-														}else{
-															LastLocation=2.21;
-														//	document.getElementById("furnitureCode").innerHTML=LastLocation;
-															gameBoard[checkRow+x][checkCol+y][1]="@"+tempFurn+" (big furniture)";
+												//If we get here, this part actually fits. Place it here and exit placeFurniture
+												//Which is actually going to be a very similar loop
+												for(let x=0;x<tempFurnHeight;x++){
+													//I don't need to check here if this row is open in the room because the next part will do that.
+													for(let y=0;y<tempFurnWidth;y+=1){
+														gameBoard[checkRow+x][checkCol+y][1]=tempFurn+" (furniture)";//Added furniture tag so I can check to see if this is when placing doors later on other side
+														if(tempFurnWidth!=1||tempFurnHeight!=1){
+															if(x==0&&y==0){
+
+																gameBoard[checkRow+x][checkCol+y][1]="^"+tempFurnHeight+"^"+tempFurnWidth+"^"+tempFurn+" (big furniture)";
+															}else{
+
+																gameBoard[checkRow+x][checkCol+y][1]="@"+tempFurn+" (big furniture)";
+															}
 														}
 													}
 												}
+												break placeFurniture;
 											}
-											break placeFurniture;
+											checkRow++;
 										}
-										checkRow++;
 									}
-								}
 
-								//That still didn't work, so now let's try moving from the start position down but hanging to the left.
-								tryThirdDirection:{
-									checkRow=randomRow;
-									checkCol=randomCol;
+									//That still didn't work, so now let's try moving from the start position down but hanging to the left.
+									tryThirdDirection:{
+										checkRow=randomRow;
+										checkCol=randomCol;
 
 
-									while(((checkCol-tempFurnWidth)+1)>=startCol&&((checkRow-startRow)+tempFurnHeight)<=numRows){
-										checkLocationThree:{
-											for(let x=0;x<tempFurnHeight;x++){
-												for(let y=0;y<tempFurnWidth;y+=1){
-													if(furnArea>=3){
-														if(nextToMedOrLarge(checkRow+x,checkCol-y)==true){
-															//This checks to see if a large item of furniture is next to another large item.
+										while(((checkCol-tempFurnWidth)+1)>=startCol&&((checkRow-startRow)+tempFurnHeight)<=numRows){
+											checkLocationThree:{
+												for(let x=0;x<tempFurnHeight;x++){
+													for(let y=0;y<tempFurnWidth;y+=1){
+														if(furnArea>=3){
+															if(nextToMedOrLarge(checkRow+x,checkCol-y)==true){
+																//This checks to see if a large item of furniture is next to another large item.
+																break checkLocationThree;
+															}
+														}
+														if(gameBoard[checkRow+x][checkCol-y][1]==2||gameBoard[checkRow+x][checkCol-y][2]==2||gameBoard[checkRow+x][checkCol-y][3]==2||gameBoard[checkRow+x][checkCol-y][4]==2||gameBoard[checkRow+x][checkCol-y][5]==2||(checkCol-startCol)>numCols||(checkRow-startRow)>numRows||gameBoard[checkRow+x][checkCol-y][1]!=0||gameBoard[checkRow+x][checkCol-y][0]!=roomNum){
+											  			//This space either has something on it, or it has a door... and furniture can't block doors
+															//It may also extend through wall
+															//This is not possible, so go to next attempt
 															break checkLocationThree;
 														}
 													}
-													if(gameBoard[checkRow+x][checkCol-y][1]==2||gameBoard[checkRow+x][checkCol-y][2]==2||gameBoard[checkRow+x][checkCol-y][3]==2||gameBoard[checkRow+x][checkCol-y][4]==2||gameBoard[checkRow+x][checkCol-y][5]==2||(checkCol-startCol)>numCols||(checkRow-startRow)>numRows||gameBoard[checkRow+x][checkCol-y][1]!=0||gameBoard[checkRow+x][checkCol-y][0]!=roomNum){
-										  			//This space either has something on it, or it has a door... and furniture can't block doors
-														//It may also extend through wall
-														//This is not possible, so go to next attempt
-														break checkLocationThree;
-													}
 												}
-											}
-											//If we get here, this part actually fits. Place it here and exit placeFurniture
-											//Which is actually going to be a very similar loop
-											for(let x=0;x<tempFurnHeight;x++){
-												//I don't need to check here if this row is open in the room because the next part will do that.
-												for(let y=0;y<tempFurnWidth;y+=1){
-													gameBoard[checkRow+x][checkCol-y][1]=tempFurn+" (furniture)";//Added furniture tag so I can check to see if this is when placing doors later on other side
-													if(tempFurnWidth!=1||tempFurnHeight!=1){
-														if(x==0&&y==(tempFurnWidth-1)){
-															LastLocation=2.3;
-													//		document.getElementById("furnitureCode").innerHTML=LastLocation;
-															gameBoard[checkRow+x][checkCol-y][1]="^"+tempFurnHeight+"^"+tempFurnWidth+"^"+tempFurn+" (big furniture)";
-														}else{
-															LastLocation=2.31;
-													//		document.getElementById("furnitureCode").innerHTML=LastLocation;
-															gameBoard[checkRow+x][checkCol-y][1]="@"+tempFurn+" (big furniture)";
+												//If we get here, this part actually fits. Place it here and exit placeFurniture
+												//Which is actually going to be a very similar loop
+												for(let x=0;x<tempFurnHeight;x++){
+													//I don't need to check here if this row is open in the room because the next part will do that.
+													for(let y=0;y<tempFurnWidth;y+=1){
+														gameBoard[checkRow+x][checkCol-y][1]=tempFurn+" (furniture)";//Added furniture tag so I can check to see if this is when placing doors later on other side
+														if(tempFurnWidth!=1||tempFurnHeight!=1){
+															if(x==0&&y==(tempFurnWidth-1)){
+
+																gameBoard[checkRow+x][checkCol-y][1]="^"+tempFurnHeight+"^"+tempFurnWidth+"^"+tempFurn+" (big furniture)";
+															}else{
+
+																gameBoard[checkRow+x][checkCol-y][1]="@"+tempFurn+" (big furniture)";
+															}
 														}
 													}
 												}
+												break placeFurniture;
 											}
-											break placeFurniture;
+											checkRow++;
 										}
-										checkRow++;
 									}
-								}
 
-								//That still didn't work, so now let's try moving from the start position left but hanging to the left.
-								tryFourthDirection:{
-									checkRow=randomRow;
-									checkCol=randomCol;
+									//That still didn't work, so now let's try moving from the start position left but hanging to the left.
+									tryFourthDirection:{
+										checkRow=randomRow;
+										checkCol=randomCol;
 
 
-									while(((checkCol-tempFurnWidth)+1)>=startCol&&((checkRow-startRow)+tempFurnHeight)<=numRows){
-										checkLocationFour:{
-											for(let x=0;x<tempFurnHeight;x++){
-												for(let y=0;y<tempFurnWidth;y+=1){
-													if(furnArea>=3){
-														if(nextToMedOrLarge(checkRow+x,checkCol-y)==true){
-															//This checks to see if a large item of furniture is next to another large item.
+										while(((checkCol-tempFurnWidth)+1)>=startCol&&((checkRow-startRow)+tempFurnHeight)<=numRows){
+											checkLocationFour:{
+												for(let x=0;x<tempFurnHeight;x++){
+													for(let y=0;y<tempFurnWidth;y+=1){
+														if(furnArea>=3){
+															if(nextToMedOrLarge(checkRow+x,checkCol-y)==true){
+																//This checks to see if a large item of furniture is next to another large item.
+																break checkLocationFour;
+															}
+														}
+														if(gameBoard[checkRow+x][checkCol-y][1]==2||gameBoard[checkRow+x][checkCol-y][2]==2||gameBoard[checkRow+x][checkCol-y][3]==2||gameBoard[checkRow+x][checkCol-y][4]==2||gameBoard[checkRow+x][checkCol-y][5]==2||(checkCol-startCol)>numCols||(checkRow-startRow)>numRows||gameBoard[checkRow+x][checkCol-y][1]!=0||gameBoard[checkRow+x][checkCol-y][0]!=roomNum){
+															//This space either has something on it, or it has a door... and furniture can't block doors
+															//It may also extend through wall
+															//This is not possible, so go to next attempt
 															break checkLocationFour;
 														}
 													}
-													if(gameBoard[checkRow+x][checkCol-y][1]==2||gameBoard[checkRow+x][checkCol-y][2]==2||gameBoard[checkRow+x][checkCol-y][3]==2||gameBoard[checkRow+x][checkCol-y][4]==2||gameBoard[checkRow+x][checkCol-y][5]==2||(checkCol-startCol)>numCols||(checkRow-startRow)>numRows||gameBoard[checkRow+x][checkCol-y][1]!=0||gameBoard[checkRow+x][checkCol-y][0]!=roomNum){
-														//This space either has something on it, or it has a door... and furniture can't block doors
-														//It may also extend through wall
-														//This is not possible, so go to next attempt
-														break checkLocationFour;
-													}
 												}
-											}
-											//If we get here, this part actually fits. Place it here and exit placeFurniture
-											//Which is actually going to be a very similar loop
-											for(let x=0;x<tempFurnHeight;x++){
-												//I don't need to check here if this row is open in the room because the next part will do that.
-												for(let y=0;y<tempFurnWidth;y+=1){
-													gameBoard[checkRow+x][checkCol-y][1]=tempFurn+" (furniture)";//Added furniture tag so I can check to see if this is when placing doors later on other side
-													if(tempFurnWidth!=1||tempFurnHeight!=1){
-														if(x==0&&y==(tempFurnWidth-1)){
-															LastLocation=2.4;
-													//		document.getElementById("furnitureCode").innerHTML=LastLocation;
-															gameBoard[checkRow+x][checkCol-y][1]="^"+tempFurnHeight+"^"+tempFurnWidth+"^"+tempFurn+" (big furniture)";
-														}else{
-															LastLocation=2.41;
-													//		document.getElementById("furnitureCode").innerHTML=LastLocation;
-															gameBoard[checkRow+x][checkCol-y][1]="@"+tempFurn+" (big furniture)";
+												//If we get here, this part actually fits. Place it here and exit placeFurniture
+												//Which is actually going to be a very similar loop
+												for(let x=0;x<tempFurnHeight;x++){
+													//I don't need to check here if this row is open in the room because the next part will do that.
+													for(let y=0;y<tempFurnWidth;y+=1){
+														gameBoard[checkRow+x][checkCol-y][1]=tempFurn+" (furniture)";//Added furniture tag so I can check to see if this is when placing doors later on other side
+														if(tempFurnWidth!=1||tempFurnHeight!=1){
+															if(x==0&&y==(tempFurnWidth-1)){
+
+																gameBoard[checkRow+x][checkCol-y][1]="^"+tempFurnHeight+"^"+tempFurnWidth+"^"+tempFurn+" (big furniture)";
+															}else{
+
+																gameBoard[checkRow+x][checkCol-y][1]="@"+tempFurn+" (big furniture)";
+															}
 														}
 													}
 												}
+												break placeFurniture;
 											}
-											break placeFurniture;
+											checkCol--;
 										}
-										checkCol--;
 									}
-								}
-								//That still didn't work, so now let's try moving from the start position left but sticking up to the left.
-								tryFifthDirection:{
-									checkRow=randomRow;
-									checkCol=randomCol;
+									//That still didn't work, so now let's try moving from the start position left but sticking up to the left.
+									tryFifthDirection:{
+										checkRow=randomRow;
+										checkCol=randomCol;
 
 
-									while(((checkCol-tempFurnWidth)+1)>=startCol&&((checkRow-tempFurnHeight)+1)>=startRow){
-										checkLocationFive:{
-											for(let x=0;x<tempFurnHeight;x++){
-												for(let y=0;y<tempFurnWidth;y+=1){
-													if(furnArea>=3){
-														if(nextToMedOrLarge(checkRow-x,checkCol-y)==true){
-															//This checks to see if a large item of furniture is next to another large item.
+										while(((checkCol-tempFurnWidth)+1)>=startCol&&((checkRow-tempFurnHeight)+1)>=startRow){
+											checkLocationFive:{
+												for(let x=0;x<tempFurnHeight;x++){
+													for(let y=0;y<tempFurnWidth;y+=1){
+														if(furnArea>=3){
+															if(nextToMedOrLarge(checkRow-x,checkCol-y)==true){
+																//This checks to see if a large item of furniture is next to another large item.
+																break checkLocationFive;
+															}
+														}
+														if(gameBoard[checkRow-x][checkCol-y][1]==2||gameBoard[checkRow-x][checkCol-y][2]==2||gameBoard[checkRow-x][checkCol-y][3]==2||gameBoard[checkRow-x][checkCol-y][4]==2||gameBoard[checkRow-x][checkCol-y][5]==2||(checkCol-startCol)>numCols||(checkRow-startRow)>numRows||gameBoard[checkRow-x][checkCol-y][1]!=0||gameBoard[checkRow-x][checkCol-y][0]!=roomNum){
+															//This space either has something on it, or it has a door... and furniture can't block doors
+															//It may also extend through wall
+															//This is not possible, so go to next attempt
 															break checkLocationFive;
 														}
 													}
-													if(gameBoard[checkRow-x][checkCol-y][1]==2||gameBoard[checkRow-x][checkCol-y][2]==2||gameBoard[checkRow-x][checkCol-y][3]==2||gameBoard[checkRow-x][checkCol-y][4]==2||gameBoard[checkRow-x][checkCol-y][5]==2||(checkCol-startCol)>numCols||(checkRow-startRow)>numRows||gameBoard[checkRow-x][checkCol-y][1]!=0||gameBoard[checkRow-x][checkCol-y][0]!=roomNum){
-														//This space either has something on it, or it has a door... and furniture can't block doors
-														//It may also extend through wall
-														//This is not possible, so go to next attempt
-														break checkLocationFive;
-													}
 												}
-											}
-											//If we get here, this part actually fits. Place it here and exit placeFurniture
-											//Which is actually going to be a very similar loop
-											for(let x=0;x<tempFurnHeight;x++){
-												//I don't need to check here if this row is open in the room because the next part will do that.
-												for(let y=0;y<tempFurnWidth;y+=1){
-													gameBoard[checkRow-x][checkCol-y][1]=tempFurn+" (furniture)";//Added furniture tag so I can check to see if this is when placing doors later on other side
-													if(tempFurnWidth!=1||tempFurnHeight!=1){
-														if(x==(tempFurnHeight-1)&&y==(tempFurnWidth-1)){
-															LastLocation=2.5;
-													//		document.getElementById("furnitureCode").innerHTML=LastLocation;
-															gameBoard[checkRow-x][checkCol-y][1]="^"+tempFurnHeight+"^"+tempFurnWidth+"^"+tempFurn+" (big furniture)";
-														}else{
-															LastLocation=2.51;
-														//	document.getElementById("furnitureCode").innerHTML=LastLocation;
-															gameBoard[checkRow-x][checkCol-y][1]="@"+tempFurn+" (big furniture)";
+												//If we get here, this part actually fits. Place it here and exit placeFurniture
+												//Which is actually going to be a very similar loop
+												for(let x=0;x<tempFurnHeight;x++){
+													//I don't need to check here if this row is open in the room because the next part will do that.
+													for(let y=0;y<tempFurnWidth;y+=1){
+														gameBoard[checkRow-x][checkCol-y][1]=tempFurn+" (furniture)";//Added furniture tag so I can check to see if this is when placing doors later on other side
+														if(tempFurnWidth!=1||tempFurnHeight!=1){
+															if(x==(tempFurnHeight-1)&&y==(tempFurnWidth-1)){
+
+																gameBoard[checkRow-x][checkCol-y][1]="^"+tempFurnHeight+"^"+tempFurnWidth+"^"+tempFurn+" (big furniture)";
+															}else{
+
+																gameBoard[checkRow-x][checkCol-y][1]="@"+tempFurn+" (big furniture)";
+															}
 														}
 													}
 												}
+												break placeFurniture;
 											}
-											break placeFurniture;
+											checkCol--;
 										}
-										checkCol--;
 									}
-								}
 
-								//That still didn't work, so now let's try moving from the start position up sticking up to the left.
-								trySixthDirection:{
-									checkRow=randomRow;
-									checkCol=randomCol;
+									//That still didn't work, so now let's try moving from the start position up sticking up to the left.
+									trySixthDirection:{
+										checkRow=randomRow;
+										checkCol=randomCol;
 
 
-									while(((checkCol-tempFurnWidth)+1)>=startCol&&((checkRow-tempFurnHeight)+1)>=startRow){
-										checkLocationSix:{
-											for(let x=0;x<tempFurnHeight;x++){
-												for(let y=0;y<tempFurnWidth;y+=1){
-													if(furnArea>=3){
-														if(nextToMedOrLarge(checkRow-x,checkCol-y)==true){
-															//This checks to see if a large item of furniture is next to another large item.
+										while(((checkCol-tempFurnWidth)+1)>=startCol&&((checkRow-tempFurnHeight)+1)>=startRow){
+											checkLocationSix:{
+												for(let x=0;x<tempFurnHeight;x++){
+													for(let y=0;y<tempFurnWidth;y+=1){
+														if(furnArea>=3){
+															if(nextToMedOrLarge(checkRow-x,checkCol-y)==true){
+																//This checks to see if a large item of furniture is next to another large item.
+																break checkLocationSix;
+															}
+														}
+														if(gameBoard[checkRow-x][checkCol-y][1]==2||gameBoard[checkRow-x][checkCol-y][2]==2||gameBoard[checkRow-x][checkCol-y][3]==2||gameBoard[checkRow-x][checkCol-y][4]==2||gameBoard[checkRow-x][checkCol-y][5]==2||(checkCol-startCol)>numCols||(checkRow-startRow)>numRows||gameBoard[checkRow-x][checkCol-y][1]!=0||gameBoard[checkRow-x][checkCol-y][0]!=roomNum){
+															//This space either has something on it, or it has a door... and furniture can't block doors
+															//It may also extend through wall
+															//This is not possible, so go to next attempt
 															break checkLocationSix;
 														}
 													}
-													if(gameBoard[checkRow-x][checkCol-y][1]==2||gameBoard[checkRow-x][checkCol-y][2]==2||gameBoard[checkRow-x][checkCol-y][3]==2||gameBoard[checkRow-x][checkCol-y][4]==2||gameBoard[checkRow-x][checkCol-y][5]==2||(checkCol-startCol)>numCols||(checkRow-startRow)>numRows||gameBoard[checkRow-x][checkCol-y][1]!=0||gameBoard[checkRow-x][checkCol-y][0]!=roomNum){
-														//This space either has something on it, or it has a door... and furniture can't block doors
-														//It may also extend through wall
-														//This is not possible, so go to next attempt
-														break checkLocationSix;
-													}
 												}
-											}
-											//If we get here, this part actually fits. Place it here and exit placeFurniture
-											//Which is actually going to be a very similar loop
-											for(let x=0;x<tempFurnHeight;x++){
-												//I don't need to check here if this row is open in the room because the next part will do that.
-												for(let y=0;y<tempFurnWidth;y+=1){
-													gameBoard[checkRow-x][checkCol-y][1]=tempFurn+" (furniture)";//Added furniture tag so I can check to see if this is when placing doors later on other side
-													if(tempFurnWidth!=1||tempFurnHeight!=1){
-														if(x==(tempFurnHeight-1)&&y==(tempFurnWidth-1)){
-															LastLocation=2.6;
-														//	document.getElementById("furnitureCode").innerHTML=LastLocation;
-															gameBoard[checkRow-x][checkCol-y][1]="^"+tempFurnHeight+"^"+tempFurnWidth+"^"+tempFurn+" (big furniture)";
-														}else{
-															LastLocation=2.61;
-														//	document.getElementById("furnitureCode").innerHTML=LastLocation;
-															gameBoard[checkRow-x][checkCol-y][1]="@"+tempFurn+" (big furniture)";
+												//If we get here, this part actually fits. Place it here and exit placeFurniture
+												//Which is actually going to be a very similar loop
+												for(let x=0;x<tempFurnHeight;x++){
+													//I don't need to check here if this row is open in the room because the next part will do that.
+													for(let y=0;y<tempFurnWidth;y+=1){
+														gameBoard[checkRow-x][checkCol-y][1]=tempFurn+" (furniture)";//Added furniture tag so I can check to see if this is when placing doors later on other side
+														if(tempFurnWidth!=1||tempFurnHeight!=1){
+															if(x==(tempFurnHeight-1)&&y==(tempFurnWidth-1)){
+
+																gameBoard[checkRow-x][checkCol-y][1]="^"+tempFurnHeight+"^"+tempFurnWidth+"^"+tempFurn+" (big furniture)";
+															}else{
+
+																gameBoard[checkRow-x][checkCol-y][1]="@"+tempFurn+" (big furniture)";
+															}
 														}
 													}
 												}
+												break placeFurniture;
 											}
-											break placeFurniture;
+											checkRow--;
 										}
-										checkRow--;
 									}
-								}
 
-								//That still didn't work, so now let's try moving from the start position up sticking up to the right.
-								trySeventhDirection:{
-									checkRow=randomRow;
-									checkCol=randomCol;
+									//That still didn't work, so now let's try moving from the start position up sticking up to the right.
+									trySeventhDirection:{
+										checkRow=randomRow;
+										checkCol=randomCol;
 
 
-									while(((checkCol+tempFurnWidth)-startCol)<=numCols&&((checkRow-tempFurnHeight)+1)>=startRow){
-										checkLocationSeven:{
-											for(let x=0;x<tempFurnHeight;x++){
-												for(let y=0;y<tempFurnWidth;y+=1){
-													if(furnArea>=3){
-														if(nextToMedOrLarge(checkRow-x,checkCol+y)==true){
-															//This checks to see if a large item of furniture is next to another large item.
+										while(((checkCol+tempFurnWidth)-startCol)<=numCols&&((checkRow-tempFurnHeight)+1)>=startRow){
+											checkLocationSeven:{
+												for(let x=0;x<tempFurnHeight;x++){
+													for(let y=0;y<tempFurnWidth;y+=1){
+														if(furnArea>=3){
+															if(nextToMedOrLarge(checkRow-x,checkCol+y)==true){
+																//This checks to see if a large item of furniture is next to another large item.
+																break checkLocationSeven;
+															}
+														}
+														if(gameBoard[checkRow-x][checkCol+y][1]==2||gameBoard[checkRow-x][checkCol+y][2]==2||gameBoard[checkRow-x][checkCol+y][3]==2||gameBoard[checkRow-x][checkCol+y][4]==2||gameBoard[checkRow-x][checkCol+y][5]==2||(checkCol-startCol)>numCols||(checkRow-startRow)>numRows||gameBoard[checkRow-x][checkCol+y][1]!=0||gameBoard[checkRow-x][checkCol+y][0]!=roomNum){
+															//This space either has something on it, or it has a door... and furniture can't block doors
+															//It may also extend through wall
+															//This is not possible, so go to next attempt
 															break checkLocationSeven;
 														}
 													}
-													if(gameBoard[checkRow-x][checkCol+y][1]==2||gameBoard[checkRow-x][checkCol+y][2]==2||gameBoard[checkRow-x][checkCol+y][3]==2||gameBoard[checkRow-x][checkCol+y][4]==2||gameBoard[checkRow-x][checkCol+y][5]==2||(checkCol-startCol)>numCols||(checkRow-startRow)>numRows||gameBoard[checkRow-x][checkCol+y][1]!=0||gameBoard[checkRow-x][checkCol+y][0]!=roomNum){
-														//This space either has something on it, or it has a door... and furniture can't block doors
-														//It may also extend through wall
-														//This is not possible, so go to next attempt
-														break checkLocationSeven;
-													}
 												}
-											}
-											//If we get here, this part actually fits. Place it here and exit placeFurniture
-											//Which is actually going to be a very similar loop
-											for(let x=0;x<tempFurnHeight;x++){
-												//I don't need to check here if this row is open in the room because the next part will do that.
-												for(let y=0;y<tempFurnWidth;y+=1){
-													gameBoard[checkRow-x][checkCol+y][1]=tempFurn+" (furniture)";//Added furniture tag so I can check to see if this is when placing doors later on other side;
-													if(tempFurnWidth!=1||tempFurnHeight!=1){
-														if(x==(tempFurnHeight-1)&&y==0){
-															LastLocation=2.7;
-													//		document.getElementById("furnitureCode").innerHTML=LastLocation;
-															gameBoard[checkRow-x][checkCol+y][1]="^"+tempFurnHeight+"^"+tempFurnWidth+"^"+tempFurn+" (big furniture)";
-														}else{
-															LastLocation=2.71;
-													//		document.getElementById("furnitureCode").innerHTML=LastLocation;
-															gameBoard[checkRow-x][checkCol+y][1]="@"+tempFurn+" (big furniture)";
+												//If we get here, this part actually fits. Place it here and exit placeFurniture
+												//Which is actually going to be a very similar loop
+												for(let x=0;x<tempFurnHeight;x++){
+													//I don't need to check here if this row is open in the room because the next part will do that.
+													for(let y=0;y<tempFurnWidth;y+=1){
+														gameBoard[checkRow-x][checkCol+y][1]=tempFurn+" (furniture)";//Added furniture tag so I can check to see if this is when placing doors later on other side;
+														if(tempFurnWidth!=1||tempFurnHeight!=1){
+															if(x==(tempFurnHeight-1)&&y==0){
+
+																gameBoard[checkRow-x][checkCol+y][1]="^"+tempFurnHeight+"^"+tempFurnWidth+"^"+tempFurn+" (big furniture)";
+															}else{
+
+																gameBoard[checkRow-x][checkCol+y][1]="@"+tempFurn+" (big furniture)";
+															}
 														}
 													}
 												}
+												break placeFurniture;
 											}
-											break placeFurniture;
+											checkRow--;
 										}
-										checkRow--;
 									}
-								}
 
-								//That still didn't work, so now let's try moving from the start position right sticking up to the right.
-								tryEigthDirection:{
-									checkRow=randomRow;
-									checkCol=randomCol;
+									//That still didn't work, so now let's try moving from the start position right sticking up to the right.
+									tryEigthDirection:{
+										checkRow=randomRow;
+										checkCol=randomCol;
 
 
-									while(((checkCol+tempFurnWidth)-startCol)<=numCols&&((checkRow-tempFurnHeight)+1)>=startRow){
-										checkLocationEight:{
-											for(let x=0;x<tempFurnHeight;x++){
-												for(let y=0;y<tempFurnWidth;y+=1){
-													if(furnArea>=3){
-														if(nextToMedOrLarge(checkRow-x,checkCol+y)==true){
-															//This checks to see if a large item of furniture is next to another large item.
+										while(((checkCol+tempFurnWidth)-startCol)<=numCols&&((checkRow-tempFurnHeight)+1)>=startRow){
+											checkLocationEight:{
+												for(let x=0;x<tempFurnHeight;x++){
+													for(let y=0;y<tempFurnWidth;y+=1){
+														if(furnArea>=3){
+															if(nextToMedOrLarge(checkRow-x,checkCol+y)==true){
+																//This checks to see if a large item of furniture is next to another large item.
+																break checkLocationEight;
+															}
+														}
+														if(gameBoard[checkRow-x][checkCol+y][1]==2||gameBoard[checkRow-x][checkCol+y][2]==2||gameBoard[checkRow-x][checkCol+y][3]==2||gameBoard[checkRow-x][checkCol+y][4]==2||gameBoard[checkRow-x][checkCol+y][5]==2||(checkCol-startCol)>numCols||(checkRow-startRow)>numRows||gameBoard[checkRow-x][checkCol+y][1]!=0||gameBoard[checkRow-x][checkCol+y][0]!=roomNum){
+															//This space either has something on it, or it has a door... and furniture can't block doors
+															//It may also extend through wall
+															//This is not possible, so go to next attempt
 															break checkLocationEight;
 														}
 													}
-													if(gameBoard[checkRow-x][checkCol+y][1]==2||gameBoard[checkRow-x][checkCol+y][2]==2||gameBoard[checkRow-x][checkCol+y][3]==2||gameBoard[checkRow-x][checkCol+y][4]==2||gameBoard[checkRow-x][checkCol+y][5]==2||(checkCol-startCol)>numCols||(checkRow-startRow)>numRows||gameBoard[checkRow-x][checkCol+y][1]!=0||gameBoard[checkRow-x][checkCol+y][0]!=roomNum){
-														//This space either has something on it, or it has a door... and furniture can't block doors
-														//It may also extend through wall
-														//This is not possible, so go to next attempt
-														break checkLocationEight;
-													}
 												}
-											}
-											//If we get here, this part actually fits. Place it here and exit placeFurniture
-											//Which is actually going to be a very similar loop
-											for(let x=0;x<tempFurnHeight;x++){
-												//I don't need to check here if this row is open in the room because the next part will do that.
-												for(let y=0;y<tempFurnWidth;y+=1){
-													gameBoard[checkRow-x][checkCol+y][1]=tempFurn+" (furniture)";//Added furniture tag so I can check to see if this is when placing doors later on other side;
-													if(tempFurnWidth!=1||tempFurnHeight!=1){
-														if(x==(tempFurnHeight-1)&&y==0){
-															LastLocation=2.8;
-												//			document.getElementById("furnitureCode").innerHTML=LastLocation;
-															gameBoard[checkRow-x][checkCol+y][1]="^"+tempFurnHeight+"^"+tempFurnWidth+"^"+tempFurn+" (big furniture)";
-														}else{
-															LastLocation=2.81;
-													//		document.getElementById("furnitureCode").innerHTML=LastLocation;
-															gameBoard[checkRow-x][checkCol+y][1]="@"+tempFurn+" (big furniture)";
+												//If we get here, this part actually fits. Place it here and exit placeFurniture
+												//Which is actually going to be a very similar loop
+												for(let x=0;x<tempFurnHeight;x++){
+													//I don't need to check here if this row is open in the room because the next part will do that.
+													for(let y=0;y<tempFurnWidth;y+=1){
+														gameBoard[checkRow-x][checkCol+y][1]=tempFurn+" (furniture)";//Added furniture tag so I can check to see if this is when placing doors later on other side;
+														if(tempFurnWidth!=1||tempFurnHeight!=1){
+															if(x==(tempFurnHeight-1)&&y==0){
+
+																gameBoard[checkRow-x][checkCol+y][1]="^"+tempFurnHeight+"^"+tempFurnWidth+"^"+tempFurn+" (big furniture)";
+															}else{
+
+																gameBoard[checkRow-x][checkCol+y][1]="@"+tempFurn+" (big furniture)";
+															}
 														}
 													}
 												}
+												break placeFurniture;
 											}
-											break placeFurniture;
+											checkCol++;
 										}
-										checkCol++;
 									}
+
+
+
+							 		//If we get to here it didn't fit. Try rotating it 90 degrees and giving another shot
+									//alert(tempFurn+" didn't fit "+tempFurnWidth +"x"+tempFurnHeight+" -Rotating");
+									randomChance=tempFurnWidth;
+									tempFurnWidth=tempFurnHeight;
+									tempFurnHeight=randomChance;
 								}
-
-
-
-						 		//If we get to here it didn't fit. Try rotating it 90 degrees and giving another shot
-								//alert(tempFurn+" didn't fit "+tempFurnWidth +"x"+tempFurnHeight+" -Rotating");
-								randomChance=tempFurnWidth;
-								tempFurnWidth=tempFurnHeight;
-								tempFurnHeight=randomChance;
 							}
 						}
 					}
+					numItems--;
 				}
-				numItems--;
-			}
-			break;
+				break;
+		}
 	}
 
 
-	LastLocation=3;
-	//document.getElementById("statusCode").innerHTML=LastLocation;
 	//Place Creatures
 	randomChance=Math.floor(Math.random()*21);
 
@@ -2574,31 +2637,33 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 			case 4:
 			case 5:
 			case 6:
-			case 7:
 				numItems=2;
 				break;
+			case 7:
 			case 8:
 			case 9:
-			case 10:
-			case 11:
 				numItems=3;
 				break;
+			case 10:
+			case 11:
 			case 12:
-			case 13:
-			case 14:
 				numItems=4;
 				break;
+			case 13:
+			case 14:
 			case 15:
+					numItems=5;
+					break;
 			case 16:
 			case 17:
-					numItems=5;
+					numItems=6;
 					break;
 			case 18:
 			case 19:
-					numItems=6;
+					numItems=7;
 					break;
 			case 20:
-					numItems=7;
+					numItems=8;
 					break;
 			default:
 				numItems=0;
@@ -2695,8 +2760,9 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 	}
 
 
-	LastLocation=4;
-	//document.getElementById("statusCode").innerHTML=LastLocation;
+
+
+	if(isLastRoom==0){
 	//Place Search Items
 	randomChance=Math.floor(Math.random()*21);
 
@@ -2771,14 +2837,28 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 				if(roomNum==16&&randomCol==17&&randomRow==13){
 					//Do nothing, this is that weird notch in one room and we place nothing.
 				}else{
-					gameBoard[randomRow][randomCol][1]=tempFurn;
-				}
-				if(roomNum==34||roomNum==35){
-					//This is actually a block, and this is the wide hall, so it needs to place both blocks
-					if(randomCol==startCol){
-							gameBoard[randomRow][randomCol+1][1]=tempFurn;
-					}else {
-						gameBoard[randomRow][randomCol-1][1]=tempFurn;
+					/*gameBoard[randomRow][randomCol][1]=tempFurn;
+				}*/
+					if(roomNum==34||roomNum==35){
+						//This is actually a block, and this is the wide hall, so it needs to place both blocks
+						if(randomCol==startCol){
+								//Check to make sure there is no door on either side first, through
+								if(gameBoard[randomRow][randomCol][2]==2||gameBoard[randomRow][randomCol+1][3]==2){
+									//Don't place the blocks
+								}else{
+									gameBoard[randomRow][randomCol+1][1]=tempFurn;
+									gameBoard[randomRow][randomCol][1]=tempFurn;
+								}
+						}else {
+							if(gameBoard[randomRow][randomCol-1][2]==2||gameBoard[randomRow][randomCol][3]==2){
+								//Don't place the blocks
+							}else{
+								gameBoard[randomRow][randomCol-1][1]=tempFurn;
+								gameBoard[randomRow][randomCol][1]=tempFurn;
+							}
+						}
+					}else{
+						gameBoard[randomRow][randomCol][1]=tempFurn;
 					}
 				}
 			}
@@ -2813,13 +2893,12 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 		}
 		numItems--;
 	}
-
+	}
 
 	roomCount++;
-
+	gameBoard[startRow][startCol][7]=1;
 	document.getElementById("results").value="("+curTime+" Room " +roomNum +")"
-	LastLocation=5;
-	//document.getElementById("statusCode").innerHTML=LastLocation;
+
 }
 
 document.querySelector('#gameBoard')
@@ -2835,6 +2914,7 @@ document.querySelector('#gameBoard')
 		roomNum=gameBoard[ev.target.parentElement.rowIndex][ev.target.cellIndex][0];
 		//document.getElementById("locationCode").innerHTML=roomNum+" "+(ev.target.parentElement.rowIndex)+" "+ev.target.cellIndex;
 
+
 		switch(roomNum){
 			case 21:
 				//alert(roomNum);
@@ -2844,7 +2924,6 @@ document.querySelector('#gameBoard')
 				openRoomVisually(roomNum,true);
 				break;
 		};
-
 
 		showBoard();
 
