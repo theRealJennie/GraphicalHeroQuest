@@ -145,7 +145,7 @@ Creatures: Creatures will move in the most obvious way and perform the most obvi
 If you run out of a creature, replace with the next toughest creature available on the chart. If no tougher creatures are available, replace with next weakest available.
 </p>
 <p>
-Exiting: When you've cleared all of the lair, return to the stairs. But you'll find a surprise waiting for you there. Use the Open Exit Room button to find out if any creatures have snuck in behind you and cut off your exit. If so, you have to kill them before you can leave.
+Exiting: When you've cleared all of the lair, return to the stairs. But you'll find a surprise waiting for you there. Use the Open Exit Room button to find out if any creatures have snuck in behind you and cut off your exit. If so, you have to kill them before you can leave. Upon leaving, you will get a reward, which is based on the level of the quest.
 </p>
 
 
@@ -254,7 +254,7 @@ function getMonster(isWandering=0, questLevel=0, isHall=0){
 				retVal+="Abomination";
 				break;
 		case (creatureType<78):
-			retVal="Gorgon(2 attack, 4 defend, 2 body, 1 mind, 5 move -- Each turn a gorgon can attack or put someone to sleep. If they put a hero to sleep, the hero remains asleep until rolling a 6. On each turn, a hero may roll 1 die for each mind point. A hero who is asleep may not attack, defend, move, or perform any action. If a hero awakens at the beginning of their turn, they may continue the turn as normal.)"
+			retVal="Gorgon(2 attack, 4 defend, 2 body, 1 mind, 5 move -- Each turn a gorgon can attack or put someone to sleep. If they put a hero to sleep, the hero remains asleep until rolling a 1 or a 6. On each turn, a hero may roll 1 die for each mind point. A hero who is asleep may not attack, defend, move, or perform any action. If a hero awakens at the beginning of their turn, they may continue the turn as normal.)"
 			break;
 		case (creatureType<86):
 			retVal+="Spider(2 attack, 2 defense, 3 body, 1 mind, 7 move -- Any time a spider does damage to a player that player loses their next turn and cannot attack or defend until after their next turn.)";
@@ -403,7 +403,32 @@ function getFurnitureLength(myFurn){
 	}
 	return furnLength;
 }
-
+function showFinalReward(){
+	let questLevel=(parseInt(document.getElementById("questLevel").value,10));
+	var note="Upon successful completion of this quest, each surviving hero is granted ";
+	switch(true){
+		case(questLevel<5):
+			note+="10";
+			break;
+		case(questLevel<10):
+			note+="20";
+			break;
+		case(questLevel<15):
+			note+="30";
+			break;
+		case(questLevel<20):
+			note+="40";
+			break;
+		case(questLevel>=25):
+			note+="50";
+			break;
+		default:
+			note+="5"
+			break;
+	}
+	note+=" gold by King Dunong as a show of His Majesty's gratitude.";
+	alert(note);
+}
 function wanderingMonster(){
 	const d = new Date();
 	let text = d.toLocaleTimeString();
@@ -429,6 +454,7 @@ function openSearch(){
 	let text = d.toLocaleTimeString();
 	let itemType=0;
 	let myList="";
+	var randomTotal=0;
 
 	myList = "(" + text + ")(Search Item)" +'\n' ;
 
@@ -456,8 +482,33 @@ function openSearch(){
 				//It's an artifact
 				myList+=" an artifact!";
 			}else{
-				//Just a treasure
-				myList+=" treasure!";
+				//10% of the time we want treasure to automatically be treasure, not draw a card.
+				randomChance=Math.floor(Math.random()*100);
+				switch(randomChance){
+					case 0:
+					case 1:
+					case 2:
+					case 3:
+						randomTotal=Math.floor(Math.random()*10)*5;
+						myList+=" " + randomTotal + " gold!";
+						break;
+					case 4:
+					case 5:
+					case 6:
+							randomTotal=Math.floor(Math.random()*10)*5;
+							myList+=" a medallion worth " + randomTotal + " gold!";
+							break;
+					case 7:
+					case 8:
+					case 9:
+							randomTotal=Math.floor(Math.random()*10)*5;
+							myList+=" jewels worth " + randomTotal + " gold!";
+							break;
+					default:
+						//Just a treasure
+						myList+=" treasure!";
+						break;
+				}
 			}
 			break;
 		case (itemType<66):
@@ -1614,6 +1665,8 @@ function listRoomContents(roomNum,curTime){
 }
 
 function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
+
+	//This function desperately needs to be refactored to split some sections off into their own functions, which would make it easier to read and maintain
 	var startRow=0;
 	var startCol=0;
 	var numRows=0;
@@ -2657,6 +2710,7 @@ document.querySelector('#gameBoard')
 			case 21:
 				//alert(roomNum);
 				openRoomVisually(roomNum,true,1);
+				showFinalReward();
 				break;
 			default:
 				openRoomVisually(roomNum,true);
