@@ -157,6 +157,7 @@ var LastLocation=0;
 var roomCount=0;
 var gameBoard=new Array(19);
 var gameBoardBackup=new Array(19);
+var artifactCount=0;
 //gameBoard position definitions:
 //0-room number
 //1-contents of that square
@@ -267,21 +268,47 @@ function getMonster(isWandering=0, questLevel=0, isHall=0){
 			break;
 		case (creatureType<104):
 			retVal+="Dread Warrior";
-			randomChance=Math.floor(Math.random()*20)+questLevel;
-			if (randomChance>19){
-				spellCount=Math.floor(Math.random()*(randomChance-19));
-				if (spellCount>0){
-					if(spellCount>5){
+			//randomChance=Math.floor(Math.random()*20)+questLevel;
+			//if (randomChance>19){
+				//spellCount=Math.floor(Math.random()*(randomChance-19));
+				//if (spellCount>0){
+				//	if(spellCount>5){
 						//Don't let them have too many Dread Spells, it'll get ridiculous.
-						if(isHall==1){
-							spellCount=3;
-						}else{
-							spellCount=5;
-						}
-					}
-					retVal+="(" + spellCount + " Dread Spells Drawn From Deck)";
+				//		if(isHall==1){
+				//			spellCount=3;
+				//		}else{
+				//			spellCount=5;
+				//		}
+				//	}
+				switch(true){
+					case (questLevel>9&&questLevel<12):
+						spellCount=1;
+						break;
+					case (questLevel>11&&questLevel<14):
+						spellCount=2;
+						break;
+					case (questLevel>13&&questLevel<16):
+						spellCount=3;
+						break;
+					case (questLevel>15&&questLevel<18):			
+						spellCount=4;
+						break;
+					case (questLevel>17):
+						spellCount=5;
+						break;
+					default:
+						spellCount=0;
+						break;
 				}
-			}
+				if(spellCount>1){
+					retVal+="(" + spellCount + " Dread Spells Drawn From Deck. Select randomly when casting.)";
+				}else{
+					if(spellCount==1){
+						retVal+="(" + spellCount + " Dread Spell Drawn From Deck)";
+					}
+				}
+				//}
+			//}
 			break;
 		case (creatureType<120):
 			retVal+="Gargoyle";
@@ -474,33 +501,39 @@ function openSearch(){
 		case (itemType<50):
 			randomChance=Math.floor(Math.random()*100);
 			itemType=parseInt(document.getElementById("questLevel").value,10);
-			if(itemType>20){
-				//Don't want there to be more than 20% chance this is an artifact and not a treasure.
+			if(itemType>10){
+				//Don't want there to be more than 10% chance this is an artifact and not a treasure.
 				itemType=10;
 			}
-			if (randomChance<itemType){
+			if (randomChance<itemType&&artifactCount==0){
 				//It's an artifact
 				myList+=" an artifact!";
+				artifactCount+=1;
 			}else{
-				//10% of the time we want treasure to automatically be treasure, not draw a card.
+				//15% of the time we want treasure to automatically be treasure, not draw a card.
 				randomChance=Math.floor(Math.random()*100);
 				switch(randomChance){
 					case 0:
 					case 1:
 					case 2:
 					case 3:
+					case 4:
 						randomTotal=Math.floor(Math.random()*10)*5;
 						myList+=" " + randomTotal + " gold!";
 						break;
-					case 4:
 					case 5:
 					case 6:
-							randomTotal=Math.floor(Math.random()*10)*5;
-							myList+=" a medallion worth " + randomTotal + " gold!";
-							break;
 					case 7:
 					case 8:
 					case 9:
+							randomTotal=Math.floor(Math.random()*10)*5;
+							myList+=" a medallion worth " + randomTotal + " gold!";
+							break;
+					case 10:
+					case 11:
+					case 12:
+					case 13:
+					case 14:
 							randomTotal=Math.floor(Math.random()*10)*5;
 							myList+=" jewels worth " + randomTotal + " gold!";
 							break;
@@ -551,6 +584,9 @@ function openSearch(){
 }
 
 function generateBlankBoard(){
+	//Adding this 5-7-22 so that we can limit artifact to one per game, but resets it when a new game is started
+	artifactCount=0;
+	
 	//First thing to do is create an array representing a blank board, then fill it with the proper walls and the stairs and doors of starting room.
 	var row=0;
 	var col=0;
