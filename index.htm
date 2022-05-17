@@ -123,8 +123,8 @@ You must enter each lair and clear out all the monsters. If you leave even one m
 <h2>
 Additional Rules
 </h2>
-<p>Start with the stairs in the center of the middle room and one closed door in the middle of each side of the room.
-</p>
+<!--<p>Start with the stairs in the center of the middle room and one closed door in the middle of each side of the room.
+</p>-->
 <p>
 When you enter a hallway, use the Open A Hall button to find out what is in the hall. Always generate a hall as the character gets to it, but only the first time you see that hall. All hall items are placed starting at left side when facing out from center room, and starting at outside wall or outside corners in for the long hallways. There is a left/right designation given. This applies to doorways on halls that have walls touching rooms on both sides, and also for creatures and blocks in the double wide hallway.
 </p>
@@ -560,7 +560,7 @@ function openSearch(){
 					myList+=" a giant spider. Place spider next to the hero. The hero immediately takes 1 damage from spider, loses their next turn, and cannot attack or defend until the conclusion of that turn. Spiders have 2 attack, 2 defend, 3 body, and 1 mind point. Any time a spider damages a hero that hero will lose their next turn and cannot attack or defend until the conclusion of that missed turn.";
 					break;
 				case 5:
-					myList+=" a ghoul. Place the ghoul next to the hero. Whenever the hero moves, the ghoul immediately moves to the hero endpoint and bumps the hero back along their path the number of moves equal to the roll of 1 red die. Ghouls have 0 attack, 3 defense, 3 body, and 1 mind point";
+					myList+=" a ghoul(0 attack, 3 defense. 3 body, 3 mind -- When the ghoul first appears, it bumps the first hero it sees in a random direction one space. When the hero the ghoul focuses on moves, they are bumped off of their ending space and must backtrack along their path the number of spaces equal to the roll of one die. The ghoul refocuses each turn by rolling a die to randomly select a hero within their line of site, and bumps that character by one space in a random direction immediately.)";
 					break;
 				case 6:
 					myList+=" a falling skull trap. Hero rolls a combat die and suffers 1 damage if a skull is rolled. Place pile of skulls on space hero is located. When passing over this space in the future this space counts as two spaces because of how you must step over and around the skulls.";
@@ -722,21 +722,72 @@ function generateBlankBoard(){
 function createStartRoom(){
 	//This will set up the basic start we use in this type of game.
 
-	//Place stairs @ 12,9. Treat like furniture, because essentially they are
-	gameBoard[9][12][1]="^2^2^Stairs(furniture)";
-	gameBoard[9][13][1]="@Stairs(furniture)";
-	gameBoard[10][12][1]="@Stairs(furniture)";
-	gameBoard[10][13][1]="@Stairs(furniture)";
-	gameBoard[6][12][5]=2;
-	gameBoard[7][12][4]=2;
-	gameBoard[11][13][5]=2;
-	gameBoard[12][13][4]=2;
-	gameBoard[9][9][3]=2;
-	gameBoard[9][10][2]=2;
-	gameBoard[9][15][3]=2;
-	gameBoard[9][16][2]=2;
-	//This part will mark entire room as in use
+	
+	//Mark entire room as in use
 	gameBoard[7][10][7]=1;
+	
+	var x=0;
+	var y=0;
+	var numDoors=Math.floor(Math.random()*6)+1; //Yes, this will sometimes give us more than 4 doors, but that will be taken care of shortly.
+	var selectSide=0;
+	var lSide=0;
+	var rSide=0;
+	var tSide=0;
+	var bSide=0;
+	
+	for(let doorCounter=0;doorCounter<=numDoors;doorCounter++){
+		selectSide=Math.floor(Math.random()*4);
+		switch (selectSide){
+			case 0:
+				if(lSide==0){
+					//Place a door along left side of the room
+					y=Math.floor(Math.random()*5)+7;
+					gameBoard[y][9][3]=2;	//left
+					gameBoard[y][10][2]=2;
+					lSide=1;
+				}
+				break;
+			case 1:
+				if(rSide==0){
+					//Place a door along right side of the room
+					y=Math.floor(Math.random()*5)+7;
+					gameBoard[y][15][3]=2;	//right
+					gameBoard[y][16][2]=2;
+					rSide=1;
+				}
+				break;
+			case 2:
+				if(tSide==0){
+					//Place a door along top side of the room
+					y=Math.floor(Math.random()*6)+10;
+					gameBoard[6][y][5]=2; //top
+					gameBoard[7][y][4]=2;
+					tSide=1;
+				}
+				break;
+			default:
+				if(bSide==0){
+					//Place a door along bottom side of the room
+					y=Math.floor(Math.random()*6)+10;
+					gameBoard[11][y][5]=2; //bottom
+					gameBoard[12][y][4]=2;
+					bSide=1;
+				}
+				break;
+		}
+	}
+	
+	//Place stairs @ 12,9. Treat like furniture, because essentially they are
+	//Now randomly place stairs
+	x=Math.floor(Math.random()*4)+7;
+	y=Math.floor(Math.random()*5)+10;
+	
+	gameBoard[x][y][1]="^2^2^Stairs(furniture)";
+	gameBoard[x][y+1][1]="@Stairs(furniture)";
+	gameBoard[x+1][y][1]="@Stairs(furniture)";
+	gameBoard[x+1][y+1][1]="@Stairs(furniture)";
+	
+	
 }
 function colorBoard(){
 	//This will just loop through and color the squares appropriately and set their room number for the future.
