@@ -231,7 +231,50 @@ function getMonster(isWandering=0, questLevel=0, isHall=0){
 		}
 	}
 
+	//Commented out the line below because the creatures seemed just a little too easy at times.
 	creatureType+=(questLevel/2);
+	//Added this so we can have more control of difficulty of creatures in levels
+	switch(true){
+		case (questLevel<3):
+			//Reduce chance of hard creatures a bit by recalculating if number is high
+			if (creatureType>75){
+				creatureType=Math.floor(Math.random()*109)-10;
+			}
+			break;
+		case (questLevel<7):
+			//Reduce chance of hard creatures a bit by recalculating if number is high
+			if (creatureType>85){
+				creatureType=Math.floor(Math.random()*109)-10;
+			}
+			break;
+		case (questLevel<11):
+			//Do nothing, this should be about right
+			break;
+		case (questLevel<14):
+			//increase chance of hard creatures a bit by recalculating if number is low
+			if (creatureType<60){
+				creatureType=Math.floor(Math.random()*109)-10;
+			}
+			break;
+		case (questLevel<18):
+			//increase chance of hard creatures a bit by recalculating if number is low
+			if (creatureType<70){
+				creatureType=Math.floor(Math.random()*109)-10;
+			}
+			break;
+		default:
+			//increase chance of hard creatures a bit by recalculating if number is low
+			if (creatureType<75){
+				creatureType=Math.floor(Math.random()*109)-10;
+			}
+			//And take a second shot at recalculating if still less than 70
+			if (creatureType<75){
+				creatureType=Math.floor(Math.random()*109)-10;
+			}
+			break;
+	}
+
+		
 	switch(true){
 		case (creatureType<18):
 			//When I added the Ghoul trap I also added the Ghoul here. It seemed reasonable it should replace about 1/4 of the goblins.
@@ -537,6 +580,21 @@ function openSearch(){
 							randomTotal=Math.floor(Math.random()*10)*5;
 							myList+=" jewels worth " + randomTotal + " gold!";
 							break;
+					case 15:
+					case 16:
+					case 17:
+					case 18:
+					case 19:
+						randomTotal=Math.floor(Math.random()*10)*5;
+						myList+=" paper money worth " + randomTotal *10 + " gold! The bills crumble to dust as you reach for them, unforunately.";
+						break;
+					case 20:
+					case 21:
+					case 22:
+					case 23:
+					case 24:
+						myList+=" a bag of jewels. Unfortunately, when you look closely you see that they are artificial, with no value.";
+						break;
 					default:
 						//Just a treasure
 						myList+=" treasure!";
@@ -570,7 +628,7 @@ function openSearch(){
 					break;
 			}
 			break;
-		case (itemType<82):
+		case (itemType<85)://(itemType<82):
 			myList+=" a secret door. (If not against an outside wall this becomes 25 gold. If in a corner, opens to wall farthest from entering doorway)";
 			break;
 		default:
