@@ -793,6 +793,7 @@ function createStartRoom(){
 	var tSide=0;
 	var bSide=0;
 	
+	
 	for(let doorCounter=0;doorCounter<=numDoors;doorCounter++){
 		selectSide=Math.floor(Math.random()*4);
 		switch (selectSide){
@@ -840,10 +841,15 @@ function createStartRoom(){
 	x=Math.floor(Math.random()*4)+7;
 	y=Math.floor(Math.random()*5)+10;
 	
+	
+	
+	
 	gameBoard[x][y][1]="^2^2^Stairs(furniture)";
 	gameBoard[x][y+1][1]="@Stairs(furniture)";
 	gameBoard[x+1][y][1]="@Stairs(furniture)";
 	gameBoard[x+1][y+1][1]="@Stairs(furniture)";
+	
+	
 	
 	
 }
@@ -1135,6 +1141,26 @@ function showBoard(){
 				}else{
 						if(colSpan>0||rowSpan>0){
 							newGameBoard+=gameBoard[row][col][1].substr(5,3);
+							if(gameBoard[row][col][1].substr(5,3)=="Sta"){
+								//Also place a random arrow to show which direction the stairs should face.
+								var stairDirection=0;
+								stairDirection=Math.floor(Math.random()*4);
+								switch(stairDirection){
+									case 1:
+										newGameBoard+= "&#8593"; 
+										break;
+									case 2:
+										newGameBoard+="&#8595";
+										break;
+									case 3:
+										newGameBoard+="&#8594";
+										break;
+									default:
+										newGameBoard+="&#8592";
+										break;
+								}
+								
+							}
 						}else{
 							if(tempText.includes("@")==true){
 								//newGameBoard+=gameBoard[row][col][1].substr(1,3);
@@ -1205,7 +1231,35 @@ function roomsShareADoor(room1,room2,roomSide){
 	var checkCol=0;
 	var checkedList=room1+","+room2+"--";
 	var myLoc="";
+	
 
+	//Addded this june 7, 2022
+	//If first room is a hall and the other is the middle room, never add a door, so claim they already share one.
+	switch(room1){
+		case 30:
+		case 31:
+		case 34:
+		case 35:
+			if(room2==21){
+				//This is a hall that is trying to put a door at the end of it and into the center room. 
+				//Don't allow that. Instead, basically just report that there already is one.
+				return true;
+			}
+			break;
+		default:
+			//Do nothing here, not a hall with center room at end.
+			break;
+	}
+	//Also added this part, because there's no putting doors into already open rooms as of june 7, 2022
+	//Check to see if room2 is already open. Don't place a door if it is.
+	checkRow=getStartRow(room2);
+	checkCol=getStartCol(room2);
+	if(gameBoard[checkRow][checkCol][7]!=0){
+		//The room is open, so don't place a door. Just say there already is one.
+		//alert("No door");
+		return true;
+	}
+	
 	//Need to check to see if there exists a door in this room that borders that room
 	checkForDoor:{
 
@@ -1266,6 +1320,7 @@ function roomsShareADoor(room1,room2,roomSide){
 				break;
 		}
 	}
+	
 	return false;
 }
 
@@ -1809,6 +1864,26 @@ function listRoomContents(roomNum,curTime){
 	document.getElementById("results").value="("+curTime+" Room " +roomNum +")"+newDescription;
 }
 
+function reduceDoorCount(numOfDoors=0,roomNumber){
+	var doorCount=numOfDoors;
+	var reductionNum=0;
+	if(doorCount>0){
+		if(roomNumber>21){
+			//this is a hall, do nothing
+		}else{
+			reductionNum=Math.floor(Math.random()*100)+1;
+			if(reductionNum>30 && reductionNum<46){
+				//Initially this was only going to be 10% of the time, but I realized we already don't place some of these doors anyway, because
+				//they are going between rooms that already share a door.
+				doorCount=doorCount-1;
+				//alert("We reduced the doorcount by 1");
+			}
+		}
+	}
+	
+	return doorCount;
+}
+
 function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 
 	//This function desperately needs to be refactored to split some sections off into their own functions, which would make it easier to read and maintain
@@ -1887,6 +1962,8 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 		//Place Doors in the room
 		numItems=Math.floor(Math.random()*4)+1;
 		//Up to 4 doors in a room, one on each side
+		//But if the room is not a hall, decrease the number by a small percentage
+		numItems=reduceDoorCount(numItems, roomNum);
 		while(numItems>0){
 		//Find out which side of the room we're trying to place this on
 		randomChance=Math.floor(Math.random()*4);
@@ -1945,10 +2022,10 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 							//This is only necessary because we don't limit the number of doors in a hall
 						//setTimeout(myFunction, 3000)
 							if(roomsShareADoor(roomNum,gameBoard[checkRow][startCol-1][0],2)==false){
-								if(doorBlockedByFurniture(checkRow,startCol-1)==false){
+								if(doorBlockedByFurniture(checkRow,startCol-1)==false){					
 									gameBoard[checkRow][startCol][randomChance]=2;
 										//Also set corresponding space in room to left
-									gameBoard[checkRow][startCol-1][randomChance+1]=2;
+									gameBoard[checkRow][startCol-1][randomChance+1]=2;									
 								}
 							}
 						}
