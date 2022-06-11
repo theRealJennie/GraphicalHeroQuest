@@ -119,23 +119,23 @@ Small kingdoms once covered the land from sea to sea. These kingdoms, numbering 
 <p>Recently, these monsters have found their way out, attacking innocent civilians nearby before returning to their underground base. King Filbon The Kind has hired you, a small band of intrepid heroes, to clean out these lairs so they can be used by the local governors for the good of the people and to protect the people from these vile creatures.
 </p>
 <p>
-You must enter each lair and clear out all the monsters. If you leave even one monster alive, it could escape and attack the public! Kill off all the monsters before you exit, and be heralded by the town as heroes of the realm.
+You must enter each lair and clear out all the monsters that you can reach. If you leave even one monster alive, it could escape and attack the public! Kill off all the monsters before you exit, and be heralded by the town as heroes of the realm.
 <h2>
 Additional Rules
 </h2>
 <!--<p>Start with the stairs in the center of the middle room and one closed door in the middle of each side of the room.
 </p>-->
 <p>
-When you enter a hallway, use the Open A Hall button to find out what is in the hall. Always generate a hall as the character gets to it, but only the first time you see that hall. All hall items are placed starting at left side when facing out from center room, and starting at outside wall or outside corners in for the long hallways. There is a left/right designation given. This applies to doorways on halls that have walls touching rooms on both sides, and also for creatures and blocks in the double wide hallway.
+When you enter a hallway, click on it to find out what is in the hall.
 </p>
 <p>
-When you first open a door, use the Open A Room button to find out what is in the room. You'll find where doors should be placed, as well as furniture, search items, and creatures. Move in a clockwise direction and spiral inward when counting to the next item. The number you see is from the starting position for the first item and from the previous item for subsequent items. If an item lands in a space it cannot occupy(not enough spaces for a table, for ex.) it is simply not placed. The only exception to this is the fireplace, which can be placed against the nearest wall. No furniture can block a door. When counting spaces, skip spaces already occupied.
+When you first open a door, click on the room to find out what is in it. You'll find where doors should be placed, as well as furniture, search items, and creatures..
 </p>
 <p>
-Searching: You do not search for traps or treasure in the regular way. Instead, you must step on a searchable items that was placed and then open it (this is an action). You may find out it is a treasure, a trap, or a secret door.
+Searching: You do not search for traps or treasure in the regular way. Instead, you must step on a searchable items that was placed and then open it (this is not an action). You may find out it is a treasure, a trap, or a secret door.
 </p>
 <p>
-Potions: Typically, you must stand directly beside another hero to exchange potions or other items. Now you can toss a potion to any hero in your line of site or the same room, even over other monsters, heros, and furniture.
+Potions: Typically, you must stand directly beside another hero to exchange potions or other items. Now you can toss a potion to any hero in your line of site or the same room, even over other monsters, heroes, and furniture.
 </p>
 <p>
 Line of sight: This is usually a straight line and cannot pass through other heros or creatures. While this is typically the case, for these quests use this more liberally. Typically, other heros can see over the dwarf, for example. And a diagonal line of sight may obviously see between two other heroes, and if it looks that way then go with that and don't be picky.
@@ -143,6 +143,8 @@ Line of sight: This is usually a straight line and cannot pass through other her
 <p>
 Creatures: Creatures will move in the most obvious way and perform the most obvious attacks possible. If there is a hero closer than the others, they'd likely go toward that hero, for example. If a hero has been attacking them, they'd likely attack back. Just use common sense.
 If you run out of a creature, replace with the next toughest creature available on the chart. If no tougher creatures are available, replace with next weakest available.
+</p>
+<p>Special rules for the wizard: Usually, throwing a dagger or the handaxe results in losing them forever. Our wizard has trained hard to become a better fighter so they can support the group. They have developed an enchantment they apply to all thrown weapons that automatically return them to their hand each turn, so the wizard never loses these items.
 </p>
 <p>
 Exiting: When you've cleared all of the lair, return to the stairs. But you'll find a surprise waiting for you there. Use the Open Exit Room button to find out if any creatures have snuck in behind you and cut off your exit. If so, you have to kill them before you can leave. Upon leaving, you will get a reward, which is based on the level of the quest.
@@ -2778,6 +2780,7 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 	if(isLastRoom==0){
 	//Place Search Items
 	randomChance=Math.floor(Math.random()*21);
+	//alert("placing search item now" + randomChance);
 
 	if(roomNum>21){
 		//This is a hall, so limit the number of Search items to 1 at most, and that will become a block
@@ -2785,7 +2788,7 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 			case 0:
 			case 1:
 			case 2:
-			case 3:
+			//case 3: got rid of this one to slightly decrease the odds of getting a block in a hall 6-10-22
 			case 4:
 				numItems=1;
 				break;
@@ -2799,27 +2802,27 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 			case 0:
 			case 1:
 			case 2:
-			case 3:
-			case 4:
-			case 5:
+			//case 3: Got rid of this one to decrease odds of getting a search item. 6-10-22
+			//case 4: Got rid of this one to decrease odds of getting a search item. 6-10-22
+			//case 5: Got rid of this one to decrease odds of getting a search item. 6-10-22
 			case 6:
 			case 7:
 				numItems=1;
 				break;
 			case 8:
 			case 9:
-			case 10:
-			case 11:
-			case 12:
-			case 13:
-			case 14:
+			//case 10: Got rid of this one to decrease odds of getting a search item. 6-10-22
+			//case 11: Got rid of this one to decrease odds of getting a search item. 6-10-22
+			//case 12: Got rid of this one to decrease odds of getting a search item. 6-10-22
+			//case 13:Got rid of this one to decrease odds of getting a search item. 6-10-22
+			//case 14:Got rid of this one to decrease odds of getting a search item. 6-10-22
 				numItems=2;
 				break;
 			case 15:
-			case 16:
-			case 17:
-			case 18:
-			case 19:
+			//case 16: Got rid of this one to decrease odds of getting a search item. 6-10-22
+			//case 17: Got rid of this one to decrease odds of getting a search item. 6-10-22
+			//case 18:Got rid of this one to decrease odds of getting a search item. 6-10-22
+			//case 19:Got rid of this one to decrease odds of getting a search item. 6-10-22
 					numItems=3;
 					break;
 			case 20:
@@ -2829,6 +2832,7 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 				numItems=0;
 				break;
 		}
+		
 	}
 	while(numItems>0){
 		if(roomNum>21){
