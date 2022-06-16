@@ -385,7 +385,7 @@ function getMonster(isWandering=0, questLevel=0, isHall=0){
 function getFurniture(){
 	var furnType="";
 
-	furnitureType=Math.floor(Math.random()*18);
+	/*furnitureType=Math.floor(Math.random()*18);
 	switch(furnitureType){
 		case 1:
 			furnType+="Throne"
@@ -423,6 +423,85 @@ function getFurniture(){
 		default:
 			furnType+="Bookshelf"
 			break;
+	}*/
+	
+	furnitureType=Math.floor(Math.random()*60);
+	switch(furnitureType){
+		case 1:
+		case 2:
+		case 3:	
+			furnType+="Throne";
+			break;
+		case 4:
+		case 5:
+		case 6:		
+			furnType="Tomb";
+			break;
+		case 7:
+		case 8:
+			furnType+="Rack";
+			break;
+		case 9:
+		case 10:
+			furnType+="Sorcerer's Table";
+			break;
+		case 11:
+		case 12:
+			furnType+="Alchemist Bench";
+			break;
+		case 13:
+		case 14:
+		case 15:
+			furnType+="Fireplace(Against nearest wall if possible)" //Any changes to the wording to any of these will need to be in the other functions, such as getFurnitureWidth, as well so they'll match properly.
+			break;
+		case 16:
+		case 17:
+			furnType+="Weapons Rack";
+			break;
+		case 18:
+		case 19:
+		case 20:
+		case 21:
+		case 22:
+		case 23:
+		case 24:
+		case 25:
+		case 26:
+			furnType+="Table";
+			break;
+		case 27:
+		case 28:
+		case 29:
+		case 30:
+		case 31:
+			furnType+="Cupboard";
+			break;
+		case 32:
+		case 33:
+		case 34:
+		case 35:
+			furnType+="SBd";
+			break;
+		case 37:
+		case 38:
+		case 39:
+			furnType+="LBd";
+			break;
+		case 42:
+		case 43:
+		case 44:
+		case 45:
+			furnType+="Bench";
+			break;
+		case 47:
+		case 48:
+		case 49:
+		case 50:
+			furnType+="STb";
+			break;
+		default:
+			furnType+="Bookshelf";
+			break;
 	}
 
 	return furnType;
@@ -437,12 +516,16 @@ function getFurnitureWidth(myFurn){
 		case "Rack":
 		case "Alchemist Bench":
 		case "Sorcerer's Table":
+		case "LBd"://Large Bed
 			furnWidth=2;
 			break;
 		case "Throne":
 		case "Weapons Rack":
 		case "Cupboard":
 		case "Bookshelf":
+		case "Bench":
+		case "STb"://Small Table
+		case "SBd"://Small Bed
 		case "Fireplace(Against nearest wall if possible)":
 			furnWidth=1;
 			break;
@@ -463,10 +546,16 @@ function getFurnitureLength(myFurn){
 		case "Weapons Rack":
 		case "Cupboard":
 		case "Bookshelf":
+		case "Bench":
 		case "Fireplace(Against nearest wall if possible)":
 			furnLength=3;
 			break;
+		case "LBd"://Large Bed
+		case "SBd"://Small Bed
+			furnLength=2;
+			break;
 		case "Throne":
+		case "STb"://Small Table
 			furnLength=1;
 			break;
 		default:
