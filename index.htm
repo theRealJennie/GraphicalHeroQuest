@@ -146,6 +146,10 @@ If you run out of a creature, replace with the next toughest creature available 
 </p>
 <p>Special rules for the wizard: Usually, throwing a dagger or the handaxe results in losing them forever. Our wizard has trained hard to become a better fighter so they can support the group. They have developed an enchantment they apply to all thrown weapons that automatically return them to their hand each turn, so the wizard never loses these items.
 </p>
+<p>Special rules for the Dread Warriors and Gargoyles: If an escape spell is case, roll a die or dice(depending on the number of unopened rooms) to decide where the creature escapes to. If all rooms are open, place creature in the center room.
+</p>
+<p>Special rules for small furniture: Ordinarily, furniture must remain in the place it is placed. In cases where creatures are cutoff and there is no other way to reach them, the characters can move small furniture aside, or even to another room when necessary. If another door opens to the space, they must use that instead, though. This applies to the small table, throne, some tables, etc. Use common sense.
+</p>
 <p>
 Exiting: When you've cleared all of the lair, return to the stairs. But you'll find a surprise waiting for you there. Use the Open Exit Room button to find out if any creatures have snuck in behind you and cut off your exit. If so, you have to kill them before you can leave. Upon leaving, you will get a reward, which is based on the level of the quest.
 </p>
@@ -345,7 +349,12 @@ function getMonster(isWandering=0, questLevel=0, isHall=0){
 						spellCount=0;
 						break;
 				}
-				if(spellCount>1){
+				var maxSpells=Math.floor(Math.random()*5)+1;
+				if (spellCount>maxSpells){
+					//alert("maxSpells");
+					spellCount=maxSpells;
+				}
+				if(spellCount>1){				
 					retVal+="(" + spellCount + " Dread Spells Drawn From Deck. Select randomly when casting.)";
 				}else{
 					if(spellCount==1){
@@ -425,7 +434,7 @@ function getFurniture(){
 			break;
 	}*/
 	
-	furnitureType=Math.floor(Math.random()*60);
+	furnitureType=Math.floor(Math.random()*58);
 	switch(furnitureType){
 		case 1:
 		case 2:
@@ -479,9 +488,9 @@ function getFurniture(){
 		case 32:
 		case 33:
 		case 34:
-		case 35:
 			furnType+="SBd";
 			break;
+		case 36:
 		case 37:
 		case 38:
 		case 39:
@@ -496,7 +505,6 @@ function getFurniture(){
 		case 47:
 		case 48:
 		case 49:
-		case 50:
 			furnType+="STb";
 			break;
 		default:
@@ -1958,10 +1966,21 @@ function listRoomContents(roomNum,curTime){
 function reduceDoorCount(numOfDoors=0,roomNumber){
 	var doorCount=numOfDoors;
 	var reductionNum=0;
+	var zeroChance=0;
+	let questLevel=(parseInt(document.getElementById("questLevel").value,10))
+	
 	if(doorCount>0){
 		if(roomNumber>21){
 			//this is a hall, do nothing
 		}else{
+		
+			zeroChance=Math.floor(Math.random()*100)+1;
+			if(zeroChance<questLevel){
+				//alert("zeroChance");
+				doorcount=0;
+				return;
+			}
+			
 			reductionNum=Math.floor(Math.random()*100)+1;
 			if(reductionNum>30 && reductionNum<46){
 				//Initially this was only going to be 10% of the time, but I realized we already don't place some of these doors anyway, because
