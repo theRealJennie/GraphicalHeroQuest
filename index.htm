@@ -164,6 +164,8 @@ var roomCount=0;
 var gameBoard=new Array(19);
 var gameBoardBackup=new Array(19);
 var artifactCount=0;
+var itemCount=new Array(20);
+
 //gameBoard position definitions:
 //0-room number
 //1-contents of that square
@@ -392,127 +394,134 @@ function getMonster(isWandering=0, questLevel=0, isHall=0){
 }
 
 function getFurniture(){
-	var furnType="";
-
-	/*furnitureType=Math.floor(Math.random()*18);
-	switch(furnitureType){
-		case 1:
-			furnType+="Throne"
-			break;
-		case 2:
-		case 3:
-			furnType="Tomb"
-			break;
-		case 4:
-			furnType+="Rack"
-			break;
-		case 5:
-		case 6:
-			furnType+="Sorcerer's Table"
-			break;
-		case 7:
-		case 8:
-			furnType+="Alchemist Bench"
-			break;
-		case 9:
-			furnType+="Fireplace(Against nearest wall if possible)" //Any changes to the wording to any of these will need to be in the other functions, such as getFurnitureWidth, as well so they'll match properly.
-			break;
-		case 10:
-			furnType+="Weapons Rack"
-			break;
-		case 11:
-		case 12:
-		case 13:
-			furnType+="Table"
-			break;
-		case 14:
-		case 15:
-			furnType+="Cupboard"
-			break;
-		default:
-			furnType+="Bookshelf"
-			break;
-	}*/
+	var iC=0;
 	
-	furnitureType=Math.floor(Math.random()*58);
-	switch(furnitureType){
-		case 1:
-		case 2:
-		case 3:	
-			furnType+="Throne";
-			break;
-		case 4:
-		case 5:
-		case 6:		
-			furnType="Tomb";
-			break;
-		case 7:
-		case 8:
-			furnType+="Rack";
-			break;
-		case 9:
-		case 10:
-			furnType+="Sorcerer's Table";
-			break;
-		case 11:
-		case 12:
-			furnType+="Alchemist Bench";
-			break;
-		case 13:
-		case 14:
-		case 15:
-			furnType+="Fireplace(Against nearest wall if possible)" //Any changes to the wording to any of these will need to be in the other functions, such as getFurnitureWidth, as well so they'll match properly.
-			break;
-		case 16:
-		case 17:
-			furnType+="Weapons Rack";
-			break;
-		case 18:
-		case 19:
-		case 20:
-		case 21:
-		case 22:
-		case 23:
-		case 24:
-		case 25:
-		case 26:
-			furnType+="Table";
-			break;
-		case 27:
-		case 28:
-		case 29:
-		case 30:
-		case 31:
-			furnType+="Cupboard";
-			break;
-		case 32:
-		case 33:
-		case 34:
-			furnType+="SBd";
-			break;
-		case 36:
-		case 37:
-		case 38:
-		case 39:
-			furnType+="LBd";
-			break;
-		case 42:
-		case 43:
-		case 44:
-		case 45:
-			furnType+="Bench";
-			break;
-		case 47:
-		case 48:
-		case 49:
-			furnType+="STb";
-			break;
-		default:
-			furnType+="Bookshelf";
-			break;
-	}
+	while(iC<5){
 
-	return furnType;
+		furnitureType=Math.floor(Math.random()*55);
+		
+		switch(furnitureType){
+			case 1:
+			case 2:
+			case 3:	
+				if(itemCount[0]<3||iC==4){					
+					itemCount[0]+=1;		
+					return "Throne";
+				}
+				break;
+			case 4:
+			case 5:
+			case 6:		
+				if(itemCount[1]<2||iC==4){					
+					itemCount[1]+=1;		
+					return "Tomb";
+				}
+				break;
+			case 7:
+			case 8:
+				if(itemCount[2]<1||iC==4){
+					itemCount[2]+=1;		
+					return "Rack";
+				}
+				break;
+			case 9:
+			case 10:
+				if(itemCount[3]<1||iC==4){					
+					itemCount[3]+=1;				
+					return "Sorcerer's Table";
+				}
+				break;
+			case 11:
+			case 12:
+				if(itemCount[4]<1||iC==4){					
+					itemCount[4]+=1;	
+					return "Alchemist Bench";
+				}
+				break;
+			case 13:
+			case 14:
+			case 15:
+				if(itemCount[5]<3||iC==4){					
+					itemCount[5]+=1;						
+					return "Fireplace(Against nearest wall if possible)" //Any changes to the wording to any of these will need to be in the other functions, such as getFurnitureWidth, as well so they'll match properly.
+				}
+				break;
+			case 16:
+			case 17:
+				if(itemCount[6]<1||iC==4){					
+					itemCount[6]+=1;					
+					return "Weapons Rack";
+				}
+				break;
+			case 18:
+			case 19:
+			case 20:
+			case 21:
+			case 22:
+			case 23:
+			case 24:
+			case 25:
+			case 26:
+				if(itemCount[7]<3||iC==4){					
+					itemCount[7]+=1;					
+					return "Table";
+				}
+				break;
+			case 27:
+			case 28:
+			case 29:
+			case 30:
+			case 31:
+				if(itemCount[8]<2||iC==4){
+					itemCount[8]+=1;	
+					return "Cupboard";
+				}
+				break;
+			case 32:
+			case 33:
+			case 34:
+				if(itemCount[9]<2||iC==4){
+					itemCount[9]+=1;	
+					return "SBd";
+				}
+				break;
+			case 36:
+			case 37:
+			case 38:
+			case 39:
+				if(itemCount[10]<2||iC==4){
+					itemCount[10]+=1;		
+					return "LBd";
+				}
+				break;
+			case 42:
+			case 43:
+			case 44:
+			case 45:
+				if(itemCount[11]<2||iC==4){
+					itemCount[11]+=1;	
+					return "Bench";
+				}
+				break;
+			case 47:
+			case 48:
+			case 49:
+				if(itemCount[12]<2||iC==4){
+					itemCount[12]+=1;	
+					return "STb";
+				}
+				break;
+			default:
+				if(itemCount[13]<3||iC==4){
+					itemCount[13]+=1;
+					return "Bookshelf";
+				}
+				break;
+		}
+		iC+=1;
+	}
+	//return furnType;
+	
 }
 function getFurnitureWidth(myFurn){
 	var furnWidth =0;
@@ -744,6 +753,11 @@ function generateBlankBoard(){
 	//Adding this 5-7-22 so that we can limit artifact to one per game, but resets it when a new game is started
 	artifactCount=0;
 	
+	var myCounter=0;
+	while(myCounter<20){
+		itemCount[myCounter]=0;
+		myCounter+=1;
+	}
 	//First thing to do is create an array representing a blank board, then fill it with the proper walls and the stairs and doors of starting room.
 	var row=0;
 	var col=0;
