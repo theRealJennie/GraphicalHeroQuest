@@ -57,7 +57,7 @@
 		<textarea class="form-control" id="questLevel" rows=1 name="questLevel"></textarea>
 	</div>
 </div>
-<div class="row">
+<div class="row" style="display:none"> //got rid of this for now because we never use it. Can re-enable later on if we want.
 	<div class="col-sm">
 		Max Rooms:
 	</div>
@@ -146,7 +146,7 @@ If you run out of a creature, replace with the next toughest creature available 
 </p>
 <p>Special rules for the wizard: Usually, throwing a dagger or the handaxe results in losing them forever. Our wizard has trained hard to become a better fighter so they can support the group. They have developed an enchantment they apply to all thrown weapons that automatically return them to their hand each turn, so the wizard never loses these items.
 </p>
-<p>Special rules for the Dread Warriors and Gargoyles: If an escape spell is case, roll a die or dice(depending on the number of unopened rooms) to decide where the creature escapes to. If all rooms are open, place creature in the center room.
+<p>Special rules for the Dread Warriors and Gargoyles: If an escape spell is cast, set creature aside. From now on, each time you enter a new room roll a die. If a 6 is rolled, place the creature in that room in the corner farthest from the doorway. If the creature has not been found before reaching the end room, place in the end room in the corner nearest the bottom of the stairs. 
 </p>
 <p>Special rules for small furniture: Ordinarily, furniture must remain in the place it is placed. In cases where creatures are cutoff and there is no other way to reach them, the characters can move small furniture aside, or even to another room when necessary. If another door opens to the space, they must use that instead, though. This applies to the small table, throne, some tables, etc. Use common sense.
 </p>
@@ -597,7 +597,7 @@ function showFinalReward(){
 		case(questLevel<20):
 			note+="40";
 			break;
-		case(questLevel>=25):
+		case(questLevel>=20):
 			note+="50";
 			break;
 		default:
@@ -1293,6 +1293,7 @@ function showBoard(){
 	newGameBoard+="</table>";
 	document.getElementById("gameBoard").innerHTML=newGameBoard;
 }
+
 function nextToMedOrLarge(checkRow,checkCol){
 	//check all around this space to make sure no large items or medium items already occupy those spaces
 	//if they do, return true;
@@ -2007,9 +2008,55 @@ function reduceDoorCount(numOfDoors=0,roomNumber){
 	
 	return doorCount;
 }
-
+function updateMissedRoom(roomNum){
+	//This will check to see if the companion to this hall is has been opened as well.
+	//alert(roomNum);
+	switch(roomNum){
+		case 22:
+			if(roomInUse(23)==false){
+				openRoomVisually(23);
+			}
+			break;
+		case 23:
+			if(roomInUse(22)==false){
+				openRoomVisually(22);
+			}
+			break;
+		case 24:
+			if(roomInUse(25)==false){
+				openRoomVisually(25);
+			}
+			break;
+		case 25:
+			if(roomInUse(24)==false){
+				openRoomVisually(24);
+			}
+			break;
+		case 26:
+			if(roomInUse(27)==false){
+				openRoomVisually(27);
+			}
+			break;
+		case 27:
+			if(roomInUse(26)==false){
+				openRoomVisually(26);
+			}
+			break;
+		case 28:
+			if(roomInUse(29)==false){
+				openRoomVisually(29);
+			}
+			break;
+		case 29:
+			if(roomInUse(28)==false){
+				openRoomVisually(28);
+			}
+			break;
+	}
+}
 function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 
+	
 	//This function desperately needs to be refactored to split some sections off into their own functions, which would make it easier to read and maintain
 	var startRow=0;
 	var startCol=0;
@@ -2032,6 +2079,8 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 	let curTime = d.toLocaleTimeString();
 	let questLevel=(parseInt(document.getElementById("questLevel").value,10))
 	let roomMax=(parseInt(document.getElementById("maxRooms").value,10))
+	
+	
 
 	if(document.getElementById("questLevel").value.length<=0){
 		alert( " Please select the quest level");
@@ -2067,6 +2116,9 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 	//Now check to see if this room is already marked as being in use
 	if(gameBoard[startRow][startCol][7]!=0&&isLastRoom==0){
 		//Room is already in use, so refresh board and exit this function
+		if(roomNum>21&&roomNum<30){
+			updateMissedRoom(roomNum);
+		}
 		showBoard();
 		listRoomContents(roomNum,curTime);
 		return;
@@ -3034,10 +3086,34 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 	}
 	}
 
-	roomCount++;
+	roomCount++;	
+	
 	gameBoard[startRow][startCol][7]=1;
 	//document.getElementById("results").value="("+curTime+" Room " +roomNum +")"
 	listRoomContents(roomNum,curTime);
+	
+	if (roomNum>21&&roomNum<30){
+	//alert(roomNum);
+		switch(roomNum){
+			case 22:
+			case 24:
+			case 26:
+			case 28:
+				if(roomInUse(roomNum+1)==false){
+					updateMissedRoom(roomNum);
+				}
+				break;
+			case 23:
+			case 25:
+			case 27:
+			case 29:
+				if(roomInUse(roomNum-1)==false){
+					updateMissedRoom(roomNum);
+				}
+				break;
+			
+		}
+	}
 }
 
 document.querySelector('#gameBoard')
