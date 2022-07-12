@@ -383,6 +383,11 @@ function getMonster(isWandering=0, questLevel=0, isHall=0){
 					retVal+="(" + spellCount + " Dread Spells Drawn From Deck)";
 				}
 			}
+			randomChance=Math.floor(Math.random()*100);
+			if (randomChance<questLevel){
+				retVal="Fire Demon(4 attack, 5 defend, 4 body, 4 mind, 5 move -- A fire demon may throw a flame in place of a normal attack. A thrown flame travels in a straight line, doing 3 damage to all heroes along its path. Each hero may roll defense dice to reduce this damage.)"
+				//Put this here to increase odds of getting a fire demon
+			}
 			break;
 		default:
 			retVal="Fire Demon(4 attack, 5 defend, 4 body, 4 mind, 5 move -- A fire demon may throw a flame in place of a normal attack. A thrown flame travels in a straight line, doing 3 damage to all heroes along its path. Each hero may roll defense dice to reduce this damage.)"
@@ -652,9 +657,9 @@ function openSearch(){
 		case (itemType<50):
 			randomChance=Math.floor(Math.random()*100);
 			itemType=parseInt(document.getElementById("questLevel").value,10);
-			if(itemType>10){
-				//Don't want there to be more than 10% chance this is an artifact and not a treasure.
-				itemType=10;
+			if(itemType>20){
+				//Don't want there to be more than 20% chance this is an artifact and not a treasure.
+				itemType=20;
 			}
 			if (randomChance<itemType&&artifactCount==0){
 				//It's an artifact
@@ -1278,7 +1283,11 @@ function showBoard(){
 							if(tempText.includes("@")==true){
 								//newGameBoard+=gameBoard[row][col][1].substr(1,3);
 							}else{
-								newGameBoard+=gameBoard[row][col][1].substr(0,3);
+								if(tempText.includes("Fire Demon")==true){
+									newGameBoard+="F D";
+								}else{
+									newGameBoard+=gameBoard[row][col][1].substr(0,3);
+								}
 							}
 						}
 				}
