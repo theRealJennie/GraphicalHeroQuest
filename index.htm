@@ -165,6 +165,7 @@ var gameBoard=new Array(19);
 var gameBoardBackup=new Array(19);
 var artifactCount=0;
 var itemCount=new Array(20);
+var creatureCount=new Array(20);
 
 //gameBoard position definitions:
 //0-room number
@@ -208,7 +209,7 @@ function backupTable(MU="M"){
 	}
 	//alert("backupTable Completed");
 }
-function getMonster(isWandering=0, questLevel=0, isHall=0){
+function getMonster(isWandering=0, questLevel=0, isHall=0, retryCount=0){
 	//This will return a monster. Has option for wandering monster so it'll know not to give Dread Warrior or Gargoyle and has a lower chance of being a goblin or skeleton.
 
 	let randomChance=0;
@@ -282,115 +283,199 @@ function getMonster(isWandering=0, questLevel=0, isHall=0){
 			break;
 	}
 
+
+	//if(creatureType<90){creatureType=10;}
+	//if(retryCount>0){alert(retryCount);}
 		
 	switch(true){
-		case (creatureType<18):
+		case (creatureType<16):
 			//When I added the Ghoul trap I also added the Ghoul here. It seemed reasonable it should replace about 1/4 of the goblins.
 			randomChance=Math.floor(Math.random()*4);
 			if (randomChance==1||(randomChance<2&&questLevel>5)){
-				retVal+="Ghoul(0 attack, 3 defense. 3 body, 3 mind -- When the ghoul first appears, it bumps the first hero it sees in a random direction one space. When the hero the ghoul focuses on moves, they are bumped off of their ending space and must backtrack along their path the number of spaces equal to the roll of one die. The ghoul refocuses each turn by rolling a die to randomly select a hero within their line of site, and bumps that character by one space in a random direction immediately.)";
+				if (creatureCount[0]>=4 && retryCount<3){
+					retVal=getMonster(isWandering,questLevel,isHall,retryCount+1);
+				}else{
+					//alert("Made it here");
+					retVal+="Ghoul(0 attack, 3 defense. 3 body, 3 mind -- When the ghoul first appears, it bumps the first hero it sees in a random direction one space. When the hero the ghoul focuses on moves, they are bumped off of their ending space and must backtrack along their path the number of spaces equal to the roll of one die. The ghoul refocuses each turn by rolling a die to randomly select a hero within their line of site, and bumps that character by one space in a random direction immediately.)";
+					creatureCount[0]++;
+				}
 			}else{
-				retVal+="Goblin";
+				if (creatureCount[1]>=6 && retryCount<3){
+					retVal=getMonster(isWandering,questLevel,isHall,retryCount+1);
+				}else{
+					retVal+="Goblin";
+					creatureCount[1]++;
+				}
 			}
 			break;
-		case (creatureType<30):
-			retVal+="Orc";
+		case (creatureType<21):
+			if (creatureCount[2]>=1 && retryCount<3){
+				retVal=getMonster(isWandering,questLevel,isHall,retryCount+1);
+			}else{
+				retVal="Rats(3 rats 1 attack, 1 defense, 1 body, 1 mind -- Rats can all go on one space if necessary, but can spread over multiple spaces if available. Initially, place to left and right of this space when viewing from door if space is available.)";
+				creatureCount[2]++;
+			}
 			break;
-		case (creatureType<45):
-			retVal+="Skeleton";
+		case (creatureType<33):
+			if (creatureCount[3]>=8 && retryCount<3){
+				retVal=getMonster(isWandering,questLevel,isHall,retryCount+1);
+			}else{
+				retVal+="Orc";
+				creatureCount[3]++;
+			}
 			break;
-		case (creatureType<60):
-			retVal+="Zombie";
+		case (creatureType<46):
+			if (creatureCount[4]>=4 && retryCount<3){
+				retVal=getMonster(isWandering,questLevel,isHall,retryCount+1);
+			}else{
+				retVal+="Skeleton";
+				creatureCount[4]++;
+			}
 			break;
-			case (creatureType<69):
+		case (creatureType<61):
+			if (creatureCount[5]>=4 && retryCount<3){
+				retVal=getMonster(isWandering,questLevel,isHall,retryCount+1);
+			}else{
+				retVal+="Zombie";
+				creatureCount[5]++;
+			}
+			break;
+		case (creatureType<70):
+			if (creatureCount[6]>=3 && retryCount<3){
+				retVal=getMonster(isWandering,questLevel,isHall,retryCount+1);
+			}else{
 				retVal+="Abomination";
-				break;
-		case (creatureType<78):
-			retVal="Gorgon(2 attack, 4 defend, 2 body, 1 mind, 5 move -- Each turn a gorgon can attack or put someone to sleep. If they put a hero to sleep, the hero remains asleep until rolling a 1 or a 6. On each turn, a hero may roll 1 die for each mind point. A hero who is asleep may not attack, defend, move, or perform any action. If a hero awakens at the beginning of their turn, they may continue the turn as normal.)"
+				creatureCount[6]++;
+			}
 			break;
-		case (creatureType<86):
-			retVal+="Spider(2 attack, 2 defense, 3 body, 1 mind, 7 move -- Any time a spider does damage to a player that player loses their next turn and cannot attack or defend until after their next turn.)";
+		case (creatureType<79):
+			if (creatureCount[7]>=4 && retryCount<3){
+				retVal=getMonster(isWandering,questLevel,isHall,retryCount+1);
+			}else{
+				retVal="Gorgon(2 attack, 4 defend, 2 body, 1 mind, 5 move -- Each turn a gorgon can attack or put someone to sleep. If they put a hero to sleep, the hero remains asleep until rolling a 1 or a 6. On each turn, a hero may roll 1 die for each mind point. A hero who is asleep may not attack, defend, move, or perform any action. If a hero awakens at the beginning of their turn, they may continue the turn as normal.)"
+				creatureCount[7]++;
+			}
+			break;
+		case (creatureType<87):
+			if (creatureCount[8]>=2 && retryCount<3){
+				retVal=getMonster(isWandering,questLevel,isHall,retryCount+1);
+			}else{
+				retVal+="Spider(2 attack, 2 defense, 3 body, 1 mind, 7 move -- Any time a spider does damage to a player that player loses their next turn and cannot attack or defend until after their next turn.)";
+				creatureCount[8]++;
+			}
 			break;
 		case (creatureType<94):
+			if (creatureCount[9]>=2 && retryCount<3){
+					retVal=getMonster(isWandering,questLevel,isHall,retryCount+1);
+			}else{
 				retVal+="Beast(4 attack, 2 defense, 3 body, 2 mind, 6 move)";
-				break;
+				creatureCount[9]++;
+			}
+			break;
 		case (creatureType<99):
-			retVal+="Mummy";
+			if (creatureCount[10]>=3 && retryCount<3){
+				retVal=getMonster(isWandering,questLevel,isHall,retryCount+1);
+			}else{
+				retVal+="Mummy";
+				creatureCount[10]++;
+			}
 			break;
 		case (creatureType<104):
-			retVal+="Dread Warrior";
-			//randomChance=Math.floor(Math.random()*20)+questLevel;
-			//if (randomChance>19){
-				//spellCount=Math.floor(Math.random()*(randomChance-19));
-				//if (spellCount>0){
-				//	if(spellCount>5){
-						//Don't let them have too many Dread Spells, it'll get ridiculous.
-				//		if(isHall==1){
-				//			spellCount=3;
-				//		}else{
-				//			spellCount=5;
-				//		}
-				//	}
-				switch(true){
-					case (questLevel>9&&questLevel<12):
-						spellCount=1;
-						break;
-					case (questLevel>11&&questLevel<14):
-						spellCount=2;
-						break;
-					case (questLevel>13&&questLevel<16):
-						spellCount=3;
-						break;
-					case (questLevel>15&&questLevel<18):			
-						spellCount=4;
-						break;
-					case (questLevel>17):
-						spellCount=5;
-						break;
-					default:
-						spellCount=0;
-						break;
-				}
-				var maxSpells=Math.floor(Math.random()*5)+1;
-				if (spellCount>maxSpells){
-					//alert("maxSpells");
-					spellCount=maxSpells;
-				}
-				if(spellCount>1){				
-					retVal+="(" + spellCount + " Dread Spells Drawn From Deck. Select randomly when casting.)";
-				}else{
-					if(spellCount==1){
-						retVal+="(" + spellCount + " Dread Spell Drawn From Deck)";
-					}
-				}
-				//}
-			//}
-			break;
-		case (creatureType<120):
-			retVal+="Gargoyle";
-			randomChance=Math.floor(Math.random()*20)+parseInt(document.getElementById("questLevel").value,10);
-			if (randomChance>19){
-				spellCount=Math.floor(Math.random()*(randomChance-19));
-				if (spellCount>0){
-					if(spellCount>5){
-						//Don't let them have too many Dread Spells, it'll get ridiculous.
-						if(isHall==1){
+			if (creatureCount[11]>=4 && retryCount<3){
+				retVal=getMonster(isWandering,questLevel,isHall,retryCount+1);
+			}else{
+				retVal+="Dread Warrior";
+				//randomChance=Math.floor(Math.random()*20)+questLevel;
+				//if (randomChance>19){
+					//spellCount=Math.floor(Math.random()*(randomChance-19));
+					//if (spellCount>0){
+					//	if(spellCount>5){
+							//Don't let them have too many Dread Spells, it'll get ridiculous.
+					//		if(isHall==1){
+					//			spellCount=3;
+					//		}else{
+					//			spellCount=5;
+					//		}
+					//	}
+					switch(true){
+						case (questLevel>9&&questLevel<12):
+							spellCount=1;
+							break;
+						case (questLevel>11&&questLevel<14):
 							spellCount=2;
-						}else{
+							break;
+						case (questLevel>13&&questLevel<16):
+							spellCount=3;
+							break;
+						case (questLevel>15&&questLevel<18):			
+							spellCount=4;
+							break;
+						case (questLevel>17):
 							spellCount=5;
+							break;
+						default:
+							spellCount=0;
+							break;
+					}
+					var maxSpells=Math.floor(Math.random()*5)+1;
+					if (spellCount>maxSpells){
+						//alert("maxSpells");
+						spellCount=maxSpells;
+					}
+					if(spellCount>1){				
+						retVal+="(" + spellCount + " Dread Spells Drawn From Deck. Select randomly when casting.)";
+					}else{
+						if(spellCount==1){
+							retVal+="(" + spellCount + " Dread Spell Drawn From Deck)";
 						}
 					}
-					retVal+="(" + spellCount + " Dread Spells Drawn From Deck)";
-				}
+					//}
+				//}
+				creatureCount[11]++;
 			}
+			break;
+		case (creatureType<120):
 			randomChance=Math.floor(Math.random()*100);
 			if (randomChance<questLevel){
-				retVal="Fire Demon(4 attack, 5 defend, 4 body, 4 mind, 5 move -- A fire demon may throw a flame in place of a normal attack. A thrown flame travels in a straight line, doing 3 damage to all heroes along its path. Each hero may roll defense dice to reduce this damage.)"
+				if (creatureCount[13]>=1 && retryCount<3){
+					retVal=getMonster(isWandering,questLevel,isHall,retryCount+1);
+				}else{
+					retVal="Fire Demon(4 attack, 5 defend, 4 body, 4 mind, 5 move -- A fire demon may throw a flame in place of a normal attack. A thrown flame travels in a straight line, doing 3 damage to all heroes along its path. Each hero may roll defense dice to reduce this damage.)"
+					creatureCount[13]++;
+				}
 				//Put this here to increase odds of getting a fire demon
+			}else{
+		
+				if (creatureCount[12]>=3 && retryCount<3){
+					retVal=getMonster(isWandering,questLevel,isHall,retryCount+1);
+				}else{
+					retVal+="Gargoyle";
+					creatureCount[12]++;
+					randomChance=Math.floor(Math.random()*20)+parseInt(document.getElementById("questLevel").value,10);
+					if (randomChance>19){
+						spellCount=Math.floor(Math.random()*(randomChance-19));
+						if (spellCount>0){
+							if(spellCount>5){
+								//Don't let them have too many Dread Spells, it'll get ridiculous.
+								if(isHall==1){
+									spellCount=2;
+								}else{
+									spellCount=5;
+								}
+							}
+							retVal+="(" + spellCount + " Dread Spells Drawn From Deck)";
+						}
+					}
+				}
 			}
 			break;
 		default:
-			retVal="Fire Demon(4 attack, 5 defend, 4 body, 4 mind, 5 move -- A fire demon may throw a flame in place of a normal attack. A thrown flame travels in a straight line, doing 3 damage to all heroes along its path. Each hero may roll defense dice to reduce this damage.)"
+			if (creatureCount[13]>=1 && retryCount<3){
+				retVal=getMonster(isWandering,questLevel,isHall,retryCount+1);
+			}else{
+				retVal="Fire Demon(4 attack, 5 defend, 4 body, 4 mind, 5 move -- A fire demon may throw a flame in place of a normal attack. A thrown flame travels in a straight line, doing 3 damage to all heroes along its path. Each hero may roll defense dice to reduce this damage.)"
+				creatureCount[13]++;
+			}
 			break;
 	}
 	//retVal+= Math.floor((Math.random()*12)+1)+'\n';
@@ -1945,6 +2030,32 @@ function listRoomContents(roomNum,curTime){
 	var roomContents="";
 	var pos=100;
 
+	//alert(roomNum);
+	//alert(numRows);
+	
+	switch(roomNum){
+		case 26:
+		case 28:
+			numRows=17;
+			checkRow=getStartRow(26);
+			break;
+		case 27:
+		case 29:
+			numRows=17;
+			checkRow=getStartRow(26);
+			break;
+		case 22:
+		case 24:
+			numCols=26;	
+			checkCol=getStartCol(22);
+			break;
+		case 23:
+		case 25:
+			numCols=26;	
+			checkCol=getStartCol(22);
+			break;
+	}
+	//alert(numRows);
 
 	for(let x=0;x<numRows;x++){
 		for(let y=0;y<numCols;y++){
@@ -2112,7 +2223,12 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 	}
 
 
-
+	//loop through to blank out creatureCount array
+	var myCounter=0;
+	while(myCounter<20){
+		creatureCount[myCounter]=0;
+		myCounter+=1;
+	}
 
 
 	startRow=getStartRow(roomNum);
