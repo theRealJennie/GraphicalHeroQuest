@@ -42,13 +42,22 @@
 </head>
 
 <body style="background-color: AntiqueWhite;">
+
+<div class="container">
+<div class="row">
+<div class="col-8">
+
 <div class="row"style="line-height: 0;padding:10px;max-width:28.5rem;" id="gameBoard">
+
+</div>
 
 </div>
 
 <!--<div class="row">
 	<div id="statusCode"></div><div id="locationCode"></div><div id="furnitureCode"></div>
 </div>-->
+<div class="col-lg-4">
+
 <div class="row">
 	<div class="col-sm">
 		Quest Level:
@@ -79,14 +88,17 @@
 	</div>
 	<div class="col-sm">
 		<button class="btn btn-rounded" onclick="openSearch()">Open Search Item</button>
-	</div>
+	</div>	
 </div>
 <div class="row">
 	<div class="col-sm">
 		<button class="btn btn-rounded" onclick="wanderingMonster()">Get Wandering Monster</button>
 	</div>
-	<div class="col-sm">
+<!--	<div class="col-sm">
 
+	</div>-->
+	<div class="col-sm">
+		<button class="btn btn-rounded" onclick="openHallSearch()">Open Hall Search</button>
 	</div>
 </div>
 <div class="row">
@@ -103,6 +115,11 @@
 		<button class="btn btn-rounded" onclick="document.getElementById('results').value = gameBoard">Dump GameBoard</button>
 	</div>-->
 </div>
+
+</div>
+</div>
+</div>
+
 <div>
 <textarea class="form-control" id="results" rows=12 name="results">
 </textarea>
@@ -715,8 +732,10 @@ function wanderingMonster(){
 	document.getElementById("results").value = myList;
 }
 
-function openSearch(){
-
+function openHallSearch(){
+	openSearch(true);
+}
+function openSearch(isHall=false){
 	//Adding a timestamp so we can be sure contents have changed
 	const d = new Date();
 	let text = d.toLocaleTimeString();
@@ -737,7 +756,18 @@ function openSearch(){
 	myList+="The searchable item is";
 
 	itemType=Math.floor(Math.random() *100)+1;
-
+	
+	if(isHall==true){
+		//Added this 7-25-22 to give a higher change of secret door if a hallway.
+		randomTotal=Math.floor(Math.random() *100)+1;
+		alert("Got to here!");
+		if (randomTotal<20){
+		alert("Got to here too!");
+			itemType=80;
+		}
+	}
+	
+	
 	switch (true){
 		case (itemType<50):
 			randomChance=Math.floor(Math.random()*100);
@@ -3104,12 +3134,14 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 			//case 3: Got rid of this one to decrease odds of getting a search item. 6-10-22
 			//case 4: Got rid of this one to decrease odds of getting a search item. 6-10-22
 			//case 5: Got rid of this one to decrease odds of getting a search item. 6-10-22
+			case 5://Added this back 7-25-22 to make up for the % that go to search items now.
 			case 6:
 			case 7:
 				numItems=1;
 				break;
 			case 8:
 			case 9:
+			case 10: //Added this back 7-25-22 to make up for the % that go to search items now.
 			//case 10: Got rid of this one to decrease odds of getting a search item. 6-10-22
 			//case 11: Got rid of this one to decrease odds of getting a search item. 6-10-22
 			//case 12: Got rid of this one to decrease odds of getting a search item. 6-10-22
@@ -3118,6 +3150,7 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 				numItems=2;
 				break;
 			case 15:
+			case 16: //Added this back 7-25-22 to make up for the % that go to search items now.
 			//case 16: Got rid of this one to decrease odds of getting a search item. 6-10-22
 			//case 17: Got rid of this one to decrease odds of getting a search item. 6-10-22
 			//case 18:Got rid of this one to decrease odds of getting a search item. 6-10-22
@@ -3136,7 +3169,15 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 	while(numItems>0){
 		if(roomNum>21){
 			//this is a hall, so the item becomes a block
+			
+			//As of 7-25 it can be a search item up to 15% of time
+			randomRow=Math.floor(Math.random()*7);
+			if(randomRow==5){
+				tempFurn="S I";
+			}else{
+			
 			tempFurn="BLK";//"Block";
+			}
 		}else{
 			tempFurn="S I";//"Search Item";
 		}
