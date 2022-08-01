@@ -83,12 +83,15 @@
 	</div>
 </div>-->
 <div class="row">
-	<div class="col-sm">
+	<!--<div class="col-sm">
 		<button class="btn btn-rounded" onclick="openHall()">Open A Hall</button>
-	</div>
+	</div>-->
 	<div class="col-sm">
 		<button class="btn btn-rounded" onclick="openSearch()">Open Search Item</button>
 	</div>	
+	<div class="col-sm">
+		<button class="btn btn-rounded" onclick="openHallSearch()">Open Hall Search</button>
+	</div>
 </div>
 <div class="row">
 	<div class="col-sm">
@@ -96,10 +99,10 @@
 	</div>
 <!--	<div class="col-sm">
 
-	</div>-->
+	</div>
 	<div class="col-sm">
 		<button class="btn btn-rounded" onclick="openHallSearch()">Open Hall Search</button>
-	</div>
+	</div>-->
 </div>
 <div class="row">
 	<div class="col-sm">
@@ -759,10 +762,11 @@ function openSearch(isHall=false){
 	
 	if(isHall==true){
 		//Added this 7-25-22 to give a higher change of secret door if a hallway.
+		//Added this 8-1-22 to give an even higher chance of secret door if a hallway.
 		randomTotal=Math.floor(Math.random() *100)+1;
-		alert("Got to here!");
-		if (randomTotal<20){
-		alert("Got to here too!");
+		//alert("Got to here!");
+		if (randomTotal<60){
+			//alert("Got to here too!");
 			itemType=80;
 		}
 	}
@@ -3171,13 +3175,29 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 			//this is a hall, so the item becomes a block
 			
 			//As of 7-25 it can be a search item up to 15% of time
-			randomRow=Math.floor(Math.random()*7);
-			if(randomRow==5){
+			//As of 8-1 25% are search items and 25% of time is nothing
+			randomRow=Math.floor(Math.random()*8);
+			
+			switch(randomRow){
+				case 5:
+				case 6:
+					tempFurn="S I";
+					break;
+				case 2:
+				case 4:
+				case 7:
+				case 1:
+					tempFurn="BLK";
+					break;
+				default:
+					//do nothing
+			}
+			/*if(randomRow==5||randomRow==6){
 				tempFurn="S I";
 			}else{
 			
 			tempFurn="BLK";//"Block";
-			}
+			}*/
 		}else{
 			tempFurn="S I";//"Search Item";
 		}
