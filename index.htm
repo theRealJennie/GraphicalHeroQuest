@@ -171,6 +171,9 @@ If you run out of a creature, replace with the next toughest creature available 
 <p>Special rules for small furniture: Ordinarily, furniture must remain in the place it is placed. In cases where creatures are cutoff and there is no other way to reach them, the characters can move small furniture aside, or even to another room when necessary. If another door opens to the space, they must use that instead, though. This applies to the small table, throne, some tables, etc. Use common sense.
 </p>
 <p>
+Note that new heal potion(4) can be purchased between any quests for 100 gold, so don't forget to stock up before you begin.
+<p>
+<p>
 Exiting: When you've cleared all of the lair, return to the stairs. But you'll find a surprise waiting for you there. Use the Open Exit Room button to find out if any creatures have snuck in behind you and cut off your exit. If so, you have to kill them before you can leave. Upon leaving, you will get a reward, which is based on the level of the quest.
 </p>
 
@@ -428,10 +431,10 @@ function getMonster(isWandering=0, questLevel=0, isHall=0, retryCount=0){
 							spellCount=3;
 							break;
 						case (questLevel>15&&questLevel<18):			
-							spellCount=4;
+							spellCount=3;
 							break;
 						case (questLevel>17):
-							spellCount=5;
+							spellCount=3;
 							break;
 						default:
 							spellCount=0;
@@ -443,7 +446,7 @@ function getMonster(isWandering=0, questLevel=0, isHall=0, retryCount=0){
 						spellCount=maxSpells;
 					}
 					if(spellCount>1){				
-						retVal+="(" + spellCount + " Dread Spells Drawn From Deck. Select randomly when casting.)";
+						retVal+="(" + spellCount + " Dread Spells drawn from deck. Select randomly when casting.)";
 					}else{
 						if(spellCount==1){
 							retVal+="(" + spellCount + " Dread Spell Drawn From Deck)";
@@ -714,7 +717,7 @@ function showFinalReward(){
 			note+="5"
 			break;
 	}
-	note+=" gold by King Dunong as a show of His Majesty's gratitude.";
+	note+=" gold by King Filbon as a show of His Majesty's gratitude.";
 	alert(note);
 }
 function wanderingMonster(){
@@ -818,7 +821,7 @@ function openSearch(isHall=false){
 					case 18:
 					case 19:
 						randomTotal=Math.floor(Math.random()*10)*5;
-						myList+=" paper money worth " + randomTotal *10 + " gold! The bills crumble to dust as you reach for them, unforunately.";
+						myList+=" paper money worth " + randomTotal *10 + " gold! The bills crumble to dust as you reach for them, unfortunately.";
 						break;
 					case 20:
 					case 21:
@@ -3135,7 +3138,7 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 			case 0:
 			case 1:
 			case 2:
-			//case 3: Got rid of this one to decrease odds of getting a search item. 6-10-22
+			case 3: 
 			//case 4: Got rid of this one to decrease odds of getting a search item. 6-10-22
 			//case 5: Got rid of this one to decrease odds of getting a search item. 6-10-22
 			case 5://Added this back 7-25-22 to make up for the % that go to search items now.
