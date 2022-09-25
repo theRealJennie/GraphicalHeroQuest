@@ -171,10 +171,13 @@ If you run out of a creature, replace with the next toughest creature available 
 <p>Special rules for small furniture: Ordinarily, furniture must remain in the place it is placed. In cases where creatures are cutoff and there is no other way to reach them, the characters can move small furniture aside, or even to another room when necessary. If another door opens to the space, they must use that instead, though. This applies to the small table, throne, some tables, etc. Use common sense.
 </p>
 <p>
-Note that new heal potion(4) can be purchased between any quests for 100 gold, so don't forget to stock up before you begin.
+Note that new heal potion(4) can be purchased between any quests for 200 gold, so don't forget to stock up before you begin.
 <p>
 <p>
 Exiting: When you've cleared all of the lair, return to the stairs. But you'll find a surprise waiting for you there. Use the Open Exit Room button to find out if any creatures have snuck in behind you and cut off your exit. If so, you have to kill them before you can leave. Upon leaving, you will get a reward, which is based on the level of the quest.
+</p>
+<p>
+	Priority precedent for creatures that automatically move first: Ghoul, Gorgon, Fire Demons, Gargoyles, then Dread Warriors
 </p>
 
 
@@ -1325,13 +1328,7 @@ function showBoard(){
 
 				newGameBoard+="<td ";
 
-			/*	if(rowSpan>0){
-					newGameBoard+=" rowspan=" +rowSpan;
-				}
-				if(colSpan>0){
-						newGameBoard+=" colspan=" +colSpan;
-				}*/
-
+		
 				newGameBoard+=" style='background: " + gameBoard[row][col][6] + "; ";
 
 				//Set borders for walls
@@ -1471,7 +1468,7 @@ function doorBlockedByFurniture(checkRow, checkCol){
 	}
 	return isBlocked;
 }
-function roomsShareADoor(room1,room2,roomSide){
+function roomsShareADoor(room1,room2,roomSide,alreadyCompared=false){
 	var checkRow=0;
 	var checkCol=0;
 	var checkedList=room1+","+room2+"--";
@@ -1563,6 +1560,71 @@ function roomsShareADoor(room1,room2,roomSide){
 					checkCol++;
 				}
 				break;
+		}
+	}
+	
+	//09-25-22 Need to check the corners in the hall, because there is a space there where two halls border the same room along same wall, which
+	//can give us a problem
+	if(alreadyCompared==false){
+		//This is to prevent an infinite loop of calling itself
+		if(room1>21||room2>21){
+			//One of these is a hall, so we need to check corners
+			if (room1<room2){
+				switch(room1){
+					case 4:
+						if(room2==32){
+							if (roomsShareADoor(room1,36,roomSide,true)==true){
+								return true;
+							}
+						}else{							
+							if(room2==36){
+								if (roomsShareADoor(room1,32,roomSide,true)==true){
+									return true;
+								}
+							}
+						}		
+						break;
+					case 8:
+						if(room2==32){
+							if (roomsShareADoor(room1,37,roomSide,true)==true){
+								return true;
+							}
+						}else{							
+							if(room2==37){
+								if (roomsShareADoor(room1,32,roomSide,true)==true){
+									return true;
+								}
+							}
+						}		
+						break;
+					case 12:
+						if(room2==33){
+							if (roomsShareADoor(room1,36,roomSide,true)==true){
+								return true;
+							}
+						}else{							
+							if(room2==36){
+								if (roomsShareADoor(room1,33,roomSide,true)==true){
+									return true;
+								}
+							}
+						}		
+						break;
+					case 16:
+						if(room2==33){
+							if (roomsShareADoor(room1,37,roomSide,true)==true){
+								return true;
+							}
+						}else{							
+							if(room2==37){
+								if (roomsShareADoor(room1,33,roomSide,true)==true){
+									return true;
+								}
+							}
+						}		
+						break;
+				}
+			}
 		}
 	}
 	
@@ -2245,7 +2307,7 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 	}
 
 
-
+	//alert(roomNum)
 
 	if(isLastRoom==0&&roomNum<21){ //Can still be hall or exit room
 		if(roomCount==roomMax-1){
