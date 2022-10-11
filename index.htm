@@ -177,7 +177,7 @@ Note that new heal potion(4) can be purchased between any quests for 200 gold, s
 Exiting: When you've cleared all of the lair, return to the stairs. But you'll find a surprise waiting for you there. Use the Open Exit Room button to find out if any creatures have snuck in behind you and cut off your exit. If so, you have to kill them before you can leave. Upon leaving, you will get a reward, which is based on the level of the quest.
 </p>
 <p>
-	Priority precedent for creatures that automatically move first: Ghoul, Gorgon, Fire Demons, Gargoyles, then Dread Warriors
+Priority precedent for creatures that automatically move first: Ghoul, Gorgon, Fire Demons, Gargoyles, then Dread Warriors
 </p>
 
 
@@ -2211,7 +2211,12 @@ function reduceDoorCount(numOfDoors=0,roomNumber){
 			zeroChance=Math.floor(Math.random()*100)+1;
 			if(zeroChance<questLevel){
 				//alert("zeroChance");
-				doorcount=0;
+				//alert("Reduced doorcounts to 0--Originally "+numOfDoors );
+				//doorcount=0;	
+				//Changed this to just reduce the doorcount by 2 on 10-11-2022 because we were getting way too few rooms.
+				//This gives us a chance at having some doors, at least.
+				doorcount=doorcount-2;
+				
 				return;
 			}
 			
@@ -3199,18 +3204,18 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 		switch(randomChance){
 			case 0:
 			case 1:
-			case 2:
-			case 3: 
+			//case 2: Got rid of this one to decrease odds of getting a search item. 10-11-22
+			//case 3: Got rid of this one to decrease odds of getting a search item. 10-11-22
 			//case 4: Got rid of this one to decrease odds of getting a search item. 6-10-22
 			//case 5: Got rid of this one to decrease odds of getting a search item. 6-10-22
-			case 5://Added this back 7-25-22 to make up for the % that go to search items now.
+			//case 5://Added this back 7-25-22 to make up for the % that go to search items now.//And got rid of it again 10-11-22
 			case 6:
 			case 7:
 				numItems=1;
 				break;
 			case 8:
 			case 9:
-			case 10: //Added this back 7-25-22 to make up for the % that go to search items now.
+			//case 10: //Added this back 7-25-22 to make up for the % that go to search items now. //And got rid of it again 10-11-22
 			//case 10: Got rid of this one to decrease odds of getting a search item. 6-10-22
 			//case 11: Got rid of this one to decrease odds of getting a search item. 6-10-22
 			//case 12: Got rid of this one to decrease odds of getting a search item. 6-10-22
@@ -3219,7 +3224,7 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 				numItems=2;
 				break;
 			case 15:
-			case 16: //Added this back 7-25-22 to make up for the % that go to search items now.
+			//case 16: //Added this back 7-25-22 to make up for the % that go to search items now. //And got rid of it again 10-11-22
 			//case 16: Got rid of this one to decrease odds of getting a search item. 6-10-22
 			//case 17: Got rid of this one to decrease odds of getting a search item. 6-10-22
 			//case 18:Got rid of this one to decrease odds of getting a search item. 6-10-22
