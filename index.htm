@@ -1631,6 +1631,63 @@ function roomsShareADoor(room1,room2,roomSide,alreadyCompared=false){
 	return false;
 }
 
+function checkTraps(){
+	//This function checks to see if a randomly selected trap is triggered and against which character
+	
+	//pit
+	//falling block
+	//Spear
+	//rat
+	//skull
+	
+	//Currently, just select a trap 5% of the time.
+	
+	var trapNum=0;
+	var charNum=0;
+	trapNum=Math.floor(Math.random()*80)+1;
+	charNum=Math.floor(Math.random()*4)+1;
+	
+	
+	//alert(trapNum + "  " + charNum);
+	switch(charNum){
+		case 1:
+			charNum="first";
+			break;
+		case 2:
+			charNum="second";
+			break;
+		case 3:
+			charNum="third";
+			break;
+		case 4:
+			charNum="fourth";
+			break;
+	}
+	switch(trapNum){
+		case 10:
+			//Pit trap
+			alert("A pit opens in the floor underneath the character who moves " + charNum + " and they take one damage. If this is the character who opened the door their turn ends. From now on, any player crossing that space must jump over it to pass. To try to jump a pit you must have enough on your roll to move onto the square past it. Then roll one combat die. If you roll a skull, you fall into the pit and take one damage and end your turn. Otherwise, you succeed and can continue the turn as usual.");
+			break;
+		case 20:
+			//falling block
+			alert("The ceiling of the dungeon crumbles and falls upon the character who moves " + charNum + ". Roll 3 combat dice and take one damage for each skull rolled. Place a block on this tile and roll a die to randomly choose which side of the block you must move to. If this is the character who opened the door, their turn ends.");
+			break;			
+		case 30:
+			//Spear
+			alert("A spear suddenly shoots from a nearby wall, striking the character who moves " + charNum + ". Roll 1 combat die and suffer one damage if a skull is rolled.");
+			break;
+		case 40:
+			//Rat
+			alert("A horde of rats appear and immediately attacks the character who moves " + charNum + ".");
+			break;
+		case 50:
+			//Skull
+			alert("A net hanging from the ceiling bursts open and spills a pile of skulls onto the character who moves " + charNum + ". Roll 1 combat dies and suffer one damage if a skull is rolled. From now on all players must use two moves to pass this square because of the poor footing.");
+			break;		
+	}
+	
+}
+
 function getStartRow(checkRoom){
 	//This returns the starting column for a room
 
@@ -2356,6 +2413,9 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 		//Actually only needs first cell marked, really.
 	//	gameBoard[startRow][startCol][7]=1;
 		//I moved this to the end of the function. Now it will only be marked as in use if it successfully completes this function.
+		
+		//10-23-22 Also check to see if any traps are triggered
+		checkTraps();
 	}
 
 	backupTable("M");
