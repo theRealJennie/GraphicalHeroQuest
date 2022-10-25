@@ -177,7 +177,7 @@ Note that new heal potion(4) can be purchased between any quests for 200 gold, s
 Exiting: When you've cleared all of the lair, return to the stairs. But you'll find a surprise waiting for you there. Use the Open Exit Room button to find out if any creatures have snuck in behind you and cut off your exit. If so, you have to kill them before you can leave. Upon leaving, you will get a reward, which is based on the level of the quest.
 </p>
 <p>
-Priority precedent for creatures that automatically move first: Ghoul, Gorgon, Fire Demons, Gargoyles, then Dread Warriors
+Priority precedent for creatures that automatically move first: Ghoul, Gorgon, Fire Demons, Gargoyles, then Dread Warriors, then from toughest to weakest.
 </p>
 
 
@@ -297,6 +297,24 @@ function getMonster(isWandering=0, questLevel=0, isHall=0, retryCount=0){
 				creatureType=Math.floor(Math.random()*109)-10;
 			}
 			break;
+		case (questLevel<24):
+			//increase chance of hard creatures a bit by recalculating if number is low
+			if (creatureType<80){
+				creatureType=Math.floor(Math.random()*109)-10;
+			}
+			break;
+		case (questLevel>28):
+			//increase chance of hard creatures a bit by recalculating if number is low
+			if (creatureType<90){
+				creatureType=Math.floor(Math.random()*109);
+			}
+			break;	
+		case (questLevel>32):
+			//increase chance of hard creatures a bit by recalculating if number is low
+			if (creatureType<100){
+				creatureType=Math.floor(Math.random()*109);
+			}
+			break;	
 		default:
 			//increase chance of hard creatures a bit by recalculating if number is low
 			if (creatureType<75){
@@ -312,7 +330,7 @@ function getMonster(isWandering=0, questLevel=0, isHall=0, retryCount=0){
 
 	//if(creatureType<90){creatureType=10;}
 	//if(retryCount>0){alert(retryCount);}
-		
+
 	switch(true){
 		case (creatureType<16):
 			//When I added the Ghoul trap I also added the Ghoul here. It seemed reasonable it should replace about 1/4 of the goblins.
@@ -390,7 +408,7 @@ function getMonster(isWandering=0, questLevel=0, isHall=0, retryCount=0){
 				creatureCount[8]++;
 			}
 			break;
-		case (creatureType<94):
+		case (creatureType<92):
 			if (creatureCount[9]>=2 && retryCount<3){
 					retVal=getMonster(isWandering,questLevel,isHall,retryCount+1);
 			}else{
@@ -398,7 +416,7 @@ function getMonster(isWandering=0, questLevel=0, isHall=0, retryCount=0){
 				creatureCount[9]++;
 			}
 			break;
-		case (creatureType<99):
+		case (creatureType<97):
 			if (creatureCount[10]>=3 && retryCount<3){
 				retVal=getMonster(isWandering,questLevel,isHall,retryCount+1);
 			}else{
@@ -406,7 +424,7 @@ function getMonster(isWandering=0, questLevel=0, isHall=0, retryCount=0){
 				creatureCount[10]++;
 			}
 			break;
-		case (creatureType<104):
+		case (creatureType<102):
 			if (creatureCount[11]>=4 && retryCount<3){
 				retVal=getMonster(isWandering,questLevel,isHall,retryCount+1);
 			}else{
@@ -460,13 +478,13 @@ function getMonster(isWandering=0, questLevel=0, isHall=0, retryCount=0){
 				creatureCount[11]++;
 			}
 			break;
-		case (creatureType<120):
+		case (creatureType<116):
 			randomChance=Math.floor(Math.random()*100);
 			if (randomChance<questLevel){
 				if (creatureCount[13]>=1 && retryCount<3){
 					retVal=getMonster(isWandering,questLevel,isHall,retryCount+1);
 				}else{
-					retVal="Fire Demon(4 attack, 5 defend, 4 body, 4 mind, 5 move -- A fire demon may throw a flame in place of a normal attack. A thrown flame travels in a straight line, doing 3 damage to all heroes along its path. Each hero may roll defense dice to reduce this damage.)"
+					retVal="Fire Demon(4 attack, 5 defend, 4 body, 4 mind, 5 move -- A fire demon may throw a flame in place of a normal attack. A thrown flame travels in a straight line, doing 3 damage to all heroes along its path. Each hero may roll defense dice to reduce this damage.)";
 					creatureCount[13]++;
 				}
 				//Put this here to increase odds of getting a fire demon
@@ -493,6 +511,15 @@ function getMonster(isWandering=0, questLevel=0, isHall=0, retryCount=0){
 						}
 					}
 				}
+			}
+			break;
+		case (creatureType<126):
+			
+			if(creatureCount[14]>=4 && retryCount<3){
+				retVal=getMonster(isWandering,questLevel,isHall,retryCount+1);
+			}else{
+				retVal="Replicant(move 10 - att, def, mind, body equal to the first hero it sees. On each of its turns after that it randomly reassigns to any hero it can see.)"
+				creatureCount[14]++;
 			}
 			break;
 		default:
