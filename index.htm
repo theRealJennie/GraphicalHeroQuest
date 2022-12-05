@@ -118,6 +118,13 @@
 		<button class="btn btn-rounded" onclick="document.getElementById('results').value = gameBoard">Dump GameBoard</button>
 	</div>-->
 </div>
+<div class="row">
+	<div class="col-sm">
+		<!--<button class="btn btn-rounded" onclick="generateBlankBoard()">Generate Blank Board</button>-->
+		<input type="checkbox" id="chkPanda" name="chkPanda" >
+		<label for="chkPanda"> Include Panda</label>
+	</div>
+</div>
 
 </div>
 </div>
@@ -192,6 +199,7 @@ var gameBoardBackup=new Array(19);
 var artifactCount=0;
 var itemCount=new Array(20);
 var creatureCount=new Array(20);
+var pandaCount=0;
 
 //gameBoard position definitions:
 //0-room number
@@ -522,6 +530,7 @@ function getMonster(isWandering=0, questLevel=0, isHall=0, retryCount=0){
 				creatureCount[14]++;
 			}
 			break;
+//Skip 15, it's used for the Giant Panda
 		default:
 			if (creatureCount[13]>=1 && retryCount<3){
 				retVal=getMonster(isWandering,questLevel,isHall,retryCount+1);
@@ -534,6 +543,59 @@ function getMonster(isWandering=0, questLevel=0, isHall=0, retryCount=0){
 	//retVal+= Math.floor((Math.random()*12)+1)+'\n';
 	return retVal;
 
+}
+
+function getPanda(roomNum){
+	//This randomly decides whether a room has the Giant Panda and if it does places it anywhere except on furniture.
+		
+	if( pandaCount>0){
+		//It only appears once per quest, so don't show it again.
+	}else{
+		placePanda=Math.floor(Math.random()*10);
+		
+		switch(placePanda){
+			//Multiple chances, even though we only want it to appear once. I'd rather be pretty sure it'll show up at some point.
+			case 3:
+			case 5:
+			case 7:
+				
+				
+				for(let pandaAttempts=0;pandaAttempts<=2;pandaAttempts++){
+					//We need the width and height of the room
+					
+					roomWidth=getRoomCols(roomNum);
+					roomHeight=getRoomRows(roomNum);
+					
+					startCol=getStartCol(roomNum);
+					startRow=getStartRow(roomNum);
+					
+					
+					
+					//Now randomly select a position within that square. Yes, I know we have two rooms that won't work on.
+					y=Math.floor(Math.random()*roomHeight);
+					x=Math.floor(Math.random()*roomWidth);
+					
+					
+					
+					//Now check the gameboard and make sure there isn't any furniture there. If so, try up to two more times.
+					if (gameBoard[startRow+x][startCol+y][1].indexOf("furniture")>=0){
+						//do nothing
+						
+					}else{
+						//Place the Panda
+						gameBoard[startRow+x][startCol+y][1]+=" Panda ";
+						pandaCount+=1;
+						creatureCount[15]+=1;
+						break;
+					}
+				}				
+				break;
+			default:
+				//Do nothing				
+				break;
+		}
+	}
+	return;
 }
 
 function getFurniture(){
@@ -909,6 +971,7 @@ function openSearch(isHall=false){
 function generateBlankBoard(){
 	//Adding this 5-7-22 so that we can limit artifact to one per game, but resets it when a new game is started
 	artifactCount=0;
+	pandaCount=0;
 	
 	var myCounter=0;
 	while(myCounter<20){
@@ -1432,7 +1495,15 @@ function showBoard(){
 								if(tempText.includes("Fire Demon")==true){
 									newGameBoard+="F D";
 								}else{
-									newGameBoard+=gameBoard[row][col][1].substr(0,3);
+									
+									//newGameBoard+=gameBoard[row][col][1].substr(0,3);
+									if(tempText.includes("Panda")==true){
+										newGameBoard+="<span style='font-size: .5rem;color:red !important;'>"+gameBoard[row][col][1].substr(0,3)+"-P</span>";
+									}else{
+										
+										newGameBoard+=gameBoard[row][col][1].substr(0,3);
+										
+									}
 								}
 							}
 						}
@@ -3430,6 +3501,13 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 	}
 
 	roomCount++;	
+	
+	//Added this 12-3-2022 to add a one-off creature possibility
+	if (chkPanda.checked && pandaCount==0){	
+		//alert(pandaCount);
+		getPanda(roomNum);		
+		//alert("tried to do panda " + pandaCount);
+	}
 	
 	gameBoard[startRow][startCol][7]=1;
 	//document.getElementById("results").value="("+curTime+" Room " +roomNum +")"
