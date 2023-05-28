@@ -2433,97 +2433,32 @@ function updateMissedRoom(roomNum){
 			break;
 	}
 }
-function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 
-	
-	//This function desperately needs to be refactored to split some sections off into their own functions, which would make it easier to read and maintain
+function addDoors(roomNum, isLastRoom){
+
 	var startRow=0;
 	var startCol=0;
-	var numRows=0;
-	var numCols=0;
-	var tempFurn="";
-	var tempFurnWidth=0;
-	var tempFurnHeight=0;
-	var furnArea=0;
-	var randomChance=0;
-	var numItems=0;
-	var randomRow=0;
-	var randomCol=0;
 	var checkRow=0;
 	var checkCol=0;
-	var largeItemCount=0;
-	var medItemCount=0;
-	var isBlocked=false;
-	const d = new Date();
-	let curTime = d.toLocaleTimeString();
-	let questLevel=(parseInt(document.getElementById("questLevel").value,10))
-	let roomMax=(parseInt(document.getElementById("maxRooms").value,10))
+	var numCols=0;
+	var numRows=0;
+	var randomChance=0;
+	var numItems=0;
 	
 	
-
-	if(document.getElementById("questLevel").value.length<=0){
-		alert( " Please select the quest level");
-		return;
-	}
-
-
-	//alert(roomNum)
-
-	if(isLastRoom==0&&roomNum<21){ //Can still be hall or exit room
-		if(roomCount==roomMax-1){
-			alert("((Last Room))");
-
-		}else{
-			if(roomCount>=roomMax){
-			alert("((Exceeds Max Room Count))");
-			return;
-			}
-		}
-	}
-
-
-	//loop through to blank out creatureCount array
-	var myCounter=0;
-	while(myCounter<20){
-		creatureCount[myCounter]=0;
-		myCounter+=1;
-	}
-
-
 	startRow=getStartRow(roomNum);
 	startCol=getStartCol(roomNum);
 	numCols=getRoomCols(roomNum);
 	numRows=getRoomRows(roomNum);
-
-
-
-	//Now check to see if this room is already marked as being in use
-	if(gameBoard[startRow][startCol][7]!=0&&isLastRoom==0){
-		//Room is already in use, so refresh board and exit this function
-		if(roomNum>21&&roomNum<30){
-			updateMissedRoom(roomNum);
-		}
-		showBoard();
-		listRoomContents(roomNum,curTime);
-		return;
-	}else{
-		//It is not already in use, so mark it
-		//Actually only needs first cell marked, really.
-	//	gameBoard[startRow][startCol][7]=1;
-		//I moved this to the end of the function. Now it will only be marked as in use if it successfully completes this function.
-		
-		//10-23-22 Also check to see if any traps are triggered
-		checkTraps();
-	}
-
-	backupTable("M");
-
-
-
-	if(isLastRoom==0){
+	
+	
+	
+	if(isLastRoom==0){		
 	//Last room (exit) gets no doors because it is already open
+	
 		//Place Doors in the room
 		numItems=Math.floor(Math.random()*4)+1;
+		
 		//Up to 4 doors in a room, one on each side
 		//But if the room is not a hall, decrease the number by a small percentage
 		numItems=reduceDoorCount(numItems, roomNum);
@@ -2563,17 +2498,15 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 			default:
 				break;
 		}
+		
 		randomChance+=2;//This is because left edge is position 2 in the array, so we add 2. So a 0 gets 2 added to become position 2 in array and will be left side. 1 gets 2 added to become position 3 in the array and is the right side, etc.
 		//Now check to see if the room already has a door on that side and skip if it does.
 		tryDoor:{
 			checkCol=startCol;
 			checkRow=startRow;
 
-
 			//Check halls to make sure we aren't trying to put a door on the outside edge of the board.
-
-			//If we get to here it means that we are ok to put a door along this wall, so do so;
-
+			
 				if(randomChance==2||randomChance==3){
 					checkRow=Math.floor(Math.random()*numRows);
 					checkRow=checkRow+(startRow);
@@ -2583,7 +2516,7 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 						if(gameBoard[checkRow][startCol][randomChance]!=0){
 							//Before placing door in a hall, double check to make sure there isn't a door between this room and the hall already
 							//This is only necessary because we don't limit the number of doors in a hall
-						//setTimeout(myFunction, 3000)
+							
 							if(roomsShareADoor(roomNum,gameBoard[checkRow][startCol-1][0],2)==false){
 								if(doorBlockedByFurniture(checkRow,startCol-1)==false){					
 									gameBoard[checkRow][startCol][randomChance]=2;
@@ -2640,9 +2573,34 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 		numItems--;
 		}
 	}
+	return;
+	
+}
 
-
-
+function addFurniture(roomNum, isLastRoom){
+	
+	var randomChance=0;
+	var isBlocked=0;
+	var tempFurn=0;
+	var tempFurnWidth=0;
+	var tempFurnHeight=0;
+	var furnArea=0;
+		
+	var startRow=0;
+	var startCol=0;
+	var checkRow=0;
+	var checkCol=0;
+	var numCols=0;
+	var numRows=0;
+	
+		
+	startRow=getStartRow(roomNum);
+	startCol=getStartCol(roomNum);
+	numCols=getRoomCols(roomNum);
+	numRows=getRoomRows(roomNum);
+	
+	
+	
 	if(isLastRoom==0){
 	//Exit room gets no additional furniture
 		//Place Furniture in the room
@@ -2695,32 +2653,23 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 					tempFurnHeight=getFurnitureLength(tempFurn);
 					furnArea=tempFurnWidth*tempFurnHeight;
 
-
+					
 					placeFurniture:{
 
 						if(furnArea>=((numRows*numCols))){
 							//Item has to be skipped, this room is too small
 							break placeFurniture;
 						}else{
+						
 							if((tempFurnWidth>numCols && tempFurnWidth>numRows)||(tempFurnHeight>numCols && tempFurnHeight>numRows)||(tempFurnHeight<numCols && tempFurnWidth>numRows)||(tempFurnWidth>numCols && tempFurnHeight>numRows)){
 								//Still won't fit, so skip it
 								break placeFurniture;
 							}else{
+							
 								//Now try to place it and see if it'll fit with existing items, doors, etc.
 								//With furniture it makes sense to place it against walls? Allow items to stick into room, though.
 
-								if(furnArea>=6){
-									largeItemCount++;
-									if(largeItemCount>1){
-										//Limit 1 big item (table, alchemist bench, etc) per room
-										break placeFurniture;
-									}
-								}else{
-									if(furnArea>=3){
-										medItemCount++;
-									}
-								}
-
+							
 								//First, randomly decide whether to swap direction of furniture item
 								randomChance=Math.floor(Math.random()*2);
 
@@ -2770,8 +2719,6 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 										}
 										break;
 								}
-
-
 
 
 								if((tempFurnWidth>=numCols&&tempFurnHeight<numCols)||(tempFurnHeight>=numRows&&tempFurnWidth<numRows)){
@@ -2876,6 +2823,8 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 											checkRow++;
 										}
 									}
+									
+									
 
 									//That still didn't work, so now let's try moving from the start position down but hanging to the left.
 									tryThirdDirection:{
@@ -3174,9 +3123,25 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 				break;
 		}
 	}
+	
+	
+	return;
+}
+function addCreatures(roomNum,isLastRoom){
+	var numItems=0;
+	var randomRow=0;
+	var randomCol=0;
+	var tempFurn=0;
+	var startCol=0;
+	var startRow=0;
+	let questLevel=(parseInt(document.getElementById("questLevel").value,10))
+	var randomChance=0;
 
+	startRow=getStartRow(roomNum);
+	startCol=getStartCol(roomNum);
+	numCols=getRoomCols(roomNum);
+	numRows=getRoomRows(roomNum);
 
-	//Place Creatures
 	randomChance=Math.floor(Math.random()*21);
 
 	if(roomNum>21){
@@ -3334,14 +3299,30 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 		}
 		numItems--;
 	}
+	
+	
+	return
+}
+function addItems(roomNum, isLastRoom){
+	var numItems=0;
+	var randomRow=0;
+	var randomCol=0;
+	var tempFurn=0;
+	var startCol=0;
+	var startRow=0;
+	//let questLevel=(parseInt(document.getElementById("questLevel").value,10))
+	var randomChance=0;
 
-
-
-
+	startRow=getStartRow(roomNum);
+	startCol=getStartCol(roomNum);
+	numCols=getRoomCols(roomNum);
+	numRows=getRoomRows(roomNum);
+	
+		
 	if(isLastRoom==0){
 	//Place Search Items
 	randomChance=Math.floor(Math.random()*21);
-	//alert("placing search item now" + randomChance);
+	
 
 	if(roomNum>21){
 		//This is a hall, so limit the number of Search items to 1 at most, and that will become a block
@@ -3349,11 +3330,11 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 			case 0:
 			case 1:
 			case 2:
-			//case 3: got rid of this one to slightly decrease the odds of getting a block in a hall 6-10-22
 			case 4:
 				numItems=1;
 				break;
 			default:
+				//Anything not directly above falls through to here, where we get the default of 0 items.
 				numItems=0;
 				break;
 		}
@@ -3361,38 +3342,23 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 		//This is a room, so move along as normal
 		switch(randomChance){
 			case 0:
-			case 1:
-			//case 2: Got rid of this one to decrease odds of getting a search item. 10-11-22
-			//case 3: Got rid of this one to decrease odds of getting a search item. 10-11-22
-			//case 4: Got rid of this one to decrease odds of getting a search item. 6-10-22
-			//case 5: Got rid of this one to decrease odds of getting a search item. 6-10-22
-			//case 5://Added this back 7-25-22 to make up for the % that go to search items now.//And got rid of it again 10-11-22
+			case 1:			
 			case 6:
 			case 7:
 				numItems=1;
 				break;
 			case 8:
-			case 9:
-			//case 10: //Added this back 7-25-22 to make up for the % that go to search items now. //And got rid of it again 10-11-22
-			//case 10: Got rid of this one to decrease odds of getting a search item. 6-10-22
-			//case 11: Got rid of this one to decrease odds of getting a search item. 6-10-22
-			//case 12: Got rid of this one to decrease odds of getting a search item. 6-10-22
-			//case 13:Got rid of this one to decrease odds of getting a search item. 6-10-22
-			//case 14:Got rid of this one to decrease odds of getting a search item. 6-10-22
+			case 9:			
 				numItems=2;
 				break;
 			case 15:
-			//case 16: //Added this back 7-25-22 to make up for the % that go to search items now. //And got rid of it again 10-11-22
-			//case 16: Got rid of this one to decrease odds of getting a search item. 6-10-22
-			//case 17: Got rid of this one to decrease odds of getting a search item. 6-10-22
-			//case 18:Got rid of this one to decrease odds of getting a search item. 6-10-22
-			//case 19:Got rid of this one to decrease odds of getting a search item. 6-10-22
 					numItems=3;
 					break;
 			case 20:
 					numItems=4;
 					break;
 			default:
+				//Anything not directly above falls through to here, where we get the default of 0 items.
 				numItems=0;
 				break;
 		}
@@ -3402,8 +3368,6 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 		if(roomNum>21){
 			//this is a hall, so the item becomes a block
 			
-			//As of 7-25 it can be a search item up to 15% of time
-			//As of 8-1 25% are search items and 25% of time is nothing
 			randomRow=Math.floor(Math.random()*8);
 			
 			switch(randomRow){
@@ -3420,12 +3384,7 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 				default:
 					//do nothing
 			}
-			/*if(randomRow==5||randomRow==6){
-				tempFurn="S I";
-			}else{
 			
-			tempFurn="BLK";//"Block";
-			}*/
 		}else{
 			tempFurn="S I";//"Search Item";
 		}
@@ -3442,8 +3401,7 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 				if(roomNum==16&&randomCol==17&&randomRow==13){
 					//Do nothing, this is that weird notch in one room and we place nothing.
 				}else{
-					/*gameBoard[randomRow][randomCol][1]=tempFurn;
-				}*/
+					
 					if(roomNum==34||roomNum==35){
 						//This is actually a block, and this is the wide hall, so it needs to place both blocks
 						if(randomCol==startCol){
@@ -3500,21 +3458,96 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 	}
 	}
 
+
+	return;
+}
+
+function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
+
+	
+	var startRow=0;
+	var startCol=0;
+	
+	const d = new Date();
+	let curTime = d.toLocaleTimeString();
+	let roomMax=(parseInt(document.getElementById("maxRooms").value,10))
+	
+	
+	//Check to make sure they set a quest level
+	if(document.getElementById("questLevel").value.length<=0){
+		alert( " Please select the quest level");
+		return;
+	}
+
+
+	if(isLastRoom==0&&roomNum<21){ //Can still be hall or exit room
+		if(roomCount==roomMax-1){
+			alert("((Last Room))");
+
+		}else{
+			if(roomCount>=roomMax){
+			alert("((Exceeds Max Room Count))");
+			return;
+			}
+		}
+	}
+
+
+	//loop through to blank out creatureCount array
+	var myCounter=0;
+	while(myCounter<20){
+		creatureCount[myCounter]=0;
+		myCounter+=1;
+	}
+
+
+	startRow=getStartRow(roomNum);
+	startCol=getStartCol(roomNum);
+	
+
+	//Now check to see if this room is already marked as being in use
+	if(roomInUse(roomNum)&&isLastRoom==0){
+		if(roomNum>21&&roomNum<30){
+			updateMissedRoom(roomNum);
+		}
+		showBoard();
+		listRoomContents(roomNum,curTime);
+		return;
+	}else{
+		checkTraps();
+	}
+	
+
+	backupTable("M");
+
+	//Add in any doors, unless they already have been placed.
+	addDoors(roomNum, isLastRoom);
+
+
+	//Add in any furniture, unless the room has already been opened.
+	addFurniture(roomNum, isLastRoom);
+	
+
+	//Place Creatures
+	addCreatures(roomNum, isLastRoom);
+
+	//Place items
+	addItems(roomNum,isLastRoom);
+
+
 	roomCount++;	
 	
 	//Added this 12-3-2022 to add a one-off creature possibility
-	if (chkPanda.checked && pandaCount==0){	
-		//alert(pandaCount);
+	if (chkPanda.checked && pandaCount==0){			
 		getPanda(roomNum);		
-		//alert("tried to do panda " + pandaCount);
 	}
 	
 	gameBoard[startRow][startCol][7]=1;
-	//document.getElementById("results").value="("+curTime+" Room " +roomNum +")"
+
 	listRoomContents(roomNum,curTime);
 	
 	if (roomNum>21&&roomNum<30){
-	//alert(roomNum);
+
 		switch(roomNum){
 			case 22:
 			case 24:
