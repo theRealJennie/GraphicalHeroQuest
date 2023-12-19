@@ -47,14 +47,13 @@
 <div class="row">
 <div class="col-8">
 
-<div class="row"style="line-height: 0;padding:10px;max-width:28.5rem;" id="gameBoard">
+	<div class="row"style="line-height: 0;padding:10px;max-width:28.5rem;" id="gameBoard">
 
-</div>
-<div id="zoomedView" style="overflow-y:auto; left: 5%; top: 5%; padding-left: 5%; padding-top: 5%; width: 90%; height: 90%; position: fixed; background-color: antiquewhite; border-color: black; border-width: 3px; border-style: double; visibility: hidden;">
+	</div>
+	<div id="zoomedView" style="overflow-y:auto; left: 3%; top: 3%; padding-left: 3%; padding-top: 3%; width: 90%; height: 90%; position: fixed; background-color: antiquewhite; border-color: black; border-width: 3px; border-style: double; visibility: hidden;">
 	<!--Here is where I"ll put the zoom in area.-->
-	This is not yet implemented, but will show a zoom of the room when completed.
-	<p></p>
-	<div class="col-sm" style="float:right; padding-right: 20px">	
+	<!--//This is not yet implemented, but will show a zoom of the room when completed.-->
+		<div class="col-sm" style="float:right; padding-right: 20px">	
 			<button class="btn btn-rounded" onclick="document.getElementById('zoomedView').style.visibility='hidden'">Close</button>
 		</div>
 	</div>
@@ -1563,8 +1562,7 @@ function showBoard(expandRoom=0){
 //				//Loop through cols
 				tempGameBoard+="<td style=' "+ tempTableName.rows.item(i).cells.item(j).style.cssText +" font-size: 1.5rem; font-weight: bold; white-space: nowrap;'>";
 					
-				// I need to aset td sizes so this is actually zoomed in better!
-
+				
 				//Add cell contents and close td
 				tempGameBoard+=tempTableName.rows.item(i).cells.item(j).innerHTML+"&nbsp";
 				
@@ -1575,7 +1573,7 @@ function showBoard(expandRoom=0){
 		tempGameBoard+="</table>";
 		
 		//Add a close button
-		tempGameBoard+="<p></p><div class=\"col-sm\" style=\"float:right; margin-right: 20px\"><button class=\"btn btn-rounded\" onclick=\"document.getElementById(\'zoomedView\').style.visibility=\'hidden\'\">Close</button></div></div>";
+		tempGameBoard+="<div class=\"col-sm\" style=\"float:right; float:top;margin-right: 20px\"><button class=\"btn btn-rounded\" onclick=\"document.getElementById(\'zoomedView\').style.visibility=\'hidden\'\">Close</button></div></div>";
 
 		//Fill zoomedView div with the table for this room, which we created just above.
 		//alert(tempGameBoard);
