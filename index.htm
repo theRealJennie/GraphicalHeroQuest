@@ -50,7 +50,14 @@
 <div class="row"style="line-height: 0;padding:10px;max-width:28.5rem;" id="gameBoard">
 
 </div>
-
+<div id="zoomedView" style="left: 5%; top: 5%; width: 80%; height: 80%; position: fixed; background-color: antiquewhite; border-color: black; border-width: 3px; border-style: double; visibility: hidden;">
+	<!--Here is where I"ll put the zoom in area.-->
+	This is not yet implemented, but will show a zoom of the room when completed.
+	<p></p>
+	<div class="col-sm" style="float:right; margin-right: 20px">	
+			<button class="btn btn-rounded" onclick="document.getElementById('zoomedView').style.visibility='hidden'">Close</button>
+		</div>
+	</div>
 </div>
 
 <!--<div class="row">
@@ -92,6 +99,7 @@
 	<div class="col-sm">
 		<button class="btn btn-rounded" onclick="openHallSearch()">Open Hall Search</button>
 	</div>
+	
 </div>
 <div class="row">
 	<div class="col-sm">
@@ -123,6 +131,9 @@
 		<!--<button class="btn btn-rounded" onclick="generateBlankBoard()">Generate Blank Board</button>-->
 		<input type="checkbox" id="chkPanda" name="chkPanda" >
 		<label for="chkPanda"> Include Panda</label>
+	</div>
+	<div class="col-sm">
+		Right-Click (Hold on Mobile) To Zoom
 	</div>
 </div>
 
@@ -200,6 +211,7 @@ var artifactCount=0;
 var itemCount=new Array(20);
 var creatureCount=new Array(20);
 var pandaCount=0;
+var mouseTimer;
 
 //gameBoard position definitions:
 //0-room number
@@ -218,6 +230,7 @@ for(i=0;i<gameBoard.length;i++){
 		gameBoardBackup[i][j]=new Array(8).fill(0);
 	}
 }
+
 function backupTable(MU="M"){
 	//MU is for move or undo.
 	//This makes a copy of the table before a move(if M) or recopies old copy into active table (U)
@@ -1373,8 +1386,8 @@ function roomInUse(roomNum){
 
 	return inUse;
 }
-function showBoard(){
-	var newGameBoard="<table>";
+function showBoard(expandRoom=0){
+	var newGameBoard="<table id='boardTable'>";
 	var row=0;
 	var col=0;
 	var rowSpan=0;
@@ -1517,7 +1530,51 @@ function showBoard(){
 		newGameBoard+="</tr>";
 	}
 	newGameBoard+="</table>";
-	document.getElementById("gameBoard").innerHTML=newGameBoard;
+	if(expandRoom>0){
+		//alert("Roomnum "+ expandRoom+"is being zoomed in on.");
+		//Here is where we make the zoomed div visible and put a table showing the specified room on it.
+		
+		
+
+		
+		tempRows=getRoomRows(expandRoom)+2; //One space on each side of the room.
+		tempCols=getRoomCols(expandRoom)+2;
+		tempStartRow=getStartRow(expandRoom)-1; //Because I want to show 1 space around the room.
+		tempStartCol=getStartCol(expandRoom)-1;
+		tempTableName=document.getElementById('boardTable');
+
+		var tempGameBoard="<table style='width:" + (tempCols*10) +"%; height: " + (tempRows*10) +"%;'>";
+		//Loop through the spaces on gameBoard[row][col] that fall into this room(expandedRoom), including the bgcolor, border, and all contents. Also show 1 row around the room?
+		
+		for(i=tempStartRow; i<(tempStartRow+tempRows);i++){
+//			//Loop through rows
+			tempGameBoard+="<tr>";// style='height:10vh; width: 80%;'>";
+			for(j=tempStartCol;j<tempCols+tempStartCol;j++){
+//				//Loop through cols
+				tempGameBoard+="<td style=' "+ tempTableName.rows.item(i).cells.item(j).style.cssText +" font-size: 1.5rem; font-weight: bold; white-space: nowrap;'>";
+					
+				// I need to aset td sizes so this is actually zoomed in better!
+
+				//Add cell contents and close td
+				tempGameBoard+=tempTableName.rows.item(i).cells.item(j).innerHTML+"&nbsp";
+				
+				tempGameBoard+="</td>";
+			}
+			tempGameBoard+="</tr>";
+		}
+		tempGameBoard+="</table>";
+		
+		//Add a close button
+		tempGameBoard+="<p></p><div class=\"col-sm\" style=\"float:right; margin-right: 20px\"><button class=\"btn btn-rounded\" onclick=\"document.getElementById(\'zoomedView\').style.visibility=\'hidden\'\">Close</button></div></div>";
+
+		//Fill zoomedView div with the table for this room, which we created just above.
+		//alert(tempGameBoard);
+		document.getElementById("zoomedView").innerHTML=tempGameBoard;
+
+		document.getElementById("zoomedView").style.visibility='visible';
+	}else{
+		document.getElementById("gameBoard").innerHTML=newGameBoard;
+	}
 }
 
 function nextToMedOrLarge(checkRow,checkCol){
@@ -3570,35 +3627,54 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 	}
 }
 
+
 document.querySelector('#gameBoard')
   .addEventListener('click', (ev) => {
 	var roomNum=100;
 
-
+	
 	if(ev.target.parentElement.rowIndex==undefined||ev.target.cellIndex==undefined){
 		exit;
 	}else{
 		//Here I need to add a call to a function that looks up the room and fills it with objects
-		//alert("The room Number is " + gameBoard[ev.target.parentElement.rowIndex][ev.target.cellIndex][0]);
 		roomNum=gameBoard[ev.target.parentElement.rowIndex][ev.target.cellIndex][0];
-		//document.getElementById("locationCode").innerHTML=roomNum+" "+(ev.target.parentElement.rowIndex)+" "+ev.target.cellIndex;
 
-
-		switch(roomNum){
-			case 21:
-				//alert(roomNum);
-				openRoomVisually(roomNum,true,1);
-				showFinalReward();
-				break;
-			default:
-				openRoomVisually(roomNum,true);
-				break;
-		};
+		
+			switch(roomNum){
+				case 21:
+					//alert(roomNum);
+					openRoomVisually(roomNum,true,1);
+					showFinalReward();
+					break;
+				default:
+					openRoomVisually(roomNum,true);
+					break;
+			};
+			
 
 		showBoard();
-		//listRoomContents(roomNum);
 	}
   });
+
+  document.querySelector("#gameBoard").addEventListener("contextmenu", (ev)=>{
+	
+		ev.preventDefault();
+		//alert("right click");
+
+		var roomNum=100;
+
+		if(ev.target.parentElement.rowIndex==undefined||ev.target.cellIndex==undefined){
+			exit;
+		}else{
+			//Here I need to add a call to a function that looks up the room and fills it with objects
+			roomNum=gameBoard[ev.target.parentElement.rowIndex][ev.target.cellIndex][0];
+			//This is where I would trigger an overlay of the specific room clicked, showing just that room zoomed in.
+			if(roomInUse(roomNum)==true){ //Don't call this here if the room hasn't actually been opened.
+				showBoard(roomNum);
+			}
+		}
+  });
+ 
 
 </script>
 
