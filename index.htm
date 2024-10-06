@@ -188,7 +188,7 @@ If you run out of a creature, replace with the next toughest creature available 
 <p>Special rules for small furniture: Ordinarily, furniture must remain in the place it is placed. In cases where creatures are cutoff and there is no other way to reach them, the characters can move small furniture aside, or even to another room when necessary. If another door opens to the space, they must use that instead, though. This applies to the small table, throne, some tables, etc. Use common sense.
 </p>
 <p>
-Note that new heal potion(4) can be purchased between any quests for 200 gold, so don't forget to stock up before you begin.
+Note that new heal potion(4) can be purchased between any quests for 100 gold, so don't forget to stock up before you begin.
 <p>
 <p>
 Exiting: When you've cleared all of the lair, return to the stairs. But you'll find a surprise waiting for you there. Use the Open Exit Room button to find out if any creatures have snuck in behind you and cut off your exit. If so, you have to kill them before you can leave. Upon leaving, you will get a reward, which is based on the level of the quest.
@@ -360,7 +360,7 @@ function getMonster(isWandering=0, questLevel=0, isHall=0, retryCount=0){
 					retVal=getMonster(isWandering,questLevel,isHall,retryCount+1);
 				}else{
 					//alert("Made it here");
-					retVal+="Ghoul(0 attack, 3 defense. 3 body, 3 mind -- When the ghoul first appears, it bumps the first hero it sees in a random direction one space. When the hero the ghoul focuses on moves, they are bumped off of their ending space and must backtrack along their path the number of spaces equal to the roll of one die. The ghoul refocuses each turn by rolling a die to randomly select a hero within their line of site, and bumps that character by one space in a random direction immediately.)";
+					retVal+="Ghoul(0 attack, 3 defense. 3 body, 3 mind -- When the ghoul first appears, it trades places with the first hero it sees and their movement ends. The ghoul refocuses each turn by rolling a die to randomly select a hero within their line of site, trading places with them immediately. On the hero's turn they may then move if they choose. When the hero the ghoul focuses on moves, they roll one die. If they roll a 1 or 6, the ghoul again trades places with them.)";
 					creatureCount[0]++;
 				}
 			}else{
@@ -803,19 +803,25 @@ function showFinalReward(){
 	var note="Upon successful completion of this quest, each surviving hero is granted ";
 	switch(true){
 		case(questLevel<5):
-			note+="10";
+			//note+="10";
+			//Change 10-6-2024
+			note+="25";
 			break;
 		case(questLevel<10):
-			note+="20";
-			break;
-		case(questLevel<15):
-			note+="30";
-			break;
-		case(questLevel<20):
+			//note+="20";
 			note+="40";
 			break;
-		case(questLevel>=20):
+		case(questLevel<15):
+			//note+="30";
 			note+="50";
+			break;
+		case(questLevel<20):
+			//note+="40";
+			note+="60";
+			break;
+		case(questLevel>=20):
+			//note+="50";
+			note+="70";
 			break;
 		default:
 			note+="5"
@@ -957,7 +963,7 @@ function openSearch(isHall=false){
 					myList+=" a giant spider. Place spider next to the hero. The hero immediately takes 1 damage from spider, loses their next turn, and cannot attack or defend until the conclusion of that turn. Spiders have 2 attack, 2 defend, 3 body, and 1 mind point. Any time a spider damages a hero that hero will lose their next turn and cannot attack or defend until the conclusion of that missed turn.";
 					break;
 				case 5:
-					myList+=" a ghoul(0 attack, 3 defense. 3 body, 3 mind -- When the ghoul first appears, it bumps the first hero it sees in a random direction one space. When the hero the ghoul focuses on moves, they are bumped off of their ending space and must backtrack along their path the number of spaces equal to the roll of one die. The ghoul refocuses each turn by rolling a die to randomly select a hero within their line of site, and bumps that character by one space in a random direction immediately.)";
+					myList+=" a ghoul(0 attack, 3 defense. 3 body, 3 mind -- When the ghoul first appears, it trades places with the first hero it sees and their movement ends. The ghoul refocuses each turn by rolling a die to randomly select a hero within their line of site, trading places with them immediately. On the hero's turn they may then move if they choose. When the hero the ghoul focuses on moves, they roll one die. If they roll a 1 or 6, the ghoul again trades places with them.)";
 					break;
 				case 6:
 					myList+=" a falling skull trap. Hero rolls a combat die and suffers 1 damage if a skull is rolled. Place pile of skulls on space hero is located. When passing over this space in the future this space counts as two spaces because of how you must step over and around the skulls.";
@@ -3275,6 +3281,12 @@ function addCreatures(roomNum,isLastRoom){
 				numItems=0;
 				break;
 		}
+		//Also, make sure the numItems is no larger than 1/3 of the floorspace of a room. This is mostly because of the two smaller rooms becoming so packed with 
+		//creatures that it is ridiculous. 10-6-2024
+		if(numItems>((numRows*numCols)/3)){
+			numItems=((numRows*numCols)/3);
+		}
+
 	}
 	switch(true){
 		case (questLevel<5):
@@ -3331,6 +3343,14 @@ function addCreatures(roomNum,isLastRoom){
 		default:
 			//Do nothing, let it get up to 7 creatures as usual
 			break;
+	}
+	if (isLastRoom>0){
+		//Added this 10-6-2024 to make final room slightly more difficult.
+		if((Math.floor(Math.random()*4))==1){
+			//I in 4 chance of getting an additional creature in final room?
+			numItems=numItems+1;
+			//alert("Added one!")
+		}						
 	}
 	while(numItems>0){
 		//First get a creature
@@ -3426,9 +3446,17 @@ function addItems(roomNum, isLastRoom){
 				//Anything not directly above falls through to here, where we get the default of 0 items.
 				numItems=0;
 				break;
-		}
-		
+		}		
 	}
+	
+	if (roomNum<21){
+		//As of 10-6-2024 I want to slightly increase the chance for more search items.
+		if(Math.floor(Math.random()*10)==1){
+			//alert("Got to this place!")
+			numItems=numItems+1;
+		}
+	}
+
 	while(numItems>0){
 		if(roomNum>21){
 			//this is a hall, so the item becomes a block
