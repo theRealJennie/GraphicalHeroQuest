@@ -206,6 +206,7 @@ var LastLocation=0;
 var roomCount=0;
 var gameBoard=new Array(19);
 var gameBoardBackup=new Array(19);
+var noteBackup="";
 var artifactCount=0;
 var itemCount=new Array(20);
 var creatureCount=new Array(20);
@@ -243,6 +244,9 @@ function backupTable(MU="M"){
 				}
 			}
 		}
+		//Make backup of notes (Added 1-26-25)
+		noteBackup=document.getElementById("results").value;
+	
 	}else{
 	//	alert("Undo");
 		for(a=0;a<19;a++){
@@ -252,6 +256,7 @@ function backupTable(MU="M"){
 				}
 			}
 		}
+		document.getElementById("results").value=noteBackup;
 	}
 	//alert("backupTable Completed");
 }
@@ -490,7 +495,7 @@ function getMonster(isWandering=0, questLevel=0, isHall=0, retryCount=0){
 						retVal+="(" + spellCount + " Dread Spells drawn from deck. Select randomly when casting.)";
 					}else{
 						if(spellCount==1){
-							retVal+="(" + spellCount + " Dread Spell Drawn From Deck)";
+							retVal+="(" + spellCount + " Dread Spell(s) Drawn From Deck)";
 						}
 					}
 					//}
@@ -990,6 +995,9 @@ function generateBlankBoard(){
 	//Adding this 5-7-22 so that we can limit artifact to one per game, but resets it when a new game is started
 	artifactCount=0;
 	pandaCount=0;
+	noteBackup=""; //1-27-25
+	document.getElementById("results").value="";// 1-27-25
+	
 	
 	var myCounter=0;
 	while(myCounter<20){
@@ -2385,6 +2393,13 @@ function listRoomContents(roomNum,curTime){
 	for(let x=0;x<numRows;x++){
 		for(let y=0;y<numCols;y++){
 			roomContents=gameBoard[checkRow+x][checkCol+y][1]+"";
+
+			//1-26-25 I added this so we can avoid that one little notch in room 16
+			if(roomNum==16&&(checkRow+x==13)&&(checkCol+y==17)){
+				//Do nothing and show nothing,this is that weird little notch and isn't actually a part of that room.
+				continue;
+			}
+
 			if(roomContents.includes("furniture")==true){
 				//Don't list anything
 				if(roomContents.includes("furniture")==true){
@@ -2393,11 +2408,21 @@ function listRoomContents(roomNum,curTime){
 					pos=roomContents.search("furniture")-1;
 				}
 
-				if(roomContents.substr(0,1)=="^"){
-					newDescription+="\n"+roomContents.substr(5,pos-5);
+				
+				if(roomContents.substr(0,1)=="^"){ 
+					newDescription+="\n"+roomContents.substr(5,pos-5);					
 				}else{
+					if(roomContents.includes("STb")){ //Added this bit about STb and Throne 1-27-25 because they'd be missed otherwise, for some reason.
+						newDescription+="\nSmall Table";
+						continue;
+					}
+					if(roomContents.includes("Throne")){
+						newDescription+="\nThrone";
+						continue;
+					}
+
 					if(roomContents.substr(0,1)=="@"){
-						//don't list here, only on first entry for this furniture item, which is at the ^ entry.
+						//don't list here, only on first entry for this furniture item, which is at the ^ entry.						
 					}else{
 						newDescription+="\n"+roomContents.substr(0,pos);
 					}
