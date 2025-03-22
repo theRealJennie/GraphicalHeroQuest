@@ -160,8 +160,7 @@ You must enter each lair and clear out all the monsters that you can reach. If y
 <h2>
 Additional Rules
 </h2>
-<!--<p>Start with the stairs in the center of the middle room and one closed door in the middle of each side of the room.
-</p>-->
+
 <p>
 When you enter a hallway, click on it to find out what is in the hall.
 </p>
@@ -1197,19 +1196,21 @@ function createStartRoom(){
 	
 	//Place stairs @ 12,9. Treat like furniture, because essentially they are
 	//Now randomly place stairs
-	x=Math.floor(Math.random()*4)+7;
-	y=Math.floor(Math.random()*5)+10;
-	
-	
-	
+	//x=Math.floor(Math.random()*4)+7;
+	//y=Math.floor(Math.random()*5)+10;
+
+	//As of 3-22-25 I now want at least one space between the stairs and walls.
+	x=Math.floor(Math.random()*2)+8;
+	y=Math.floor(Math.random()*3)+11;
+		
 	
 	gameBoard[x][y][1]="^2^2^Stairs(furniture)";
 	gameBoard[x][y+1][1]="@Stairs(furniture)";
 	gameBoard[x+1][y][1]="@Stairs(furniture)";
 	gameBoard[x+1][y+1][1]="@Stairs(furniture)";
 	
-	
-	
+	//As of 3-22-25 we also now allow creatures in starting room.
+	addCreatures(21,false);
 	
 }
 function colorBoard(){
@@ -3360,7 +3361,7 @@ function addCreatures(roomNum,isLastRoom){
 				}else{
 					//Last room we'll allow up to 6
 					if(numItems>6){
-						numItems=6
+						numItems=6;
 					}
 				}
 			}
@@ -3376,6 +3377,11 @@ function addCreatures(roomNum,isLastRoom){
 			numItems=numItems+1;
 			//alert("Added one!")
 		}						
+	} else if(roomNum==21){
+		//This is the middle room, but it is at the start. Limit creatures to two.
+		if(numItems>2){
+			numItems=2;
+		}
 	}
 	while(numItems>0){
 		//First get a creature
