@@ -1203,15 +1203,54 @@ function createStartRoom(){
 	x=Math.floor(Math.random()*2)+8;
 	y=Math.floor(Math.random()*3)+11;
 		
+								
 	
 	gameBoard[x][y][1]="^2^2^Stairs(furniture)";
 	gameBoard[x][y+1][1]="@Stairs(furniture)";
 	gameBoard[x+1][y][1]="@Stairs(furniture)";
 	gameBoard[x+1][y+1][1]="@Stairs(furniture)";
 	
+	//Added this here 3-26-2025 to try to fix issue where stair direction changes because it is randomly selected at visual time. I'll now do it here.
+	var stairDirection=0;
+	stairDirection=Math.floor(Math.random()*4);
+	switch(stairDirection){
+		case 1:
+			gameBoard[x][y][1]+= "&#8593"; 
+			break;
+		case 2:
+			gameBoard[x][y][1]+="&#8595";
+			break;
+		case 3:
+			gameBoard[x][y][1]+="&#8594";
+			break;
+		default:
+			gameBoard[x][y][1]+="&#8592";
+			break;
+	}
+	
 	//As of 3-22-25 we also now allow creatures in starting room.
 	addCreatures(21,false);
 	
+}
+
+function clearStartCreatures(){
+	//This will clear out the starting room creatures so that we only have the stairs and doors. This is so we can place creatures at the beginning but they won't still show at end.
+	var x=7;
+	var y=10;	
+	while(y<16){
+		x=7;
+		while(x<12){
+			
+			if(gameBoard[x][y][1].length>1){			
+				if (gameBoard[x][y][1].indexOf('Stairs')<=0){
+					//Not a stairs space
+					gameBoard[x][y][1]="";
+				}
+			}			
+			x=x+1;
+		}
+		y=y+1;
+	}	
 }
 function colorBoard(){
 	//This will just loop through and color the squares appropriately and set their room number for the future.
@@ -1497,7 +1536,7 @@ function showBoard(expandRoom=0){
 							newGameBoard+=gameBoard[row][col][1].substr(5,3);
 							if(gameBoard[row][col][1].substr(5,3)=="Sta"){
 								//Also place a random arrow to show which direction the stairs should face.
-								var stairDirection=0;
+								/*var stairDirection=0;
 								stairDirection=Math.floor(Math.random()*4);
 								switch(stairDirection){
 									case 1:
@@ -1512,6 +1551,21 @@ function showBoard(expandRoom=0){
 									default:
 										newGameBoard+="&#8592";
 										break;
+								}*/
+								if(gameBoard[row][col][1].indexOf("&#8593")>0){
+									newGameBoard+= "&#8593"; 
+								}else{
+									if(gameBoard[row][col][1].indexOf("&#8595")>0){
+										newGameBoard+="&#8595";
+									}else{										
+										if(gameBoard[row][col][1].indexOf("&#8594")>0){
+											newGameBoard+="&#8594";
+										}else{
+											if(gameBoard[row][col][1].indexOf("&#8592")>0){
+												newGameBoard+="&#8592";
+											}
+										}
+									}	
 								}
 								
 							}
@@ -3710,7 +3764,12 @@ document.querySelector('#gameBoard')
 			switch(roomNum){
 				case 21:
 					//alert(roomNum);
+					
+					//remove creatures placed at start so we only have stairs and doors. 
+					clearStartCreatures();
+					
 					openRoomVisually(roomNum,true,1);
+					
 					showFinalReward();
 					break;
 				default:
