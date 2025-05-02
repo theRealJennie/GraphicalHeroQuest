@@ -23,7 +23,7 @@ const creatureSet=[ //This is formatted like this for simplicity purposes, makin
 	0,
 	6, 
 	0,
-	"Gob",
+	"Yay",
 	"",
 	0,
 	0,
