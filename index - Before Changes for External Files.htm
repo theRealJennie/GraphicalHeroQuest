@@ -39,8 +39,6 @@
 	}
 
 </style>
-<script  src="creatures.js"></script>
-
 </head>
 
 <body style="background-color: AntiqueWhite;">
@@ -54,12 +52,16 @@
 	</div>
 	<div id="zoomedView" style="overflow-y:auto; left: 3%; top: 3%; padding-left: 3%; padding-top: 3%; width: 90%; height: 90%; position: fixed; background-color: antiquewhite; border-color: black; border-width: 3px; border-style: double; visibility: hidden;">
 	<!--Here is where I"ll put the zoom in area.-->
+	<!--//This is not yet implemented, but will show a zoom of the room when completed.-->
 		<div class="col-sm" style="float:right; padding-right: 20px">	
 			<button class="btn btn-rounded" onclick="document.getElementById('zoomedView').style.visibility='hidden'">Close</button>
 		</div>
 	</div>
 </div>
 
+<!--<div class="row">
+	<div id="statusCode"></div><div id="locationCode"></div><div id="furnitureCode"></div>
+</div>-->
 <div class="col-lg-4">
 
 <div class="row">
@@ -78,7 +80,18 @@
 		<textarea class="form-control" id="maxRooms" rows=1 name="maxRooms"></textarea>
 	</div>
 </div>
+<!--<div class="row">
+	<div class="col-sm">
+		<button class="btn btn-rounded" onclick="showBoard()">Refresh Board</button>
+	</div>
+	<div class="col-sm">
+		<button class="btn btn-rounded" onclick="showBoard(21,,1)">Open Exit Room</button>
+	</div>
+</div>-->
 <div class="row">
+	<!--<div class="col-sm">
+		<button class="btn btn-rounded" onclick="openHall()">Open A Hall</button>
+	</div>-->
 	<div class="col-sm">
 		<button class="btn btn-rounded" onclick="openSearch()">Open Search Item</button>
 	</div>	
@@ -91,6 +104,12 @@
 	<div class="col-sm">
 		<button class="btn btn-rounded" onclick="wanderingMonster()">Get Wandering Monster</button>
 	</div>
+<!--	<div class="col-sm">
+
+	</div>
+	<div class="col-sm">
+		<button class="btn btn-rounded" onclick="openHallSearch()">Open Hall Search</button>
+	</div>-->
 </div>
 <div class="row">
 	<div class="col-sm">
@@ -99,10 +118,16 @@
 	<div class="col-sm">
 		<button class="btn btn-rounded" onclick="backupTable('U'); showBoard();">Undo</button>
 	</div>
+<!--	<div class="col-sm">
+		<button class="btn btn-rounded" onclick="alert(LastLocation)">Error Location</button>
+	</div>
+	<div class="col-sm">
+		<button class="btn btn-rounded" onclick="document.getElementById('results').value = gameBoard">Dump GameBoard</button>
+	</div>-->
 </div>
 <div class="row">
 	<div class="col-sm">
-		
+		<!--<button class="btn btn-rounded" onclick="generateBlankBoard()">Generate Blank Board</button>-->
 		<input type="checkbox" id="chkPanda" name="chkPanda" >
 		<label for="chkPanda"> Include Panda</label>
 	</div>
@@ -110,6 +135,7 @@
 		Right-Click (Hold on Mobile) To Zoom
 	</div>
 </div>
+
 </div>
 </div>
 </div>
@@ -154,7 +180,7 @@ Line of sight: This is usually a straight line and cannot pass through other her
 Creatures: Creatures will move in the most obvious way and perform the most obvious attacks possible. If there is a hero closer than the others, they'd likely go toward that hero, for example. If a hero has been attacking them, they'd likely attack back. Just use common sense.
 If you run out of a creature, replace with the next toughest creature available on the chart. If no tougher creatures are available, replace with next weakest available.
 </p>
-<p>Special rules for the wizard: Usually, throwing a dagger or the handaxe results in losing them forever. Our wizard has trained hard to become a better fighter so they can support the group. They have developed an enchantment they apply to all thrown weapons that automatically return them to their hand each turn, so the heroes never lose these items.
+<p>Special rules for the wizard: Usually, throwing a dagger or the handaxe results in losing them forever. Our wizard has trained hard to become a better fighter so they can support the group. They have developed an enchantment they apply to all thrown weapons that automatically return them to their hand each turn, so the wizard never loses these items.
 </p>
 <p>Special rules for the Dread Warriors and Gargoyles: If an escape spell is cast, set creature aside. From now on, each time you enter a new room roll a die. If a 6 is rolled, place the creature in that room in the corner farthest from the doorway. If the creature has not been found before reaching the end room, place in the end room in the corner nearest the bottom of the stairs. 
 </p>
@@ -167,9 +193,7 @@ Note that new heal potion(4) can be purchased between any quests for 100 gold, s
 Exiting: When you've cleared all of the lair, return to the stairs. But you'll find a surprise waiting for you there. Use the Open Exit Room button to find out if any creatures have snuck in behind you and cut off your exit. If so, you have to kill them before you can leave. Upon leaving, you will get a reward, which is based on the level of the quest.
 </p>
 <p>
-Priority precedent for creatures that automatically move first: Ghoul, Gorgon, Fire Demons, Gargoyles, then Dread Warriors, then from toughest to weakest. 
-
-When using alternate character sets, apply these same rules to the similar creatures in those sets, using common sense to decide which applies.
+Priority precedent for creatures that automatically move first: Ghoul, Gorgon, Fire Demons, Gargoyles, then Dread Warriors, then from toughest to weakest.
 </p>
 
 
@@ -181,7 +205,6 @@ var LastLocation=0;
 var roomCount=0;
 var gameBoard=new Array(19);
 var gameBoardBackup=new Array(19);
-let creatureList=[];//new Array(30); //This allows for up to 30 different creature types, but I'll be able to add more to this if ever necessary. 
 var noteBackup="";
 var artifactCount=0;
 var itemCount=new Array(20);
@@ -206,342 +229,6 @@ for(i=0;i<gameBoard.length;i++){
 		gameBoardBackup[i][j]=new Array(8).fill(0);
 	}
 }
-
-
-function loadExternalData(){
-	//This should load the creature and furniture data from external .json files when completed.
-
-	loadCreatures(); //Loads all creatures from creatures.js into creatureList for use here. 
-	
-	//This needs to run each time the gameboard is loaded so it can adjust odds for the level. 
-	setCreatureOdds((parseInt(document.getElementById("questLevel").value,10)));
-}
-
-function loadCreatures() {
-	//We know that the variable creatureSet is there and imported as a single-dimension array from creatures.js.
-	//Now we just loop through those and load them into creatureList.
-	
-	
-	//creatureSet has 8 entries for each creature.
-	var totalElements=creatureSet.length;
-	
-
-	for(outerCounter=0; outerCounter<totalElements;outerCounter+=8){
-		//Loop through every creature in source creatureSet
-			creatureList.push([creatureSet[outerCounter],creatureSet[outerCounter+1],creatureSet[outerCounter+2],creatureSet[outerCounter+3],creatureSet[outerCounter+4],creatureSet[outerCounter+5],creatureSet[outerCounter+6],creatureSet[outerCounter+7]]);
-	};		
-	
-}
-
-function getMonster(isWandering=0,questLevel=0, isHall=0, retryCount=0){
-	var maxWandering=Math.floor(creatureList.length*.8);
-	var minWandering=Math.floor(creatureList.length*.2);
-	var creatureType=0;
-	var retVal="";
-	
-	if(questLevel==0){
-		 questLevel=(parseInt(document.getElementById("questLevel").value,10));
-	};
-	creatureType=Math.floor(Math.random()*creatureList[creatureList.length-1][6]); 
-	//This will randomize based on the actual range available after all the level adjustments and so on that is done in the setCreatureOdds function upon loading each board. 
-	//Technically this is not the creature type at this point, at least not based on index location, it is the value chosen that needs compared to the creature's selectionUpperRange.
-	
-	for(x=0;x<creatureList.length;x++){
-		if(creatureList[x][6]>=creatureType){
-			creatureType=x;
-			break;
-		}		
-	}		
-	
-	
-	if(isWandering==1){
-		if(creatureType>maxWandering){
-			creatureType=maxWandering;
-		}
-	}	
-	
-	
-	//Before we go any farther, let's check to make sure we don't have too many of this creature and retry if we do.
-	if(creatureList[creatureType][7]>=creatureList[creatureType][2] && retryCount<3){
-		creatureType=getMonster(isWandering,questLevel,isHall,retryCount+1);
-	}else{
-		creatureList[creatureType][7]+=1; //Increment the count in use.
-	}
-	
-	//In this new function we're going to put the abbreviation at the beginning of the description. We can then pull that when we put the creature on the map later. 
-	retVal=creatureList[creatureType][4] + " " + creatureList[creatureType][5];
-	
-	//Now search for the words "Dread Spells" and replace with a spellcount+ "Dread Spells";
-	if(retVal.includes("Dread Spell")==true){
-		retVal=retVal.replace("Dread Spells", "(" + getSpellCount(creatureType, questLevel) + " Dread Spell(s)");
-	}
-	
-	
-	if(retryCount>0){
-		return creatureType; 	//This is so the original calling function can assign description and all that. 
-	}else{
-		return retVal;
-	}
-	
-	return retVal;
-}
-function getSpellCount(creatureIndex=0,questLevel=0, isHall=0){
-	var spellCount=Math.round(Math.random()* creatureList[creatureIndex][3]);//Random based on the max spells for the creature. 
-		
-	//alert(Math.random()* creatureList[creatureIndex][3] + "  " + questLevel);
-	if(questLevel<12){
-		if(spellCount>1){
-			spellCount=1;
-		}
-	}else if (questLevel<14){
-		if(spellCount>2){
-			spellCount=2;
-		}
-	}else{
-		if(spellCount>2){
-			if(isHall>0){
-				spellCount=2; //This is the max spells in a hall. 
-			}
-		}
-	}	
-	
-	return spellCount;
-}
-function setCreatureOdds(questLevel=0){
-	//This will calculate set the upper boundary of each creature based on quest level and the toughness of the creatures, taking into account 
-	//the number of creatures in the set. So on lewer quest levels the odds of getting a goblin are way higher than they are in later quest levels, for example. 
-		
-	var countAdjuster=15/creatureList.length;//This is to base this on the fact that we used to have 15 in our base set.	
-	var curMaxVal=0;
-	
-	var tempVal=0;
-	let x;
-	
-	var largeCreatureMultiplier=0; //This can be adjusted down below so we can manipulate the odds of a large creature a bit based on level.
-	var largeCreatureLowerBounds=0; //This will also be changed below, and the point is to multiply this times the number of creatures to get the starting point of what we consider large creatures, and that can change based on the level. 
-	var largeCreatureLowerBounds2=0; //This is so I can have a second set of creatures, like Dread Warriors and above, that are even harder still to get on low levels, potentially even reducing their odds to zero for levels under 5. 
-	var largeCreatureMultiplier2=0;
-	var smallCreatureMultiplier=0; //This is to increase the odds of small creatures on low levels. By small I mean the first 5 or 6 creatures. 
-	var midCreatureMultiplier=0; //I specifically added this for later rounds, so I can reduce these in higher levels. 
-	var replicantMultiplier=0;
-	
-	
-	//Set multipliers for creatures of various sizes based on the questLevel. 
-	switch(true){
-		case(questLevel<=5):
-			smallCreatureMultiplier=1.5;
-			midCreatureMultiplier=smallCreatureMultiplier*.6;
-			largeCreatureLowerBounds=Math.round(creatureList.length*.58);
-			largeCreatureMultiplier=smallCreatureMultiplier*.0533;
-			largeCreatureLowerBounds2=Math.round(creatureList.length*.78);
-			largeCreatureMultiplier2=0;
-			replicantMultiplier=0;
-			break;	
-		case(questLevel<=10):
-			smallCreatureMultiplier=1+((10-questLevel)*.1);
-			midCreatureMultiplier=smallCreatureMultiplier*(.7-((10-questLevel)*.02));
-			largeCreatureLowerBounds=Math.round(creatureList.length*.58);
-			largeCreatureMultiplier=smallCreatureMultiplier*(.6 -((10-questLevel)*.01334));
-			largeCreatureLowerBounds2=Math.round(creatureList.length*(.8 -((10-questLevel)*.004)));
-			largeCreatureMultiplier2=.2-((10-questLevel)*.04);
-			replicantMultiplier=0;
-			break;				
-		case(questLevel<=35):
-			smallCreatureMultiplier=.25 +((35-questLevel)*.03);
-			midCreatureMultiplier=smallCreatureMultiplier*(3.2 -((35-questLevel)*.1));
-			largeCreatureLowerBounds=Math.round(creatureList.length*.58);
-			largeCreatureMultiplier=smallCreatureMultiplier*(4.6 -((35-questLevel)*.16));
-			largeCreatureLowerBounds2=Math.round(creatureList.length*(.74+((35-questLevel)*.0024)));
-			largeCreatureMultiplier2=smallCreatureMultiplier*(2.8-((35-questLevel)*.104));
-			replicantMultiplier=smallCreatureMultiplier*((35-questLevel)*.005);
-			break;			
-		case(questLevel<=45):
-			smallCreatureMultiplier=.2 +((45-questLevel)*.005);
-			midCreatureMultiplier=smallCreatureMultiplier*(4.5 -((45-questLevel)*.13));
-			largeCreatureLowerBounds=Math.round(creatureList.length*.58);
-			largeCreatureMultiplier=smallCreatureMultiplier*(7.5 -((45-questLevel)*.29));
-			largeCreatureLowerBounds2=Math.round(creatureList.length*.74);
-			largeCreatureMultiplier2=smallCreatureMultiplier*(4.25 -((45-questLevel)*.145));
-			replicantMultiplier=smallCreatureMultiplier*(5 -((45-questLevel)*.4));
-			break;
-		case(questLevel>45):
-			smallCreatureMultiplier=.2;
-			midCreatureMultiplier=smallCreatureMultiplier*(4.5 -((questLevel-45)*.05));
-			largeCreatureLowerBounds=Math.round(creatureList.length*.56);
-			largeCreatureMultiplier=smallCreatureMultiplier*(7.5 +((questLevel-45)*.15));
-			largeCreatureLowerBounds2=Math.round(creatureList.length*(.85-((questLevel-45)*.0024)));
-			largeCreatureMultiplier2=smallCreatureMultiplier*(4.25+((questLevel-45)*.25));
-			replicantMultiplier=smallCreatureMultiplier*(5+((questLevel-45)*.25));
-			break;
-		default:
-			//Just a catch all
-			break;
-	}
-			
-	//This is based on the fact that there were 15 creatures in our default set, so we need this to be like that. This may mean we have over the 1000 above, but it shouldn't be too far off and that should still work ok.	
-	for(x=0;x<creatureList.length;x++){
-		//Loop through the creatures and assign the selectionRange for them. 
-		switch(true){		
-			case (x==0):
-				//This would be a ghoul in the original set. 	
-				tempVal=Math.round(35*countAdjuster);//We don't use the smallCreatureMultiplier on this because we don't want to affect it with the other small creatures. 
-				creatureList[x][6]=tempVal;//30;
-				curMaxVal=tempVal;//30;
-				break;				
-			case (Math.round(countAdjuster*x)==1):
-				//This would be a Goblin in the original set. 				
-				curMaxVal+=Math.round(99*countAdjuster*smallCreatureMultiplier);//99;
-				creatureList[x][6]=curMaxVal;
-				break;
-			case (Math.round(countAdjuster*x)==2):
-				//This would be Rats in the original set. 
-				curMaxVal+=Math.round(20*countAdjuster);//45;
-				creatureList[x][6]=curMaxVal;
-				break;
-			case (Math.round(countAdjuster*x)==3):				
-				//This would be an Orc in the original set. 
-				curMaxVal+=Math.round(99*countAdjuster*smallCreatureMultiplier);//99;
-				creatureList[x][6]=curMaxVal;
-				break;
-			case (Math.round(countAdjuster*x)==4):				
-				//This would be a Skeleton in the original set. 
-				curMaxVal+=Math.round(90*countAdjuster*smallCreatureMultiplier);//107
-				creatureList[x][6]=curMaxVal;
-				break;
-			case (Math.round(countAdjuster*x)==5):				
-				//This would be a Zombie in the original set. (Why this is the most likely thing you'll get, I have no clue.)
-				curMaxVal+=Math.round(99*countAdjuster*smallCreatureMultiplier);//122;
-				creatureList[x][6]=curMaxVal;
-				break;
-			case (Math.round(countAdjuster*x)==6):				
-				//This would be an Abomination in the original set. 
-				if(largeCreatureLowerBounds<=6){
-					if(largeCreatureLowerBounds2<=7){
-						curMaxVal+=Math.round((largeCreatureMultiplier2*76*midCreatureMultiplier)*countAdjuster);
-					}else{
-						curMaxVal+=Math.round((largeCreatureMultiplier*76*midCreatureMultiplier)*countAdjuster);//76;	
-					}	
-				}else{
-					curMaxVal+=Math.round(76*countAdjuster*midCreatureMultiplier);//76;}
-				}
-				creatureList[x][6]=curMaxVal;
-				break;
-			case (Math.round(countAdjuster*x)==7):				
-				//This would be a Gorgon in the original set. 				
-				if(largeCreatureLowerBounds<=7){
-					if(largeCreatureLowerBounds2<=7){
-						curMaxVal+=Math.round((largeCreatureMultiplier2*76*midCreatureMultiplier)*countAdjuster);
-					}else{
-						curMaxVal+=Math.round((largeCreatureMultiplier*76*midCreatureMultiplier)*countAdjuster);//76;	
-					}	
-				}else{
-					curMaxVal+=Math.round(76*countAdjuster*midCreatureMultiplier);//76;
-				}
-				creatureList[x][6]=curMaxVal;
-				break;
-			case (Math.round(countAdjuster*x)==8):				
-				//This would be a Spider in the original set. 
-				if(largeCreatureLowerBounds<=8){
-					if(largeCreatureLowerBounds2<=8){
-						curMaxVal+=Math.round((largeCreatureMultiplier2*80*midCreatureMultiplier)*countAdjuster);
-					}else{
-						curMaxVal+=Math.round((largeCreatureMultiplier*80*midCreatureMultiplier)*countAdjuster);//76;	
-					}		
-				}else{
-					curMaxVal+=Math.round(80*countAdjuster*midCreatureMultiplier);//68;
-				}
-				creatureList[x][6]=curMaxVal;
-				break;
-			case (Math.round(countAdjuster*x)==9):				
-				//This would be a Beast in the original set. 
-				if(largeCreatureLowerBounds<=9){
-					if(largeCreatureLowerBounds2<=9){
-						curMaxVal+=Math.round((largeCreatureMultiplier2*60)*countAdjuster);
-						alert("9");
-					}else{
-						curMaxVal+=Math.round((largeCreatureMultiplier*60)*countAdjuster);//76;	
-					}				
-				}else{
-					curMaxVal+=Math.round(60*countAdjuster);//45;
-				}
-				creatureList[x][6]=curMaxVal;
-				break;
-			case (Math.round(countAdjuster*x)==10):				
-				//This would be a Mummy in the original set. 
-				if(largeCreatureLowerBounds<=10){
-					if(largeCreatureLowerBounds2<=10){
-						curMaxVal+=Math.round((largeCreatureMultiplier2*60)*countAdjuster);
-					}else{
-						curMaxVal+=Math.round((largeCreatureMultiplier*60)*countAdjuster);//76;	
-					}		
-				}else{
-					curMaxVal+=Math.round(60*countAdjuster);//45; //We had too few mummies, so I raised it to 70					
-				}
-				creatureList[x][6]=curMaxVal;
-				break;
-			case (Math.round(countAdjuster*x)==11):				
-				//This would be a Dread Warrior in the original set. 
-				if(largeCreatureLowerBounds<=11){
-					if(largeCreatureLowerBounds2<=11){
-						curMaxVal+=Math.round((largeCreatureMultiplier2*55)*countAdjuster);
-					}else{
-						curMaxVal+=Math.round((largeCreatureMultiplier*55)*countAdjuster);//76;	
-					}			
-				}else{
-					curMaxVal+=Math.round(45*countAdjuster);//45;
-				}
-				creatureList[x][6]=curMaxVal;
-				break;
-			case (Math.round(countAdjuster*x)==12):				
-				//This would be a Gargoyle in the original set. 
-				if(largeCreatureLowerBounds<=12){
-					if(largeCreatureLowerBounds2<=12){
-						curMaxVal+=Math.round((largeCreatureMultiplier2*50)*countAdjuster);
-					}else{
-						curMaxVal+=Math.round((largeCreatureMultiplier*50)*countAdjuster);//76;	
-					}		
-				}else{
-					curMaxVal+=Math.round(50*countAdjuster);//60; //Lowered this from 92 because it looked like we were getting way too many gargoyles
-				}
-				creatureList[x][6]=curMaxVal;
-				break;
-			case (Math.round(countAdjuster*x)==13):				
-				//This would be a Fire Demon in the original set. 
-				if(largeCreatureLowerBounds<=13){
-					if(largeCreatureLowerBounds2<=13){
-						curMaxVal+=Math.round((largeCreatureMultiplier2*15)*countAdjuster);
-					}else{
-						curMaxVal+=Math.round((largeCreatureMultiplier*15)*countAdjuster);//76;	
-					}				
-				}else{    
-					curMaxVal+=Math.round(20*countAdjuster);//45;
-				}
-				creatureList[x][6]=curMaxVal;
-				break;
-			case (Math.round(countAdjuster*x)==14):				
-				//This would be a Replicant in the original set. 
-				if(largeCreatureLowerBounds<=14){
-					if(largeCreatureLowerBounds2<=14){
-						curMaxVal+=Math.round((largeCreatureMultiplier2*5*replicantMultiplier)*countAdjuster);
-						//curMaxVal+=Math.round(10*countAdjuster*replicantMultiplier);//84;//We had too many Replicants		
-					}else{
-						curMaxVal+=Math.round((largeCreatureMultiplier*5*replicantMultiplier)*countAdjuster);//76;	
-					}				
-				}else{    
-					curMaxVal+=Math.round(5*countAdjuster*replicantMultiplier);
-				}	
-				creatureList[x][6]=curMaxVal;
-				break;
-			default:
-				//This is just to catch any possible mistakes	
-				curMaxVal+=Math.round(45*countAdjuster);//45;
-				creatureList[x][6]=curMaxVal;
-				break;
-		}		
-	}	
-}
-
-
 
 function backupTable(MU="M"){
 	//MU is for move or undo.
@@ -572,7 +259,307 @@ function backupTable(MU="M"){
 	}
 	//alert("backupTable Completed");
 }
+function getMonster(isWandering=0, questLevel=0, isHall=0, retryCount=0){
+	//This will return a monster. Has option for wandering monster so it'll know not to give Dread Warrior or Gargoyle and has a lower chance of being a goblin or skeleton.
 
+	let randomChance=0;
+	let spellCount=0;
+	var retVal="";
+	let creatureType=0;
+	creatureType=Math.floor(Math.random()*109)-10;
+
+	if(questLevel==0){
+		 questLevel=(parseInt(document.getElementById("questLevel").value,10));
+	};
+
+	if(questLevel<5){
+		//Had to wrap this in this if statement or else you'd get a larger amount of goblins in every quest before 10;
+		creatureType+=(questLevel-10);
+	}
+
+
+
+	if(isWandering==1){
+		if(creatureType<20){
+			//We want less chance of goblin, so is creatureType<20 we are going to add to it. This doesn't eliminate chance of goblin, just reduces it.
+			creatureType+=10;
+		}
+		if(creatureType>89){
+			//No Dread Warriors or Gargoyles as wandering monsters.
+			creatureType=89;
+		}
+	}
+
+	//Commented out the line below because the creatures seemed just a little too easy at times.
+	creatureType+=(questLevel/2);
+	//Added this so we can have more control of difficulty of creatures in levels
+	switch(true){
+		case (questLevel<3):
+			//Reduce chance of hard creatures a bit by recalculating if number is high
+			if (creatureType>75){
+				creatureType=Math.floor(Math.random()*109)-10;
+			}
+			break;
+		case (questLevel<7):
+			//Reduce chance of hard creatures a bit by recalculating if number is high
+			if (creatureType>85){
+				creatureType=Math.floor(Math.random()*109)-10;
+			}
+			break;
+		case (questLevel<11):
+			//Do nothing, this should be about right
+			break;
+		case (questLevel<14):
+			//increase chance of hard creatures a bit by recalculating if number is low
+			if (creatureType<60){
+				creatureType=Math.floor(Math.random()*109)-10;
+			}
+			break;
+		case (questLevel<18):
+			//increase chance of hard creatures a bit by recalculating if number is low
+			if (creatureType<70){
+				creatureType=Math.floor(Math.random()*109)-10;
+			}
+			break;
+		case (questLevel<24):
+			//increase chance of hard creatures a bit by recalculating if number is low
+			if (creatureType<80){
+				creatureType=Math.floor(Math.random()*109)-10;
+			}
+			break;
+		case (questLevel>28):
+			//increase chance of hard creatures a bit by recalculating if number is low
+			if (creatureType<90){
+				creatureType=Math.floor(Math.random()*109);
+			}
+			break;	
+		case (questLevel>32):
+			//increase chance of hard creatures a bit by recalculating if number is low
+			if (creatureType<100){
+				creatureType=Math.floor(Math.random()*109);
+			}
+			break;	
+		default:
+			//increase chance of hard creatures a bit by recalculating if number is low
+			if (creatureType<75){
+				creatureType=Math.floor(Math.random()*109)-10;
+			}
+			//And take a second shot at recalculating if still less than 70
+			if (creatureType<75){
+				creatureType=Math.floor(Math.random()*109)-10;
+			}
+			break;
+	}
+
+
+	//if(creatureType<90){creatureType=10;}
+	//if(retryCount>0){alert(retryCount);}
+
+	switch(true){
+		case (creatureType<16):
+			//When I added the Ghoul trap I also added the Ghoul here. It seemed reasonable it should replace about 1/4 of the goblins.
+			randomChance=Math.floor(Math.random()*4);
+			if (randomChance==1||(randomChance<2&&questLevel>5)){
+				if (creatureCount[0]>=4 && retryCount<3){
+					retVal=getMonster(isWandering,questLevel,isHall,retryCount+1);
+				}else{
+					//alert("Made it here");
+					retVal+="Ghoul(0 attack, 3 defense. 3 body, 3 mind -- When the ghoul first appears, it trades places with the first hero it sees and their movement ends. The ghoul refocuses each turn by rolling a die to randomly select a hero within their line of site, trading places with them immediately. On the hero's turn they may then move if they choose. When the hero the ghoul focuses on moves, they roll one die. If they roll a 1 or 6, the ghoul again trades places with them.)";
+					creatureCount[0]++;
+				}
+			}else{
+				if (creatureCount[1]>=6 && retryCount<3){
+					retVal=getMonster(isWandering,questLevel,isHall,retryCount+1);
+				}else{
+					retVal+="Goblin";
+					creatureCount[1]++;
+				}
+			}
+			break;
+		case (creatureType<21):
+			if (creatureCount[2]>=1 && retryCount<3){
+				retVal=getMonster(isWandering,questLevel,isHall,retryCount+1);
+			}else{
+				retVal="Rats(3 rats 1 attack, 1 defense, 1 body, 1 mind -- Rats can all go on one space if necessary, but can spread over multiple spaces if available. Initially, place to left and right of this space when viewing from door if space is available.)";
+				creatureCount[2]++;
+			}
+			break;
+		case (creatureType<33):
+			if (creatureCount[3]>=8 && retryCount<3){
+				retVal=getMonster(isWandering,questLevel,isHall,retryCount+1);
+			}else{
+				retVal+="Orc";
+				creatureCount[3]++;
+			}
+			break;
+		case (creatureType<46):
+			if (creatureCount[4]>=4 && retryCount<3){
+				retVal=getMonster(isWandering,questLevel,isHall,retryCount+1);
+			}else{
+				retVal+="Skeleton";
+				creatureCount[4]++;
+			}
+			break;
+		case (creatureType<61):
+			if (creatureCount[5]>=4 && retryCount<3){
+				retVal=getMonster(isWandering,questLevel,isHall,retryCount+1);
+			}else{
+				retVal+="Zombie";
+				creatureCount[5]++;
+			}
+			break;
+		case (creatureType<70):
+			if (creatureCount[6]>=3 && retryCount<3){
+				retVal=getMonster(isWandering,questLevel,isHall,retryCount+1);
+			}else{
+				retVal+="Abomination";
+				creatureCount[6]++;
+			}
+			break;
+		case (creatureType<79):
+			if (creatureCount[7]>=4 && retryCount<3){
+				retVal=getMonster(isWandering,questLevel,isHall,retryCount+1);
+			}else{
+				retVal="Gorgon(2 attack, 4 defend, 2 body, 1 mind, 5 move -- Each turn a gorgon can attack or put someone to sleep. If they put a hero to sleep, the hero remains asleep until rolling a 1 or a 6. On each turn, a hero may roll 1 die for each mind point. A hero who is asleep may not attack, defend, move, or perform any action. If a hero awakens at the beginning of their turn, they may continue the turn as normal.)"
+				creatureCount[7]++;
+			}
+			break;
+		case (creatureType<87):
+			if (creatureCount[8]>=2 && retryCount<3){
+				retVal=getMonster(isWandering,questLevel,isHall,retryCount+1);
+			}else{
+				retVal+="Spider(2 attack, 2 defense, 3 body, 1 mind, 7 move -- Any time a spider does damage to a player that player loses their next turn and cannot attack or defend until after their next turn.)";
+				creatureCount[8]++;
+			}
+			break;
+		case (creatureType<92):
+			if (creatureCount[9]>=2 && retryCount<3){
+					retVal=getMonster(isWandering,questLevel,isHall,retryCount+1);
+			}else{
+				retVal+="Beast(4 attack, 2 defense, 3 body, 2 mind, 6 move)";
+				creatureCount[9]++;
+			}
+			break;
+		case (creatureType<97):
+			if (creatureCount[10]>=3 && retryCount<3){
+				retVal=getMonster(isWandering,questLevel,isHall,retryCount+1);
+			}else{
+				retVal+="Mummy";
+				creatureCount[10]++;
+			}
+			break;
+		case (creatureType<102):
+			if (creatureCount[11]>=4 && retryCount<3){
+				retVal=getMonster(isWandering,questLevel,isHall,retryCount+1);
+			}else{
+				retVal+="Dread Warrior";
+				//randomChance=Math.floor(Math.random()*20)+questLevel;
+				//if (randomChance>19){
+					//spellCount=Math.floor(Math.random()*(randomChance-19));
+					//if (spellCount>0){
+					//	if(spellCount>5){
+							//Don't let them have too many Dread Spells, it'll get ridiculous.
+					//		if(isHall==1){
+					//			spellCount=3;
+					//		}else{
+					//			spellCount=5;
+					//		}
+					//	}
+					switch(true){
+						case (questLevel>9&&questLevel<12):
+							spellCount=1;
+							break;
+						case (questLevel>11&&questLevel<14):
+							spellCount=2;
+							break;
+						case (questLevel>13&&questLevel<16):
+							spellCount=3;
+							break;
+						case (questLevel>15&&questLevel<18):			
+							spellCount=3;
+							break;
+						case (questLevel>17):
+							spellCount=3;
+							break;
+						default:
+							spellCount=0;
+							break;
+					}
+					var maxSpells=Math.floor(Math.random()*5)+1;
+					if (spellCount>maxSpells){
+						//alert("maxSpells");
+						spellCount=maxSpells;
+					}
+					if(spellCount>1){				
+						retVal+="(" + spellCount + " Dread Spells drawn from deck. Select randomly when casting.)";
+					}else{
+						if(spellCount==1){
+							retVal+="(" + spellCount + " Dread Spell(s) Drawn From Deck)";
+						}
+					}
+					//}
+				//}
+				creatureCount[11]++;
+			}
+			break;
+		case (creatureType<116):
+			randomChance=Math.floor(Math.random()*100);
+			if (randomChance<questLevel){
+				if (creatureCount[13]>=1 && retryCount<3){
+					retVal=getMonster(isWandering,questLevel,isHall,retryCount+1);
+				}else{
+					retVal="Fire Demon(4 attack, 5 defend, 4 body, 4 mind, 5 move -- A fire demon may throw a flame in place of a normal attack. A thrown flame travels in a straight line, doing 3 damage to all heroes along its path. Each hero may roll defense dice to reduce this damage.)";
+					creatureCount[13]++;
+				}
+				//Put this here to increase odds of getting a fire demon
+			}else{
+		
+				if (creatureCount[12]>=3 && retryCount<3){
+					retVal=getMonster(isWandering,questLevel,isHall,retryCount+1);
+				}else{
+					retVal+="Gargoyle";
+					creatureCount[12]++;
+					randomChance=Math.floor(Math.random()*20)+parseInt(document.getElementById("questLevel").value,10);
+					if (randomChance>19){
+						spellCount=Math.floor(Math.random()*(randomChance-19));
+						if (spellCount>0){
+							if(spellCount>5){
+								//Don't let them have too many Dread Spells, it'll get ridiculous.
+								if(isHall==1){
+									spellCount=2;
+								}else{
+									spellCount=5;
+								}
+							}
+							retVal+="(" + spellCount + " Dread Spells Drawn From Deck)";
+						}
+					}
+				}
+			}
+			break;
+		case (creatureType<126):
+			
+			if(creatureCount[14]>=4 && retryCount<3){
+				retVal=getMonster(isWandering,questLevel,isHall,retryCount+1);
+			}else{
+				retVal="Replicant(move 10 - att, def, mind, body equal to the first hero it sees. On each of its turns after that it randomly reassigns to any hero it can see.)"
+				creatureCount[14]++;
+			}
+			break;
+//Skip 15, it's used for the Giant Panda
+		default:
+			if (creatureCount[13]>=1 && retryCount<3){
+				retVal=getMonster(isWandering,questLevel,isHall,retryCount+1);
+			}else{
+				retVal="Fire Demon(4 attack, 5 defend, 4 body, 4 mind, 5 move -- A fire demon may throw a flame in place of a normal attack. A thrown flame travels in a straight line, doing 3 damage to all heroes along its path. Each hero may roll defense dice to reduce this damage.)"
+				creatureCount[13]++;
+			}
+			break;
+	}
+	//retVal+= Math.floor((Math.random()*12)+1)+'\n';
+	return retVal;
+
+}
 
 function getPanda(roomNum){
 	//This randomly decides whether a room has the Giant Panda and if it does places it anywhere except on furniture.
@@ -1145,11 +1132,6 @@ function generateBlankBoard(){
 		}
 		row+=1
 	}
-	
-	//setCreatureOdds((parseInt(document.getElementById("questLevel").value,10)));//Added this 4-30-25
-	loadExternalData();//Added this 4-30-25 and I moved the setCreatureOdds call into that function.
-	
-	
 	createStartRoom();
 	showBoard();
 }
@@ -1727,7 +1709,6 @@ function roomsShareADoor(room1,room2,roomSide,alreadyCompared=false){
 
 	//Addded this june 7, 2022
 	//If first room is a hall and the other is the middle room, never add a door, so claim they already share one.
-
 	switch(room1){
 		case 30:
 		case 31:
@@ -1747,14 +1728,11 @@ function roomsShareADoor(room1,room2,roomSide,alreadyCompared=false){
 	//Check to see if room2 is already open. Don't place a door if it is.
 	checkRow=getStartRow(room2);
 	checkCol=getStartCol(room2);
-	
-
 	if(gameBoard[checkRow][checkCol][7]!=0){
 		//The room is open, so don't place a door. Just say there already is one.
 		//alert("No door");
 		return true;
 	}
-	
 	
 	//Need to check to see if there exists a door in this room that borders that room
 	checkForDoor:{
@@ -1765,12 +1743,10 @@ function roomsShareADoor(room1,room2,roomSide,alreadyCompared=false){
 				//Just loop along left side to see if there is a door and if so see if it opens to room2
 				checkRow=getStartRow(room1);
 				checkCol=getStartCol(room1);
-	
 				while(gameBoard[checkRow][checkCol][0]==room1){
 					checkedList+=gameBoard[checkRow][checkCol-1][0]+",";
 					if(gameBoard[checkRow][checkCol][2]==2){
 							if(gameBoard[checkRow][checkCol-1][0]==room2){
-							
 								return true;
 							}
 					}
@@ -1780,12 +1756,10 @@ function roomsShareADoor(room1,room2,roomSide,alreadyCompared=false){
 			case 3:
 				checkRow=getStartRow(room1);
 				checkCol=getStartCol(room1)+getRoomCols(room1)-1;
-			
 				while(gameBoard[checkRow][checkCol][0]==room1){
 					checkedList+=gameBoard[checkRow][checkCol+1][0]+",";
 					if(gameBoard[checkRow][checkCol][3]==2){
 						if(gameBoard[checkRow][checkCol+1][0]==room2){
-						
 							return true;
 						}
 					}
@@ -1795,49 +1769,31 @@ function roomsShareADoor(room1,room2,roomSide,alreadyCompared=false){
 			case 4:
 				checkRow=getStartRow(room1);
 				checkCol=getStartCol(room1);
-								 
 				while(gameBoard[checkRow][checkCol][0]==room1){
 					checkedList+=gameBoard[checkRow-1][checkCol][0]+",";
-			
 					if(gameBoard[checkRow][checkCol][4]==2){
-		
 						if(gameBoard[checkRow-1][checkCol][0]==room2){
-					
 							return true;
 						}
 					}
 					checkCol++;
-					
-					//And when I add this, it works. So I think it's just getting out of bounds. 
-					if(checkCol>=26){break;}
 				}
-				
-				
-				
-				
-		
 				break;
 			default:
 				checkRow=getStartRow(room1)+getRoomRows(room1)-1;
 				checkCol=getStartCol(room1);
-		
 				while(gameBoard[checkRow][checkCol][0]==room1){
 					checkedList+=gameBoard[checkRow+1][checkCol][0]+",";
 					if(gameBoard[checkRow][checkCol][5]==2){
 						if(gameBoard[checkRow+1][checkCol][0]==room2){
-					
 							return true;
 						}
 					}
 					checkCol++;
-					
-					//And when I add this, it works. So I think it's just getting out of bounds. 
-					if(checkCol>=26){break;}
 				}
 				break;
 		}
 	}
-	
 	
 	//09-25-22 Need to check the corners in the hall, because there is a space there where two halls border the same room along same wall, which
 	//can give us a problem
@@ -1903,6 +1859,7 @@ function roomsShareADoor(room1,room2,roomSide,alreadyCompared=false){
 			}
 		}
 	}
+	
 	return false;
 }
 
@@ -2547,31 +2504,26 @@ function listRoomContents(roomNum,curTime){
 }
 
 function reduceDoorCount(numOfDoors=0,roomNumber){
-	
 	var doorCount=numOfDoors;
 	var reductionNum=0;
 	var zeroChance=0;
 	let questLevel=(parseInt(document.getElementById("questLevel").value,10))
 	
-	
-	
 	if(doorCount>0){
-	
 		if(roomNumber>21){
 			//this is a hall, do nothing
 		}else{
 		
 			zeroChance=Math.floor(Math.random()*100)+1;
-			
 			if(zeroChance<questLevel){
 				//alert("zeroChance");
 				//alert("Reduced doorcounts to 0--Originally "+numOfDoors );
 				//doorcount=0;	
 				//Changed this to just reduce the doorcount by 2 on 10-11-2022 because we were getting way too few rooms.
 				//This gives us a chance at having some doors, at least.
-				doorCount=doorCount-2;
+				doorcount=doorcount-2;
 				
-				return doorCount;
+				return;
 			}
 			
 			reductionNum=Math.floor(Math.random()*100)+1;
@@ -2583,6 +2535,7 @@ function reduceDoorCount(numOfDoors=0,roomNumber){
 			}
 		}
 	}
+	
 	return doorCount;
 }
 function updateMissedRoom(roomNum){
@@ -2659,138 +2612,117 @@ function addDoors(roomNum, isLastRoom){
 		
 		//Up to 4 doors in a room, one on each side
 		//But if the room is not a hall, decrease the number by a small percentage
-		
 		numItems=reduceDoorCount(numItems, roomNum);
-
 		while(numItems>0){
-			//Find out which side of the room we're trying to place this on
-			randomChance=Math.floor(Math.random()*4);
-			//This is to take care of hallways--can't place a door on the outside edge of the Board
-			
-	
+		//Find out which side of the room we're trying to place this on
+		randomChance=Math.floor(Math.random()*4);
+		//This is to take care of hallways--can't place a door on the outside edge of the Board
+		switch(randomChance){
+			case 0:
+				if(startCol==0){
+					//This is one of the halls on the left of the board, so it can't be on the left of this hall.
+					//Switch to right side instead.
+					randomChance++;
+				}
+				break;
+			case 1:
+				if(startCol==25){
+					//This is one of the halls on the right of the board, so it can't be on the right of this hall.
+					//Switch to left side instead.
+					randomChance--;
+				}
+				break;
+			case 2:
+				if(startRow==0){
+					//This is one of the halls on the top of the board, so it can't be on the top of this hall.
+					//Switch to bottom side instead.
+					randomChance++;
+				}
+				break;
+			case 3:
+				if(startRow==18){
+					//This is one of the halls on the bottom of the board, so it can't be on the bottom of this hall.
+					//Switch to top side instead.
+					randomChance--;
+				}
+				break;
+			default:
+				break;
+		}
 		
-			switch(randomChance){
-				case 0:
-					if(startCol==0){
-						//This is one of the halls on the left of the board, so it can't be on the left of this hall.
-						//Switch to right side instead.
-						randomChance++;
-					}
-					break;
-				case 1:
-					if(startCol==25){
-						//This is one of the halls on the right of the board, so it can't be on the right of this hall.
-						//Switch to left side instead.
-						randomChance--;
-					}
-					break;
-				case 2:
-					if(startRow==0){
-						//This is one of the halls on the top of the board, so it can't be on the top of this hall.
-						//Switch to bottom side instead.
-						randomChance++;
-					}
-					break;
-				case 3:
-					if(startRow==18){
-						//This is one of the halls on the bottom of the board, so it can't be on the bottom of this hall.
-						//Switch to top side instead.
-						randomChance--;
-					}
-					break;
-				default:
-					break;
-			}
-			
-			randomChance+=2;//This is because left edge is position 2 in the array, so we add 2. So a 0 gets 2 added to become position 2 in array and will be left side. 1 gets 2 added to become position 3 in the array and is the right side, etc.
-			//Now check to see if the room already has a door on that side and skip if it does.
-			tryDoor:{
-				checkCol=startCol;
-				checkRow=startRow;
+		randomChance+=2;//This is because left edge is position 2 in the array, so we add 2. So a 0 gets 2 added to become position 2 in array and will be left side. 1 gets 2 added to become position 3 in the array and is the right side, etc.
+		//Now check to see if the room already has a door on that side and skip if it does.
+		tryDoor:{
+			checkCol=startCol;
+			checkRow=startRow;
 
-				//Check halls to make sure we aren't trying to put a door on the outside edge of the board.
-					
-					if(randomChance==2||randomChance==3){
-						
-						checkRow=Math.floor(Math.random()*numRows);
-						checkRow=checkRow+(startRow);
-						if(randomChance==2){
-							//Left side of room
-							//Check to make sure the place we are placing it is not an open hall space, where there is no wall
-							if(gameBoard[checkRow][startCol][randomChance]!=0){
-								//Before placing door in a hall, double check to make sure there isn't a door between this room and the hall already
-								//This is only necessary because we don't limit the number of doors in a hall
-								
-								if(roomsShareADoor(roomNum,gameBoard[checkRow][startCol-1][0],2)==false){
-									if(doorBlockedByFurniture(checkRow,startCol-1)==false){					
-										gameBoard[checkRow][startCol][randomChance]=2;
-											//Also set corresponding space in room to left
-										gameBoard[checkRow][startCol-1][randomChance+1]=2;									
-									}
-								}
-							}
-						}else{
+			//Check halls to make sure we aren't trying to put a door on the outside edge of the board.
 			
-							//Right side of room
-							//Check to make sure the place we are placing it is not an open hall space, where there is no wall
-							if(gameBoard[checkRow][startCol+(numCols-1)][randomChance]!=0){
-								if(roomsShareADoor(roomNum,gameBoard[checkRow][startCol+(numCols)][0],3)==false){
-									if(doorBlockedByFurniture(checkRow,startCol+(numCols))==false){
-										gameBoard[checkRow][startCol+(numCols-1)][randomChance]=2;
-										//Also set corresponding space in room to right
-										gameBoard[checkRow][startCol+(numCols)][randomChance-1]=2;
-									}
+				if(randomChance==2||randomChance==3){
+					checkRow=Math.floor(Math.random()*numRows);
+					checkRow=checkRow+(startRow);
+					if(randomChance==2){
+						//Left side of room
+						//Check to make sure the place we are placing it is not an open hall space, where there is no wall
+						if(gameBoard[checkRow][startCol][randomChance]!=0){
+							//Before placing door in a hall, double check to make sure there isn't a door between this room and the hall already
+							//This is only necessary because we don't limit the number of doors in a hall
+							
+							if(roomsShareADoor(roomNum,gameBoard[checkRow][startCol-1][0],2)==false){
+								if(doorBlockedByFurniture(checkRow,startCol-1)==false){					
+									gameBoard[checkRow][startCol][randomChance]=2;
+										//Also set corresponding space in room to left
+									gameBoard[checkRow][startCol-1][randomChance+1]=2;									
 								}
 							}
 						}
 					}else{
-						
-						checkCol=Math.floor(Math.random()*numCols);
-						checkCol=checkCol+(startCol);
-						
-						if(randomChance==4){
-					
-							//Top side of room
-							//Check to make sure the place we are placing it is not an open hall space, where there is no wall
-							if(gameBoard[startRow][checkCol][randomChance]!=0){
-								
-								
-								if(roomsShareADoor(roomNum,gameBoard[startRow-1][checkCol][0],4)==false){
-						
-									if(doorBlockedByFurniture(startRow-1,checkCol)==false){
-							
-										gameBoard[startRow][checkCol][randomChance]=2;
-										//also set corresponding space in room above setInterval(function () {
-										gameBoard[startRow-1][checkCol][randomChance+1]=2;
-									}
-								}
-							}
-						}else{
-						
-							//Bottom side of room
-							//Check to make sure the place we are placing it is not an open hall space, where there is no wall
-							if(gameBoard[startRow+(numRows-1)][checkCol][randomChance]!=0){
-							
-								if(roomsShareADoor(roomNum,gameBoard[startRow+(numRows)][checkCol][0],5)==false){
-								
-									if(doorBlockedByFurniture(startRow+(numRows),checkCol)==false){
-									
-										gameBoard[startRow+(numRows-1)][checkCol][randomChance]=2;
-										//Also set corresponding space in room below it
-										gameBoard[startRow+(numRows)][checkCol][randomChance-1]=2;
-									}
+						//Right side of room
+						//Check to make sure the place we are placing it is not an open hall space, where there is no wall
+						if(gameBoard[checkRow][startCol+(numCols-1)][randomChance]!=0){
+							if(roomsShareADoor(roomNum,gameBoard[checkRow][startCol+(numCols)][0],3)==false){
+								if(doorBlockedByFurniture(checkRow,startCol+(numCols))==false){
+									gameBoard[checkRow][startCol+(numCols-1)][randomChance]=2;
+									//Also set corresponding space in room to right
+									gameBoard[checkRow][startCol+(numCols)][randomChance-1]=2;
 								}
 							}
 						}
-						
 					}
-					
-			}
-	
-			showBoard();
-			numItems--;
+				}else{
+					checkCol=Math.floor(Math.random()*numCols);
+					checkCol=checkCol+(startCol);
+					if(randomChance==4){
+						//Top side of room
+						//Check to make sure the place we are placing it is not an open hall space, where there is no wall
+						if(gameBoard[startRow][checkCol][randomChance]!=0){
+							if(roomsShareADoor(roomNum,gameBoard[startRow-1][checkCol][0],4)==false){
+								if(doorBlockedByFurniture(startRow-1,checkCol)==false){
+									gameBoard[startRow][checkCol][randomChance]=2;
+									//also set corresponding space in room above setInterval(function () {
+									gameBoard[startRow-1][checkCol][randomChance+1]=2;
+								}
+							}
+						}
+					}else{
+						//Bottom side of room
+						//Check to make sure the place we are placing it is not an open hall space, where there is no wall
+						if(gameBoard[startRow+(numRows-1)][checkCol][randomChance]!=0){
+							if(roomsShareADoor(roomNum,gameBoard[startRow+(numRows)][checkCol][0],5)==false){
+								if(doorBlockedByFurniture(startRow+(numRows),checkCol)==false){
+									gameBoard[startRow+(numRows-1)][checkCol][randomChance]=2;
+									//Also set corresponding space in room below it
+									gameBoard[startRow+(numRows)][checkCol][randomChance-1]=2;
+								}
+							}
+						}
+					}
+				}
+
 		}
-		
+		showBoard();
+		numItems--;
+		}
 	}
 	return;
 	
@@ -3740,19 +3672,15 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 
 
 	//loop through to blank out creatureCount array
-	/*var myCounter=0;
+	var myCounter=0;
 	while(myCounter<20){
 		creatureCount[myCounter]=0;
 		myCounter+=1;
-	}*/
-	for(x=0;x<creatureList.length;x++){
-		creatureList[x][7]=0;
 	}
 
 
 	startRow=getStartRow(roomNum);
 	startCol=getStartCol(roomNum);
-	
 	
 
 	//Now check to see if this room is already marked as being in use
@@ -3767,15 +3695,11 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 		checkTraps();
 	}
 	
-		
+
 	backupTable("M");
-	
-	
 
 	//Add in any doors, unless they already have been placed.
 	addDoors(roomNum, isLastRoom);
-	
-	
 
 
 	//Add in any furniture, unless the room has already been opened.
@@ -3795,7 +3719,6 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 	if (chkPanda.checked && pandaCount==0){			
 		getPanda(roomNum);		
 	}
-	
 	
 	gameBoard[startRow][startCol][7]=1;
 
@@ -3844,6 +3767,7 @@ document.querySelector('#gameBoard')
 					
 					//remove creatures placed at start so we only have stairs and doors. 
 					clearStartCreatures();
+					
 					openRoomVisually(roomNum,true,1);
 					
 					showFinalReward();
