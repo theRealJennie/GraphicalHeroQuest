@@ -19,11 +19,11 @@ const creatureSet=[ //This is formatted like this for simplicity purposes, makin
 	0,
 	0,
 	
-	"XXXlin",
+	"Goblin",
 	0,
 	6, 
 	0,
-	"Yay",
+	"Gob",
 	"",
 	0,
 	0,
