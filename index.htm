@@ -245,7 +245,22 @@ function loadExternalData(){
 	
 }
 
-
+function testNewFurnitureFunctions(){
+	let testArr=[];
+	
+	
+	for(furnCounter=0;furnCounter<10;furnCounter++){
+		testArr.push([getFurniture()]);
+	}	
+	
+	//alert("New Furniture Test: " + testArr);
+	
+	/*for(furnCounter=0;furnCounter<10;furnCounter++){
+		addFurnitureRedux(furnCounter+2);
+	}	
+	showBoard();
+	alert("End of test functions");*/
+}	
 
 
 
@@ -474,7 +489,7 @@ function setCreatureOdds(questLevel=0){
 				if(largeCreatureLowerBounds<=9){
 					if(largeCreatureLowerBounds2<=9){
 						curMaxVal+=Math.round((largeCreatureMultiplier2*60)*countAdjuster);
-						//alert("9");
+						alert("9");
 					}else{
 						curMaxVal+=Math.round((largeCreatureMultiplier*60)*countAdjuster);//76;	
 					}				
@@ -646,7 +661,7 @@ function getPanda(roomNum){
 
 
 function getFurniture(triesAllowed=5){
-
+	//var triesAllowed=5; //This is so it can randomly choose a piece of furniture. If that piece has met its max number, try again.
 	furnitureType=Math.floor(Math.random()*furnitureList[furnitureList.length-1][6]);
 		
 	while(triesAllowed>0){
@@ -875,7 +890,6 @@ function addFurniture(roomNum=0, isLastRoom=0){
 								}
 								rowCount=0;
 								if(tmpRow!=rndRow||tmpCol!=rndCol){
-									//If the item is already against a wall, basically. 
 									while(rowCount<tempFurnHeight){									
 										colCount=0;
 										while(colCount<tempFurnWidth){
@@ -932,7 +946,7 @@ function addFurniture(roomNum=0, isLastRoom=0){
 							if(canPlace==true){			
 								//Now just place the furniture in this place and exit the for.
 								//Add description and (furniture) or (big furniture)
-																		
+								//gameBoard[rndRow][rndCol][1]="^"+tempFurnWidth+"^"+tempFurnHeight+"^" ;													
 								tempDesc+=" (furniture)";
 															
 								//Now for all of the spaces for this item I need them to start with @ and then get the description, except for upper left which has ^W^H^ then desc.
@@ -2652,7 +2666,16 @@ function listRoomContents(roomNum,curTime){
 				if(roomContents.substr(0,1)=="^"){ 
 					newDescription+="\n"+roomContents.substr(5,pos-5);					
 				}else{
-									
+					//alert(roomContents);
+					/*if(roomContents.includes("STb")){ //Added this bit about STb and Throne 1-27-25 because they'd be missed otherwise, for some reason. Need to get this working for all 1x1 furniture.
+						newDescription+="\nSmall Table";
+						continue;
+					}
+					if(roomContents.includes("Throne")){
+						newDescription+="\nThrone";
+						continue;
+					}*/
+					
 
 					if(roomContents.substr(0,1)=="@"){
 						//don't list here, only on first entry for this furniture item, which is at the ^ entry.						
