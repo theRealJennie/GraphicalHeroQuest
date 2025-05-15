@@ -8,7 +8,7 @@
 	selectionUpperRange
 	inUseCount
 */
-/*
+
 const furnitureSet=[
 
 	"Throne",
@@ -136,10 +136,10 @@ const furnitureSet=[
 	"Bookshelf.",
 	0,
 	0
-];*/
+];
 
 
-
+/*
 const furnitureSet=[
 
 	"Throne",
@@ -375,4 +375,4 @@ const furnitureSet=[
 	"Bookshelf.",
 	0,
 	0
-];
+];*/
