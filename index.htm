@@ -1,0 +1,3473 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+<style>
+	textarea{
+	//	font-size: 2.5rem !important;
+	}
+	div{
+		//font-size: 2.5rem !important;
+		padding-bottom: 5px !important;
+	}
+	button{
+		//font-size: 2.5rem !important;
+		background-color: lightgray !important;
+	}
+	table{
+		width: 100%;
+		border-collapse: collapse;
+	}
+	td{
+		font-size: .75rem;
+		height: 1.5rem;
+		width: 1.5rem;
+		max-width: 10px;
+		min-width: 1.5rem;
+		opacity: .40;
+
+	//Never put this inline-block, it breaks td width and row sizing
+	//	display: inline-block;
+		border-width:1px;
+		border-color: black;
+		border-style: solid;
+		background: lightGrey;
+		text-align: center;
+		padding-top: .5em;
+		word-wrap: wrap;
+	}
+
+</style>
+<script  src="creatures.js"></script>
+<script  src="furniture.js"></script>
+</head>
+
+<body style="background-color: AntiqueWhite;">
+
+<div class="container">
+<div class="row">
+<div class="col-8">
+
+	<div class="row"style="line-height: 0;padding:10px;max-width:28.5rem;" id="gameBoard">
+
+	</div>
+	<div id="zoomedView" style="overflow-y:auto; left: 3%; top: 3%; padding-left: 3%; padding-top: 3%; width: 90%; height: 90%; position: fixed; background-color: antiquewhite; border-color: black; border-width: 3px; border-style: double; visibility: hidden;">
+	<!--Here is where I"ll put the zoom in area.-->
+		<div class="col-sm" style="float:right; padding-right: 20px">	
+			<button class="btn btn-rounded" onclick="document.getElementById('zoomedView').style.visibility='hidden'">Close</button>
+		</div>
+	</div>
+</div>
+
+<div class="col-lg-4">
+
+<div class="row">
+	<div class="col-sm">
+		Quest Level:
+	</div>
+	<div class="col-sm">
+		<textarea class="form-control" id="questLevel" rows=1 name="questLevel"></textarea>
+	</div>
+</div>
+<div class="row" style="display:none"> //got rid of this for now because we never use it. Can re-enable later on if we want.
+	<div class="col-sm">
+		Max Rooms:
+	</div>
+	<div class="col-sm">
+		<textarea class="form-control" id="maxRooms" rows=1 name="maxRooms"></textarea>
+	</div>
+</div>
+<div class="row">
+	<div class="col-sm">
+		<button class="btn btn-rounded" onclick="openSearch()">Open Search Item</button>
+	</div>	
+	<div class="col-sm">
+		<button class="btn btn-rounded" onclick="openHallSearch()">Open Hall Search</button>
+	</div>
+	
+</div>
+<div class="row">
+	<div class="col-sm">
+		<button class="btn btn-rounded" onclick="wanderingMonster()">Get Wandering Monster</button>
+	</div>
+</div>
+<div class="row">
+	<div class="col-sm">
+		<button class="btn btn-rounded" onclick="generateBlankBoard()">Generate Blank Board</button>
+	</div>
+	<div class="col-sm">
+		<button class="btn btn-rounded" onclick="backupTable('U'); showBoard();">Undo</button>
+	</div>
+</div>
+<div class="row">
+	<div class="col-sm">
+		
+		<input type="checkbox" id="chkPanda" name="chkPanda" >
+		<label for="chkPanda"> Include Panda</label>
+	</div>
+	<div class="col-sm">
+		Right-Click (Hold on Mobile) To Zoom
+	</div>
+</div>
+</div>
+</div>
+</div>
+
+<div>
+<textarea class="form-control" id="results" rows=12 name="results">
+</textarea>
+</div>
+
+<h2>
+Your Mission
+</h2>
+<p>
+Small kingdoms once covered the land from sea to sea. These kingdoms, numbering in the dozens, existed side by side, often in a state of war for resources and land. Until A century ago, when King Dunong The Mighty conquered the kingdoms, uniting all people of the land into one strong realm.
+</p>
+<p>It has existed in this form ever since, with a governor having direct control over each territory that made up the lesser kingdoms. Each of these kingdoms had castles, but over time the underground levels of these castles became infested with evil monsters of all kinds.
+</p>
+<p>Recently, these monsters have found their way out, attacking innocent civilians nearby before returning to their underground base. King Filbon The Kind has hired you, a small band of intrepid heroes, to clean out these lairs so they can be used by the local governors for the good of the people and to protect the people from these vile creatures.
+</p>
+<p>
+You must enter each lair and clear out all the monsters that you can reach. If you leave even one monster alive, it could escape and attack the public! Kill off all the monsters before you exit, and be heralded by the town as heroes of the realm.
+<h2>
+Additional Rules
+</h2>
+
+<p>
+When you enter a hallway, click on it to find out what is in the hall.
+</p>
+<p>
+When you first open a door, click on the room to find out what is in it. You'll find where doors should be placed, as well as furniture, search items, and creatures..
+</p>
+<p>
+Searching: You do not search for traps or treasure in the regular way. Instead, you must step on a searchable items that was placed and then open it (this is not an action). You may find out it is a treasure, a trap, or a secret door.
+</p>
+<p>
+Potions: Typically, you must stand directly beside another hero to exchange potions or other items. Now you can toss a potion to any hero in your line of site or the same room, even over other monsters, heroes, and furniture.
+</p>
+<p>
+Line of sight: This is usually a straight line and cannot pass through other heros or creatures. While this is typically the case, for these quests use this more liberally. Typically, other heros can see over the dwarf, for example. And a diagonal line of sight may obviously see between two other heroes, and if it looks that way then go with that and don't be picky.
+</p>
+<p>
+Creatures: Creatures will move in the most obvious way and perform the most obvious attacks possible. If there is a hero closer than the others, they'd likely go toward that hero, for example. If a hero has been attacking them, they'd likely attack back. Just use common sense.
+If you run out of a creature, replace with the next toughest creature available on the chart. If no tougher creatures are available, replace with next weakest available.
+</p>
+<p>Special rules for the wizard: Usually, throwing a dagger or the handaxe results in losing them forever. Our wizard has trained hard to become a better fighter so they can support the group. They have developed an enchantment they apply to all thrown weapons that automatically return them to their hand each turn, so the heroes never lose these items.
+</p>
+<p>Special rules for the Dread Warriors and Gargoyles: If an escape spell is cast, set creature aside. From now on, each time you enter a new room roll a die. If a 6 is rolled, place the creature in that room in the corner farthest from the doorway. If the creature has not been found before reaching the end room, place in the end room in the corner nearest the bottom of the stairs. 
+</p>
+<p>Special rules for small furniture: Ordinarily, furniture must remain in the place it is placed. In cases where creatures are cutoff and there is no other way to reach them, arrange the room so that this isn't the case, moving small furniture if possible to a nearby space or removing it altogether if necessary. Use common sense.
+</p>
+<p>
+Note that new heal potion(4) can be purchased between any quests for 100 gold, so don't forget to stock up before you begin.
+<p>
+<p>
+Exiting: When you've cleared all of the lair, return to the stairs. But you'll find a surprise waiting for you there. Use the Open Exit Room button to find out if any creatures have snuck in behind you and cut off your exit. If so, you have to kill them before you can leave. Upon leaving, you will get a reward, which is based on the level of the quest.
+</p>
+<p>
+Priority precedent for creatures that automatically move first: Ghoul, Gorgon, Fire Demons, Gargoyles, then Dread Warriors, then from toughest to weakest. 
+
+When using alternate character sets, apply these same rules to the similar creatures in those sets, using common sense to decide which applies.
+</p>
+
+
+
+
+<script>
+
+var LastLocation=0;
+var roomCount=0;
+var gameBoard=new Array(19);
+var gameBoardBackup=new Array(19);
+let creatureList=[];
+let furnitureList=[]; 
+var noteBackup="";
+var artifactCount=0;
+var itemCount=new Array(20);
+var creatureCount=new Array(20);
+var pandaCount=0;
+var mouseTimer;
+
+//gameBoard position definitions:
+//0-room number
+//1-contents of that square
+//2-2 for a door on left side of square, 1 for a wall on left side, 0 for nothing
+//3-same, but for right side
+//4-same, but for top side
+//5-same, but for bottom side
+//6-background color for this square
+//7-room in use
+for(i=0;i<gameBoard.length;i++){
+	gameBoard[i]=new Array(26);
+	gameBoardBackup[i]=new Array(26);
+	for(j=0;j<gameBoard[0].length;j++){
+		gameBoard[i][j]=new Array(8).fill(0);
+		gameBoardBackup[i][j]=new Array(8).fill(0);
+	}
+}
+
+
+function loadExternalData(){
+	//This should load the creature and furniture data from external .js files when completed.
+
+		
+	//creatureSet has 8 entries for each creature.
+	var totalElements=creatureSet.length;
+	
+	creatureList=[];//Empty these because we're reloading data.
+	furnitureList=[];
+	
+
+	for(outerCounter=0; outerCounter<totalElements;outerCounter+=8){
+		//Loop through every creature in source creatureSet
+			creatureList.push([creatureSet[outerCounter],creatureSet[outerCounter+1],creatureSet[outerCounter+2],creatureSet[outerCounter+3],creatureSet[outerCounter+4],creatureSet[outerCounter+5],creatureSet[outerCounter+6],creatureSet[outerCounter+7]]);
+	};	
+	
+	//This needs to run each time the gameboard is loaded so it can adjust odds for the level. 
+	setCreatureOdds((parseInt(document.getElementById("questLevel").value,10)));
+	
+	//Now load the furniture from furniture.js
+	
+	totalElements=furnitureSet.length;
+	tempUpper=0;
+	
+	for(outerCounter=0; outerCounter<totalElements;outerCounter+=8){
+		//Loop through every creature in source creatureSet
+			tempUpper+=furnitureSet[outerCounter+1]; 	//This is to set the upper range here. We don't need a special function like we do with the creatures
+														//because the odds don't change based on the quest level. 
+			furnitureList.push([furnitureSet[outerCounter],furnitureSet[outerCounter+1],furnitureSet[outerCounter+2],furnitureSet[outerCounter+3],furnitureSet[outerCounter+4],furnitureSet[outerCounter+5],tempUpper,furnitureSet[outerCounter+7]]);
+	};	
+	//alert(furnitureList);
+	
+	testNewFurnitureFunctions();
+	
+}
+
+
+
+
+
+
+function getMonster(isWandering=0,questLevel=0, isHall=0, retryCount=0){
+	var maxWandering=Math.floor(creatureList.length*.8);
+	var minWandering=Math.floor(creatureList.length*.2);
+	var creatureType=0;
+	var retVal="";
+	
+	if(questLevel==0){
+		 questLevel=(parseInt(document.getElementById("questLevel").value,10));
+	};
+	creatureType=Math.floor(Math.random()*creatureList[creatureList.length-1][6]); 
+	//This will randomize based on the actual range available after all the level adjustments and so on that is done in the setCreatureOdds function upon loading each board. 
+	//Technically this is not the creature type at this point, at least not based on index location, it is the value chosen that needs compared to the creature's selectionUpperRange.
+	
+	for(x=0;x<creatureList.length;x++){
+		if(creatureList[x][6]>=creatureType){
+			creatureType=x;
+			break;
+		}		
+	}		
+	
+	
+	if(isWandering==1){
+		if(creatureType>maxWandering){
+			creatureType=maxWandering;
+		}
+	}	
+	
+	
+	//Before we go any farther, let's check to make sure we don't have too many of this creature and retry if we do.
+	if(creatureList[creatureType][7]>=creatureList[creatureType][2] && retryCount<3){
+		creatureType=getMonster(isWandering,questLevel,isHall,retryCount+1);
+	}else{
+		creatureList[creatureType][7]+=1; //Increment the count in use.
+	}
+	
+	//In this new function we're going to put the abbreviation at the beginning of the description. We can then pull that when we put the creature on the map later. 
+	retVal=creatureList[creatureType][4] + " " + creatureList[creatureType][5];
+	
+	//Now search for the words "Dread Spells" and replace with a spellcount+ "Dread Spells";
+	if(retVal.includes("Dread Spell")==true){
+		retVal=retVal.replace("Dread Spells", "(" + getSpellCount(creatureType, questLevel) + " Dread Spell(s)");
+	}
+	
+	
+	if(retryCount>0){
+		return creatureType; 	//This is so the original calling function can assign description and all that. 
+	}else{
+		return retVal;
+	}
+	
+	return retVal;
+}
+function getSpellCount(creatureIndex=0,questLevel=0, isHall=0){
+	var spellCount=Math.round(Math.random()* creatureList[creatureIndex][3]);//Random based on the max spells for the creature. 
+		
+	//alert(Math.random()* creatureList[creatureIndex][3] + "  " + questLevel);
+	if(questLevel<12){
+		if(spellCount>1){
+			spellCount=1;
+		}
+	}else if (questLevel<14){
+		if(spellCount>2){
+			spellCount=2;
+		}
+	}else{
+		if(spellCount>2){
+			if(isHall>0){
+				spellCount=2; //This is the max spells in a hall. 
+			}
+		}
+	}	
+	
+	return spellCount;
+}
+function setCreatureOdds(questLevel=0){
+	//This will calculate set the upper boundary of each creature based on quest level and the toughness of the creatures, taking into account 
+	//the number of creatures in the set. So on lewer quest levels the odds of getting a goblin are way higher than they are in later quest levels, for example. 
+		
+	var countAdjuster=15/creatureList.length;//This is to base this on the fact that we used to have 15 in our base set.	
+	var curMaxVal=0;
+	
+	var tempVal=0;
+	let x;
+	
+	var largeCreatureMultiplier=0; //This can be adjusted down below so we can manipulate the odds of a large creature a bit based on level.
+	var largeCreatureLowerBounds=0; //This will also be changed below, and the point is to multiply this times the number of creatures to get the starting point of what we consider large creatures, and that can change based on the level. 
+	var largeCreatureLowerBounds2=0; //This is so I can have a second set of creatures, like Dread Warriors and above, that are even harder still to get on low levels, potentially even reducing their odds to zero for levels under 5. 
+	var largeCreatureMultiplier2=0;
+	var smallCreatureMultiplier=0; //This is to increase the odds of small creatures on low levels. By small I mean the first 5 or 6 creatures. 
+	var midCreatureMultiplier=0; //I specifically added this for later rounds, so I can reduce these in higher levels. 
+	var replicantMultiplier=0;
+	
+	
+	//Set multipliers for creatures of various sizes based on the questLevel. 
+	switch(true){
+		case(questLevel<=5):
+			smallCreatureMultiplier=1.5;
+			midCreatureMultiplier=smallCreatureMultiplier*.6;
+			largeCreatureLowerBounds=Math.round(creatureList.length*.58);
+			largeCreatureMultiplier=smallCreatureMultiplier*.0533;
+			largeCreatureLowerBounds2=Math.round(creatureList.length*.78);
+			largeCreatureMultiplier2=0;
+			replicantMultiplier=0;
+			break;	
+		case(questLevel<=10):
+			smallCreatureMultiplier=1+((10-questLevel)*.1);
+			midCreatureMultiplier=smallCreatureMultiplier*(.7-((10-questLevel)*.02));
+			largeCreatureLowerBounds=Math.round(creatureList.length*.58);
+			largeCreatureMultiplier=smallCreatureMultiplier*(.6 -((10-questLevel)*.01334));
+			largeCreatureLowerBounds2=Math.round(creatureList.length*(.8 -((10-questLevel)*.004)));
+			largeCreatureMultiplier2=.2-((10-questLevel)*.04);
+			replicantMultiplier=0;
+			break;				
+		case(questLevel<=35):
+			smallCreatureMultiplier=.25 +((35-questLevel)*.03);
+			midCreatureMultiplier=smallCreatureMultiplier*(3.2 -((35-questLevel)*.1));
+			largeCreatureLowerBounds=Math.round(creatureList.length*.58);
+			largeCreatureMultiplier=smallCreatureMultiplier*(4.6 -((35-questLevel)*.16));
+			largeCreatureLowerBounds2=Math.round(creatureList.length*(.74+((35-questLevel)*.0024)));
+			largeCreatureMultiplier2=smallCreatureMultiplier*(2.8-((35-questLevel)*.104));
+			replicantMultiplier=smallCreatureMultiplier*((35-questLevel)*.005);
+			break;			
+		case(questLevel<=45):
+			smallCreatureMultiplier=.2 +((45-questLevel)*.005);
+			midCreatureMultiplier=smallCreatureMultiplier*(4.5 -((45-questLevel)*.13));
+			largeCreatureLowerBounds=Math.round(creatureList.length*.58);
+			largeCreatureMultiplier=smallCreatureMultiplier*(7.5 -((45-questLevel)*.29));
+			largeCreatureLowerBounds2=Math.round(creatureList.length*.74);
+			largeCreatureMultiplier2=smallCreatureMultiplier*(4.25 -((45-questLevel)*.145));
+			replicantMultiplier=smallCreatureMultiplier*(5 -((45-questLevel)*.4));
+			break;
+		case(questLevel>45):
+			smallCreatureMultiplier=.2;
+			midCreatureMultiplier=smallCreatureMultiplier*(4.5 -((questLevel-45)*.05));
+			largeCreatureLowerBounds=Math.round(creatureList.length*.56);
+			largeCreatureMultiplier=smallCreatureMultiplier*(7.5 +((questLevel-45)*.15));
+			largeCreatureLowerBounds2=Math.round(creatureList.length*(.85-((questLevel-45)*.0024)));
+			largeCreatureMultiplier2=smallCreatureMultiplier*(4.25+((questLevel-45)*.25));
+			replicantMultiplier=smallCreatureMultiplier*(5+((questLevel-45)*.25));
+			break;
+		default:
+			//Just a catch all
+			break;
+	}
+			
+	//This is based on the fact that there were 15 creatures in our default set, so we need this to be like that. This may mean we have over the 1000 above, but it shouldn't be too far off and that should still work ok.	
+	for(x=0;x<creatureList.length;x++){
+		//Loop through the creatures and assign the selectionRange for them. 
+		switch(true){		
+			case (x==0):
+				//This would be a ghoul in the original set. 	
+				tempVal=Math.round(35*countAdjuster);//We don't use the smallCreatureMultiplier on this because we don't want to affect it with the other small creatures. 
+				creatureList[x][6]=tempVal;//30;
+				curMaxVal=tempVal;//30;
+				break;				
+			case (Math.round(countAdjuster*x)==1):
+				//This would be a Goblin in the original set. 				
+				curMaxVal+=Math.round(99*countAdjuster*smallCreatureMultiplier);//99;
+				creatureList[x][6]=curMaxVal;
+				break;
+			case (Math.round(countAdjuster*x)==2):
+				//This would be Rats in the original set. 
+				curMaxVal+=Math.round(20*countAdjuster);//45;
+				creatureList[x][6]=curMaxVal;
+				break;
+			case (Math.round(countAdjuster*x)==3):				
+				//This would be an Orc in the original set. 
+				curMaxVal+=Math.round(99*countAdjuster*smallCreatureMultiplier);//99;
+				creatureList[x][6]=curMaxVal;
+				break;
+			case (Math.round(countAdjuster*x)==4):				
+				//This would be a Skeleton in the original set. 
+				curMaxVal+=Math.round(90*countAdjuster*smallCreatureMultiplier);//107
+				creatureList[x][6]=curMaxVal;
+				break;
+			case (Math.round(countAdjuster*x)==5):				
+				//This would be a Zombie in the original set. (Why this is the most likely thing you'll get, I have no clue.)
+				curMaxVal+=Math.round(99*countAdjuster*smallCreatureMultiplier);//122;
+				creatureList[x][6]=curMaxVal;
+				break;
+			case (Math.round(countAdjuster*x)==6):				
+				//This would be an Abomination in the original set. 
+				if(largeCreatureLowerBounds<=6){
+					if(largeCreatureLowerBounds2<=7){
+						curMaxVal+=Math.round((largeCreatureMultiplier2*76*midCreatureMultiplier)*countAdjuster);
+					}else{
+						curMaxVal+=Math.round((largeCreatureMultiplier*76*midCreatureMultiplier)*countAdjuster);//76;	
+					}	
+				}else{
+					curMaxVal+=Math.round(76*countAdjuster*midCreatureMultiplier);//76;}
+				}
+				creatureList[x][6]=curMaxVal;
+				break;
+			case (Math.round(countAdjuster*x)==7):				
+				//This would be a Gorgon in the original set. 				
+				if(largeCreatureLowerBounds<=7){
+					if(largeCreatureLowerBounds2<=7){
+						curMaxVal+=Math.round((largeCreatureMultiplier2*76*midCreatureMultiplier)*countAdjuster);
+					}else{
+						curMaxVal+=Math.round((largeCreatureMultiplier*76*midCreatureMultiplier)*countAdjuster);//76;	
+					}	
+				}else{
+					curMaxVal+=Math.round(76*countAdjuster*midCreatureMultiplier);//76;
+				}
+				creatureList[x][6]=curMaxVal;
+				break;
+			case (Math.round(countAdjuster*x)==8):				
+				//This would be a Spider in the original set. 
+				if(largeCreatureLowerBounds<=8){
+					if(largeCreatureLowerBounds2<=8){
+						curMaxVal+=Math.round((largeCreatureMultiplier2*80*midCreatureMultiplier)*countAdjuster);
+					}else{
+						curMaxVal+=Math.round((largeCreatureMultiplier*80*midCreatureMultiplier)*countAdjuster);//76;	
+					}		
+				}else{
+					curMaxVal+=Math.round(80*countAdjuster*midCreatureMultiplier);//68;
+				}
+				creatureList[x][6]=curMaxVal;
+				break;
+			case (Math.round(countAdjuster*x)==9):				
+				//This would be a Beast in the original set. 
+				if(largeCreatureLowerBounds<=9){
+					if(largeCreatureLowerBounds2<=9){
+						curMaxVal+=Math.round((largeCreatureMultiplier2*60)*countAdjuster);
+						//alert("9");
+					}else{
+						curMaxVal+=Math.round((largeCreatureMultiplier*60)*countAdjuster);//76;	
+					}				
+				}else{
+					curMaxVal+=Math.round(60*countAdjuster);//45;
+				}
+				creatureList[x][6]=curMaxVal;
+				break;
+			case (Math.round(countAdjuster*x)==10):				
+				//This would be a Mummy in the original set. 
+				if(largeCreatureLowerBounds<=10){
+					if(largeCreatureLowerBounds2<=10){
+						curMaxVal+=Math.round((largeCreatureMultiplier2*60)*countAdjuster);
+					}else{
+						curMaxVal+=Math.round((largeCreatureMultiplier*60)*countAdjuster);//76;	
+					}		
+				}else{
+					curMaxVal+=Math.round(60*countAdjuster);//45; //We had too few mummies, so I raised it to 70					
+				}
+				creatureList[x][6]=curMaxVal;
+				break;
+			case (Math.round(countAdjuster*x)==11):				
+				//This would be a Dread Warrior in the original set. 
+				if(largeCreatureLowerBounds<=11){
+					if(largeCreatureLowerBounds2<=11){
+						curMaxVal+=Math.round((largeCreatureMultiplier2*55)*countAdjuster);
+					}else{
+						curMaxVal+=Math.round((largeCreatureMultiplier*55)*countAdjuster);//76;	
+					}			
+				}else{
+					curMaxVal+=Math.round(45*countAdjuster);//45;
+				}
+				creatureList[x][6]=curMaxVal;
+				break;
+			case (Math.round(countAdjuster*x)==12):				
+				//This would be a Gargoyle in the original set. 
+				if(largeCreatureLowerBounds<=12){
+					if(largeCreatureLowerBounds2<=12){
+						curMaxVal+=Math.round((largeCreatureMultiplier2*50)*countAdjuster);
+					}else{
+						curMaxVal+=Math.round((largeCreatureMultiplier*50)*countAdjuster);//76;	
+					}		
+				}else{
+					curMaxVal+=Math.round(50*countAdjuster);//60; //Lowered this from 92 because it looked like we were getting way too many gargoyles
+				}
+				creatureList[x][6]=curMaxVal;
+				break;
+			case (Math.round(countAdjuster*x)==13):				
+				//This would be a Fire Demon in the original set. 
+				if(largeCreatureLowerBounds<=13){
+					if(largeCreatureLowerBounds2<=13){
+						curMaxVal+=Math.round((largeCreatureMultiplier2*15)*countAdjuster);
+					}else{
+						curMaxVal+=Math.round((largeCreatureMultiplier*15)*countAdjuster);//76;	
+					}				
+				}else{    
+					curMaxVal+=Math.round(20*countAdjuster);//45;
+				}
+				creatureList[x][6]=curMaxVal;
+				break;
+			case (Math.round(countAdjuster*x)==14):				
+				//This would be a Replicant in the original set. 
+				if(largeCreatureLowerBounds<=14){
+					if(largeCreatureLowerBounds2<=14){
+						curMaxVal+=Math.round((largeCreatureMultiplier2*5*replicantMultiplier)*countAdjuster);
+						//curMaxVal+=Math.round(10*countAdjuster*replicantMultiplier);//84;//We had too many Replicants		
+					}else{
+						curMaxVal+=Math.round((largeCreatureMultiplier*5*replicantMultiplier)*countAdjuster);//76;	
+					}				
+				}else{    
+					curMaxVal+=Math.round(5*countAdjuster*replicantMultiplier);
+				}	
+				creatureList[x][6]=curMaxVal;
+				break;
+			default:
+				//This is just to catch any possible mistakes	
+				curMaxVal+=Math.round(45*countAdjuster);//45;
+				creatureList[x][6]=curMaxVal;
+				break;
+		}		
+	}	
+}
+
+
+
+function backupTable(MU="M"){
+	//MU is for move or undo.
+	//This makes a copy of the table before a move(if M) or recopies old copy into active table (U)
+	//alert("backupTable");
+	//alert(MU);
+	if(MU=="M"){
+		for(a=0;a<19;a++){
+			for(b=0;b<26;b++){
+				for(c=0;c<8;c++){
+					gameBoardBackup[a][b][c]=gameBoard[a][b][c];
+				}
+			}
+		}
+		//Make backup of notes (Added 1-26-25)
+		noteBackup=document.getElementById("results").value;
+	
+	}else{
+	//	alert("Undo");
+		for(a=0;a<19;a++){
+			for(b=0;b<26;b++){
+				for(c=0;c<8;c++){
+					gameBoard[a][b][c]=gameBoardBackup[a][b][c];
+				}
+			}
+		}
+		document.getElementById("results").value=noteBackup;
+	}
+	//alert("backupTable Completed");
+}
+
+
+function getPanda(roomNum){
+	//This randomly decides whether a room has the Giant Panda and if it does places it anywhere except on furniture.
+		
+	if( pandaCount>0){
+		//It only appears once per quest, so don't show it again.
+	}else{
+		placePanda=Math.floor(Math.random()*10);
+		
+		switch(placePanda){
+			//Multiple chances, even though we only want it to appear once. I'd rather be pretty sure it'll show up at some point.
+			case 3:
+			case 5:
+			case 7:
+				
+				
+				for(let pandaAttempts=0;pandaAttempts<=2;pandaAttempts++){
+					//We need the width and height of the room
+					
+					roomWidth=getRoomCols(roomNum);
+					roomHeight=getRoomRows(roomNum);
+					
+					startCol=getStartCol(roomNum);
+					startRow=getStartRow(roomNum);
+					
+					
+					
+					//Now randomly select a position within that square. Yes, I know we have two rooms that won't work on.
+					y=Math.floor(Math.random()*roomHeight);
+					x=Math.floor(Math.random()*roomWidth);
+					
+					
+					
+					//Now check the gameboard and make sure there isn't any furniture there. If so, try up to two more times.
+					if (gameBoard[startRow+x][startCol+y][1].indexOf("furniture")>=0){
+						//do nothing
+						
+					}else{
+						//Place the Panda
+						gameBoard[startRow+x][startCol+y][1]+=" Panda ";
+						pandaCount+=1;
+						creatureCount[15]+=1;
+						break;
+					}
+				}				
+				break;
+			default:
+				//Do nothing				
+				break;
+		}
+	}
+	return;
+}
+
+
+function getFurniture(triesAllowed=5){
+
+	furnitureType=Math.floor(Math.random()*furnitureList[furnitureList.length-1][6]);
+		
+	while(triesAllowed>0){
+		
+		//furnitureType=Math.floor(Math.random()*furnitureList.length);
+		furnitureType=Math.floor(Math.random()*furnitureList[furnitureList.length-1][6]);
+	
+		
+		//Now find the first entry in the list where the upperRange is larger than furnitureType;
+		for(x=0;x<furnitureList.length;x++){
+		
+			if(furnitureList[x][6]>furnitureType){
+				//We have found our furniture!
+				if(furnitureList[x][7]==furnitureList[x][1]){					
+					triesAllowed--;
+					getFurniture(triesAllowed);
+				}else{
+					//I changed this to return the index in the furnitureList array instead. It makes it easier to work with later, and makes more sense.
+					return(x);	//return (furnitureList[x][4]+" "+furnitureList[x][5]);
+				}
+			}
+		}
+		triesAllowed=triesAllowed-1;
+	}
+	//If we get to here, it didn't find any furniture that we can use, so default to the bookshelf.
+	return (furnitureList[furnitureList.length-1][4]+" "+furnitureList[furnitureList.length-1][5] );
+}
+function addFurniture(roomNum=0, isLastRoom=0){
+	
+	var randomChance=0;
+	var tempFurn=0;//This is the index number of the furniture in the furnitureList array.
+	
+	var startRow=getStartRow(roomNum);
+	var startCol=getStartCol(roomNum);
+	var numCols=getRoomCols(roomNum);
+	var numRows=getRoomRows(roomNum);
+	
+	var tempFurnWidth=0;
+	var tempFurnHeight=0;
+	var rndRow=0;
+	var rndCol=0;
+	
+	var rowCount=0;
+	var colCount=0;
+	var canPlace=true;
+	var tempDesc="";
+	var numItems=0;
+	var tempFlipDirections=0;
+	
+	var rndWall=0;
+	var tmpRow=0;
+	var tmpCol=0;
+	var canShift=false;
+	
+	
+	//This section has an error that keeps the page from loading at all unless I comment it out, yet it works if I do that. It's not in while loops or placeFucniture section;
+	
+	if(isLastRoom>0){
+		//Exit room doesn't get any additional furniture
+		return;
+	}else{
+		
+		//Place furniture		
+				
+		if(roomNum>21){
+			//This is a hall, so it doesn't get furniture.
+			//break;
+		}else{
+			//Randomly figure out how many items will be in the room.
+			randomChance=Math.floor(Math.random()*21);	
+			
+			switch(randomChance){
+				case 0:
+				case 3:
+				case 4:
+				case 5:
+					numItems=1;
+					break;		
+				case 6:
+				case 7:
+				case 8:
+				case 9:
+				case 10:
+				case 11:
+					numItems=2;
+					break;
+				case 12:
+				case 13:
+				case 14:
+				case 15:
+				case 16:
+				case 17:
+					numItems=3;
+					break;			
+				case 1:
+				case 2:
+				case 18:
+				case 19:
+					numItems=4;
+					break;
+				default:
+					numItems=0;
+					break;
+			}
+			
+			//alert(roomNum);
+			if(roomNum==11||roomNum==12){
+				//These are the tiny Rooms
+				numItems=1;
+			}
+			while(numItems>0){
+				tempFurn=getFurniture();
+				tempDesc=furnitureList[tempFurn][4]+" "+furnitureList[tempFurn][5];
+				
+			
+						
+				placeFurniture:{					
+					
+					if((furnitureList[x][3]*furnitureList[x][2])>((numRows*numCols)/2)){
+						//Furniture is actually too big for the room, so... yeah, don't place it.
+						//Currently, there isn't any that fit this description as of 5-6-25
+						break placeFurniture;
+					}else{
+					
+						//Now randomely decide whether the furniture should be placed vertically or horizontally.
+						randomChance=Math.floor(Math.random()*2)+1;
+						if(randomChance==1){
+							tempFurnWidth=furnitureList[tempFurn][3];
+							tempFurnHeight=furnitureList[tempFurn][2];
+						}else{
+							tempFurnWidth=furnitureList[tempFurn][2];
+							tempFurnHeight=furnitureList[tempFurn][3];
+						}
+						
+						//Some rooms are narrow, so I need to check to see if this piece of furniture blocks all the way across and then flip the other way if it does.
+						if(tempFurnWidth>=numCols){
+							tempFlipDirections=tempFurnWidth;
+							tempFurnWidth=tempFurnHeight;
+							tempFurnHeight=tempFlipDirections;
+						}
+						//Some rooms are only 3 rows tall, so if the item is as tall as that then flip back the other way unless it's a room that is only two wide.
+						if(tempFurnHeight>=numRows&&numCols>tempFurnHeight){
+							tempFlipDirections=tempFurnWidth;
+							tempFurnWidth=tempFurnHeight;
+							tempFurnHeight=tempFlipDirections;
+						}
+												
+						//It probably works best to try up to 20 different random locations in a room rather than iterate over each position and rotating the room to try from 
+						//each wall. Also, we almost never end up against a wall anyway.						
+						for(x=0;x<50;x++){		
+						
+							canPlace=true;	//Set to true if it starts the loop because we'll set it to false in here if there is a problem.
+											//If no problem, won't be set to false, so we can exit and place it. 
+							rndRow=Math.floor(Math.random()*(numRows))+startRow; //We want to start at startrow and startcol, plus a random amount, but 
+																								//can't extend beyond right or bottom of room.;
+							rndCol=Math.floor(Math.random()*(numCols))+startCol;
+							
+							rowCount=0;								
+																		
+	  						while(rowCount<tempFurnHeight){									
+								colCount=0;
+								while(colCount<tempFurnWidth){
+									//First verify we're actually looking at the current room. This is just to prevent errors.
+									if(rowCount+rndRow>18||colCount+rndCol>25){
+										//This is off the gameboard, so I need to just mark it as not possible and go on or it could cause an error later.										
+										canPlace=false;
+										break;
+									}
+									if(gameBoard[rndRow+rowCount][rndCol+colCount][0]!=roomNum){
+										canPlace=false;
+										break; //Exits the while loop because we already had a problem with this piece.
+									}		
+									if(gameBoard[rndRow+rowCount][rndCol+colCount][1]!=""){
+										//There is something here, so set canPlace to false and move on.
+										canPlace=false; 
+										break; //Exits the while loop because we already had a problem with this piece.
+									}
+									if(furnitureList[tempFurn][7]>=furnitureList[tempFurn][1]){
+										//We already have the max number in use.
+										canPlace=false;
+										break;//Exits the while loop because we already had a problem with this piece.
+									}
+									if(gameBoard[rndRow+rowCount][rndCol+colCount][2]==2||gameBoard[rndRow+rowCount][rndCol+colCount][3]==2||gameBoard[rndRow+rowCount][rndCol+colCount][4]==2||gameBoard[rndRow+rowCount][rndCol+colCount][5]==2){
+										//These array locations indicate there is a door tied to that square if any of them are a 2.
+										//This space is blocked by an existing door, so we can't put the furniture here. 
+										canPlace=false;
+										break;
+									}
+									if(tempFurnWidth*tempFurnHeight>=3){
+										if(nextToMedOrLarge(rndRow+rowCount,rndCol+colCount)==true){
+											//This is a large item and it's next to another large item, so exit.
+											canPlace=false;
+											break;//Exits the while loop because we already had a problem with this piece.
+										}
+									}
+									colCount++;
+								}
+								rowCount++;
+							}
+							
+							
+							//Now randomly choose one side and try to move this furniture to that side. If it works, make that the new rndRow and rndCol, otherwise leave them along.
+							//But not for small furniture that is 1x1, it can go anywhere.
+							if(tempFurnWidth>1||tempFurnHeight>1){
+								canShift=true;
+								rndWall=Math.round(Math.random()*4);
+								switch(rndWall){
+									case 0:
+										//Try to place against top wall.
+										tmpRow=0;
+										tmpCol=rndCol;
+										break;
+									case 1:
+										//Try to place against bottom wall.
+										tmpRow=numCols-tempFurnHeight;
+										tmpCol=rndCol;
+										break;
+									case 2:
+										tmpRow=rndRow;
+										tmpCol=0;
+										break;
+									default:
+										tmpRow=rndRow;
+										tmpCol=numCols-tempFurnWidth;
+										break;								
+								}
+								rowCount=0;
+								if(tmpRow!=rndRow||tmpCol!=rndCol){
+									//If the item is already against a wall, basically. 
+									while(rowCount<tempFurnHeight){									
+										colCount=0;
+										while(colCount<tempFurnWidth){
+											//First verify we're actually looking at the current room. This is just to prevent errors.
+											if(rowCount+tmpRow>18||colCount+tmpCol>25){
+												//This is off the gameboard, so I need to just mark it as not possible and go on or it could cause an error later.										
+												canShift=false;
+												break;
+											}
+											if(gameBoard[tmpRow+rowCount][tmpCol+colCount][0]!=roomNum){
+												canShift=false;
+												break; //Exits the while loop because we already had a problem with this piece.
+											}		
+											if(gameBoard[tmpRow+rowCount][tmpCol+colCount][1]!=""){
+												//There is something here, so set canPlace to false and move on.
+												canShift=false; 
+												break; //Exits the while loop because we already had a problem with this piece.
+											}
+											if(furnitureList[tempFurn][7]>=furnitureList[tempFurn][1]){
+												//We already have the max number in use.
+												canShift=false;
+												break;//Exits the while loop because we already had a problem with this piece.
+											}
+											if(gameBoard[tmpRow+rowCount][tmpCol+colCount][2]==2||gameBoard[tmpRow+rowCount][tmpCol+colCount][3]==2||gameBoard[tmpRow+rowCount][tmpCol+colCount][4]==2||gameBoard[tmpRow+rowCount][tmpCol+colCount][5]==2){
+												//These array locations indicate there is a door tied to that square if any of them are a 2.
+												//This space is blocked by an existing door, so we can't put the furniture here. 
+												canShift=false;
+												break;
+											}
+											if(tempFurnWidth*tempFurnHeight>=3){
+												if(nextToMedOrLarge(tmpRow+rowCount,tmpCol+colCount)==true){
+													//This is a large item and it's next to another large item, so exit.
+													canShift=false;
+													break;//Exits the while loop because we already had a problem with this piece.
+												}
+											}
+											colCount++;
+										}
+										rowCount++;
+									}
+									
+									if(canShift==true){
+										//We can move this item against a wall, so switch to those row and column numbers. 
+										//alert("We shifted furniture against wall. " + tempFurnWidth + " " + tempFurnHeight+ " " +tmpRow+" "+tmpCol);
+										rndRow=tmpRow;
+										rndCol=tmpCol;
+										canPlace=true; //This overrides previously set to canPlace=false because we moved it aside and tried it. 
+									}
+								}
+							}
+							
+							
+							//In theory, if we get to here canPlace should be false if there were any problems or true if there aren't.
+							if(canPlace==true){			
+								//Now just place the furniture in this place and exit the for.
+								//Add description and (furniture) or (big furniture)
+																		
+								tempDesc+=" (furniture)";
+															
+								//Now for all of the spaces for this item I need them to start with @ and then get the description, except for upper left which has ^W^H^ then desc.
+								rowCount=0;
+								colCount=0;									
+								
+								if(tempFurnWidth!=1||tempFurnHeight!=1){						
+									while(rowCount<tempFurnHeight){
+										colCount=0;
+										while(colCount<tempFurnWidth){
+											if(colCount==0&&rowCount==0){
+												gameBoard[rndRow+rowCount][rndCol+colCount][1]="^"+tempFurnHeight+"^"+tempFurnWidth+"^"+tempDesc+" (big furniture)";
+											}else{												
+												gameBoard[rndRow+rowCount][rndCol+colCount][1]="@"+tempDesc+" (big furniture)";
+											}colCount++;											
+										}
+										rowCount++;
+									}		
+								}else{												
+									gameBoard[rndRow+rowCount][rndCol+colCount][1]=tempDesc + " (small furniture)";
+								}
+								furnitureList[tempFurn][7]++;
+								break placeFurniture;//exits the for loop.
+							}							
+						}								
+					}					
+				}
+				numItems--;		
+				
+				
+			}
+		}		
+	}
+	return;
+}
+
+
+
+
+
+
+function showFinalReward(){
+	let questLevel=(parseInt(document.getElementById("questLevel").value,10));
+	var note="Upon successful completion of this quest, each surviving hero is granted ";
+	switch(true){
+		case(questLevel<5):
+			note+="25";
+			break;
+		case(questLevel<10):
+			note+="40";
+			break;
+		case(questLevel<15):
+			note+="50";
+			break;
+		case(questLevel<20):
+			note+="60";
+			break;
+		case(questLevel>=20):
+			note+="70";
+			break;
+		default:
+			note+="5"
+			break;
+	}
+	note+=" gold by King Filbon as a show of His Majesty's gratitude.";
+	alert(note);
+}
+function wanderingMonster(){
+	const d = new Date();
+	let text = d.toLocaleTimeString();
+	let questLevel=(parseInt(document.getElementById("questLevel").value,10));
+	let myList="";
+
+	myList = "(" + text + ")(Wandering Monster)" + '\n' ;
+
+	//Make sure they set a quest level before beginning.
+	if(document.getElementById("questLevel").value.length==0){
+		document.getElementById("results").value = myList + "Please select the quest level.";
+		return;
+	}
+
+	myList+=" " + getMonster(1,questLevel) ;
+	document.getElementById("results").value = myList;
+}
+
+function openHallSearch(){
+	openSearch(true);
+}
+function openSearch(isHall=false){
+	//Adding a timestamp so we can be sure contents have changed
+	const d = new Date();
+	let text = d.toLocaleTimeString();
+	let itemType=0;
+	let myList="";
+	var randomTotal=0;
+
+	myList = "(" + text + ")(Search Item)" +'\n' ;
+
+	//Make sure they set a quest level before beginning.
+	if(document.getElementById("questLevel").value.length<=0){
+		document.getElementById("results").value = myList + "Please select the quest level.";
+		return;
+	}
+
+
+
+	myList+="The searchable item is";
+
+	itemType=Math.floor(Math.random() *100)+1;
+	
+	if(isHall==true){
+		//Added this 7-25-22 to give a higher change of secret door if a hallway.
+		//Added this 8-1-22 to give an even higher chance of secret door if a hallway.
+		randomTotal=Math.floor(Math.random() *100)+1;
+		//alert("Got to here!");
+		if (randomTotal<60){
+			//alert("Got to here too!");
+			itemType=80;
+		}
+	}
+	
+	
+	switch (true){
+		case (itemType<50):
+			randomChance=Math.floor(Math.random()*100);
+			itemType=parseInt(document.getElementById("questLevel").value,10);
+			if(itemType>20){
+				//Don't want there to be more than 20% chance this is an artifact and not a treasure.
+				itemType=20;
+			}
+			if (randomChance<itemType&&artifactCount==0){
+				//It's an artifact
+				myList+=" an artifact!";
+				artifactCount+=1;
+			}else{
+				//15% of the time we want treasure to automatically be treasure, not draw a card.
+				randomChance=Math.floor(Math.random()*100);
+				switch(randomChance){
+					case 0:
+					case 1:
+					case 2:
+					case 3:
+					case 4:
+						randomTotal=Math.floor(Math.random()*10)*5;
+						myList+=" " + randomTotal + " gold!";
+						break;
+					case 5:
+					case 6:
+					case 7:
+					case 8:
+					case 9:
+							randomTotal=Math.floor(Math.random()*10)*5;
+							myList+=" a medallion worth " + randomTotal + " gold!";
+							break;
+					case 10:
+					case 11:
+					case 12:
+					case 13:
+					case 14:
+							randomTotal=Math.floor(Math.random()*10)*5;
+							myList+=" jewels worth " + randomTotal + " gold!";
+							break;
+					case 15:
+					case 16:
+					case 17:
+					case 18:
+					case 19:
+						randomTotal=Math.floor(Math.random()*10)*5;
+						myList+=" paper money worth " + randomTotal *10 + " gold! The bills crumble to dust as you reach for them, unfortunately.";
+						break;
+					case 20:
+					case 21:
+					case 22:
+					case 23:
+					case 24:
+						myList+=" a bag of jewels. Unfortunately, when you look closely you see that they are artificial, with no value.";
+						break;
+					default:
+						//Just a treasure
+						myList+=" treasure!";
+						break;
+				}
+			}
+			break;
+		case (itemType<66):
+
+			switch(Math.floor(Math.random()*7)){
+				case 1:
+					myList+=" a falling block trap. Roll 3 combat dice and suffer 1 damage for each skull. Must immediately move off of square and square is now blocked and impassable.";
+					break;
+				case 2:
+					myList+=" a spear trap. Roll 1 combat die and suffer one damage if a skull is rolled.";
+					break;
+				case 3:
+					myList+=" a horde of rats. Place 3 rat tokens on spaces around hero(rats can share a space). Rats immediately attack hero with 1 attack die each. On future turns rats may move up to 6 spaces and have 1 attack die, 1 defense die, 1 body point, and 1 mind point.";
+					break;
+				case 4:
+					myList+=" a giant spider. Place spider next to the hero. The hero immediately takes 1 damage from spider, loses their next turn, and cannot attack or defend until the conclusion of that turn. Spiders have 2 attack, 2 defend, 3 body, and 1 mind point. Any time a spider damages a hero that hero will lose their next turn and cannot attack or defend until the conclusion of that missed turn.";
+					break;
+				case 5:
+					myList+=" a ghoul(0 attack, 3 defense. 3 body, 3 mind -- When the ghoul first appears, it trades places with the first hero it sees and their movement ends. The ghoul refocuses each turn by rolling a die to randomly select a hero within their line of site, trading places with them immediately. On the hero's turn they may then move if they choose. When the hero the ghoul focuses on moves, they roll one die. If they roll a 1 or 6, the ghoul again trades places with them.)";
+					break;
+				case 6:
+					myList+=" a falling skull trap. Hero rolls a combat die and suffers 1 damage if a skull is rolled. Place pile of skulls on space hero is located. When passing over this space in the future this space counts as two spaces because of how you must step over and around the skulls.";
+					break;
+				default:
+					mylist+=" a pit trap. Suffer one damage. Roll one less combat die while in pit. May move out on any subsequent turns. Pit remains in place and must either be jumped or stepped into in the future.";
+					break;
+			}
+			break;
+		case (itemType<85)://(itemType<82):
+			myList+=" a secret door. (If not against an outside wall this becomes 25 gold. If in a corner, opens to wall farthest from entering doorway)";
+			break;
+		default:
+			myList+= " a heal potion. (heals up to 4 body points)";
+			break;
+	}
+
+	//Update textarea to show what we now have
+	document.getElementById("results").value = myList;
+
+}
+
+function generateBlankBoard(){
+	//Adding this 5-7-22 so that we can limit artifact to one per game, but resets it when a new game is started
+	artifactCount=0;
+	pandaCount=0;
+	noteBackup=""; //1-27-25
+	document.getElementById("results").value="";// 1-27-25
+	
+	
+	var myCounter=0;
+	while(myCounter<20){
+		itemCount[myCounter]=0;
+		myCounter+=1;
+	}
+	//First thing to do is create an array representing a blank board, then fill it with the proper walls and the stairs and doors of starting room.
+	var row=0;
+	var col=0;
+
+	while (row<19){
+
+		col=0;
+		while(col<26){
+			ele=0;
+			while(ele<8){
+				gameBoard[row][col][ele]=0;
+				ele+=1;
+			}
+			col+=1;
+		}
+		row+=1;
+	}
+
+	//Set horizontal walls
+	col=1;
+	while(col<25){
+		if(col<12||col>13){
+			gameBoard[0][col][5]=1; //bottom edge of row 0
+			gameBoard[1][col][4]=1;	//top edge of row 1 -- we mark both for easier detection later on.
+
+			gameBoard[17][col][5]=1;
+			gameBoard[18][col][4]=1;
+
+			if(col<9||col>16){
+				gameBoard[8][col][5]=1;
+				gameBoard[9][col][4]=1;
+				gameBoard[9][col][5]=1;
+				gameBoard[10][col][4]=1;
+				if(col<9){
+					gameBoard[3][col][5]=1;
+					gameBoard[4][col][4]=1;
+					if(col<5){
+						gameBoard[13][col][5]=1;
+						gameBoard[14][col][4]=1;
+					}else{
+						gameBoard[12][col][5]=1;
+						gameBoard[13][col][4]=1;
+					}
+				}else{
+					gameBoard[4][col][5]=1;
+					gameBoard[5][col][4]=1;
+					if(col>17){
+						gameBoard[13][col][5]=1;
+						gameBoard[14][col][4]=1;
+					}else{
+						gameBoard[12][col][5]=1;
+						gameBoard[13][col][4]=1;
+					}
+				}
+			}else{
+				gameBoard[5][col][5]=1;
+				gameBoard[6][col][4]=1;
+				gameBoard[12][col][5]=1;
+				gameBoard[13][col][4]=1;
+				if(col>9&&col<16){
+					gameBoard[6][col][5]=1;
+					gameBoard[7][col][4]=1;
+					gameBoard[11][col][5]=1;
+					gameBoard[12][col][4]=1;
+				}
+			}
+		}else{
+			gameBoard[6][col][5]=1;
+			gameBoard[7][col][4]=1;
+			gameBoard[11][col][5]=1;
+			gameBoard[12][col][4]=1;
+		}
+		col+=1;
+	}
+	//set vertical walls
+	row=1;
+	col=0;
+	while(row<18){
+		if(row<9||row>9){
+			gameBoard[row][0][3]=1;
+			gameBoard[row][1][2]=1;
+
+			gameBoard[row][24][3]=1;
+			gameBoard[row][25][2]=1;
+
+			gameBoard[row][4][3]=1;
+			gameBoard[row][5][2]=1;
+
+			gameBoard[row][8][3]=1;
+			gameBoard[row][9][2]=1;
+
+			gameBoard[row][20][3]=1;
+			gameBoard[row][21][2]=1;
+			if(row<9){
+				gameBoard[row][16][3]=1;
+				gameBoard[row][17][2]=1;
+			}else{
+				if(row<13){
+					gameBoard[row][16][3]=1;
+					gameBoard[row][17][2]=1;
+					gameBoard[row][6][3]=1;
+					gameBoard[row][7][2]=1;
+				}else{
+					gameBoard[row][17][3]=1;
+					gameBoard[row][18][2]=1;
+				}
+			}
+
+			if(row>12||row<6){
+				gameBoard[row][11][3]=1;
+				gameBoard[row][12][2]=1;
+				gameBoard[row][13][3]=1;
+				gameBoard[row][14][2]=1;
+			}else{
+				if(row>6&&row<12){
+					gameBoard[row][9][3]=1;
+					gameBoard[row][10][2]=1;
+					gameBoard[row][15][3]=1;
+					gameBoard[row][16][2]=1;
+				}
+			}
+		}else{
+			gameBoard[row][9][3]=1;
+			gameBoard[row][10][2]=1;
+			gameBoard[row][15][3]=1;
+			gameBoard[row][16][2]=1;
+		}
+		row+=1
+	}
+	
+	//setCreatureOdds((parseInt(document.getElementById("questLevel").value,10)));//Added this 4-30-25
+	loadExternalData();//Added this 4-30-25 and I moved the setCreatureOdds call into that function.
+	
+	
+	createStartRoom();
+	showBoard();
+}
+function createStartRoom(){
+	//This will set up the basic start we use in this type of game.
+
+	
+	//Mark entire room as in use
+	gameBoard[7][10][7]=1;
+	
+	var x=0;
+	var y=0;
+	var numDoors=Math.floor(Math.random()*6)+1; //Yes, this will sometimes give us more than 4 doors, but that will be taken care of shortly.
+	var selectSide=0;
+	var lSide=0;
+	var rSide=0;
+	var tSide=0;
+	var bSide=0;
+	
+	
+	for(let doorCounter=0;doorCounter<=numDoors;doorCounter++){
+		selectSide=Math.floor(Math.random()*4);
+		switch (selectSide){
+			case 0:
+				if(lSide==0){
+					//Place a door along left side of the room
+					y=Math.floor(Math.random()*5)+7;
+					gameBoard[y][9][3]=2;	//left
+					gameBoard[y][10][2]=2;
+					lSide=1;
+				}
+				break;
+			case 1:
+				if(rSide==0){
+					//Place a door along right side of the room
+					y=Math.floor(Math.random()*5)+7;
+					gameBoard[y][15][3]=2;	//right
+					gameBoard[y][16][2]=2;
+					rSide=1;
+				}
+				break;
+			case 2:
+				if(tSide==0){
+					//Place a door along top side of the room
+					y=Math.floor(Math.random()*6)+10;
+					gameBoard[6][y][5]=2; //top
+					gameBoard[7][y][4]=2;
+					tSide=1;
+				}
+				break;
+			default:
+				if(bSide==0){
+					//Place a door along bottom side of the room
+					y=Math.floor(Math.random()*6)+10;
+					gameBoard[11][y][5]=2; //bottom
+					gameBoard[12][y][4]=2;
+					bSide=1;
+				}
+				break;
+		}
+	}
+	
+	//Place stairs @ 12,9. Treat like furniture, because essentially they are
+	//Now randomly place stairs
+	//x=Math.floor(Math.random()*4)+7;
+	//y=Math.floor(Math.random()*5)+10;
+
+	//As of 3-22-25 I now want at least one space between the stairs and walls.
+	x=Math.floor(Math.random()*2)+8;
+	y=Math.floor(Math.random()*3)+11;
+		
+								
+	
+	gameBoard[x][y][1]="^2^2^Stairs(furniture)";
+	gameBoard[x][y+1][1]="@Stairs(furniture)";
+	gameBoard[x+1][y][1]="@Stairs(furniture)";
+	gameBoard[x+1][y+1][1]="@Stairs(furniture)";
+	
+	//Added this here 3-26-2025 to try to fix issue where stair direction changes because it is randomly selected at visual time. I'll now do it here.
+	var stairDirection=0;
+	stairDirection=Math.floor(Math.random()*4);
+	switch(stairDirection){
+		case 1:
+			gameBoard[x][y][1]+= "&#8593"; 
+			break;
+		case 2:
+			gameBoard[x][y][1]+="&#8595";
+			break;
+		case 3:
+			gameBoard[x][y][1]+="&#8594";
+			break;
+		default:
+			gameBoard[x][y][1]+="&#8592";
+			break;
+	}
+	
+	//As of 3-22-25 we also now allow creatures in starting room.
+	addCreatures(21,false);
+	
+}
+
+function clearStartCreatures(){
+	//This will clear out the starting room creatures so that we only have the stairs and doors. This is so we can place creatures at the beginning but they won't still show at end.
+	var x=7;
+	var y=10;	
+	while(y<16){
+		x=7;
+		while(x<12){
+			
+			if(gameBoard[x][y][1].length>1){			
+				if (gameBoard[x][y][1].indexOf('Stairs')<=0){
+					//Not a stairs space
+					gameBoard[x][y][1]="";
+				}
+			}			
+			x=x+1;
+		}
+		y=y+1;
+	}	
+}
+function colorBoard(){
+	//This will just loop through and color the squares appropriately and set their room number for the future.
+	var row=0;
+	var col=0;
+
+	while(row<19){
+		col=0;
+		while(col<26){
+			switch(true){
+				case(col>0&&col<5&&row>0&&row<4):
+					gameBoard[row][col][6]="Tan";//Too dark to read easily "SaddleBrown";
+					gameBoard[row][col][0]=0;
+					break;
+				case(col>4&&col<9&&row>0&&row<4):
+					gameBoard[row][col][6]="IndianRed";
+					gameBoard[row][col][0]=1;
+					break;
+				case(col>8&&col<12&&row>0&&row<6):
+					gameBoard[row][col][6]="DarkTurquoise";
+					gameBoard[row][col][0]=2;
+					break;
+				case(col>0&&col<5&&row>3&&row<9):
+					gameBoard[row][col][6]="LightSlateGrey";
+					gameBoard[row][col][0]=3;
+					break;
+				case(col>4&&col<9&&row>3&&row<9):
+					gameBoard[row][col][6]="GreenYellow";
+					gameBoard[row][col][0]=4;
+					break;
+				case(col>13&&col<17&&row>0&&row<6):
+					gameBoard[row][col][6]="Tan";//Too dark to read easily "SaddleBrown";
+					gameBoard[row][col][0]=5;
+					break;
+				case(col>16&&col<21&&row>0&&row<5):
+					gameBoard[row][col][6]="LightSteelBlue";
+					gameBoard[row][col][0]=6;
+					break;
+				case(col>20&&col<25&&row>0&&row<5):
+					gameBoard[row][col][6]="SandyBrown";
+					gameBoard[row][col][0]=7;
+					break;
+				case(col>16&&col<21&&row>4&&row<9):
+					gameBoard[row][col][6]="SandyBrown";
+					gameBoard[row][col][0]=8;
+					break;
+				case(col>20&&col<25&&row>4&&row<9):
+					gameBoard[row][col][6]="LemonChiffon";
+					gameBoard[row][col][0]=9;
+					break;
+				case(col>0&&col<5&&row>9&&row<14):
+					gameBoard[row][col][6]="Khaki";
+					gameBoard[row][col][0]=10;
+					break;
+				case(col>4&&col<7&&row>9&&row<13):
+					gameBoard[row][col][6]="DarkTurquoise";
+					gameBoard[row][col][0]=11;
+					break;
+				case(col>6&&col<9&&row>9&&row<13):
+					gameBoard[row][col][6]="DarkTurquoise";
+					gameBoard[row][col][0]=12;
+					break;
+				case(col>0&&col<5&&row>13&&row<18):
+					gameBoard[row][col][6]="LightSlateGrey";
+					gameBoard[row][col][0]=13;
+					break;
+				case(col>4&&col<9&&row>12&&row<18):
+					gameBoard[row][col][6]="IndianRed";
+					gameBoard[row][col][0]=14;
+					break;
+				case(col>8&&col<12&&row>12&&row<18):
+					gameBoard[row][col][6]="LemonChiffon";
+					gameBoard[row][col][0]=15;
+					break;
+				case((col>16&&col<21&&row>9&&row<14)&&(col>17||row<13)):
+					//This has a one square exception that I need to take care of.
+					gameBoard[row][col][6]="LightSteelBlue";
+					gameBoard[row][col][0]=16;
+					break;
+				case(col>20&&col<25&&row>9&&row<14):
+					gameBoard[row][col][6]="Khaki";
+					gameBoard[row][col][0]=17;
+					break;
+				case((col>13&&col<18&&row>12&&row<18)||(col==17&&row==13)):
+					gameBoard[row][col][6]="Tan";//Too dark to read easily "SaddleBrown";
+					gameBoard[row][col][0]=18;
+					break;
+				case(col>17&&col<21&&row>12&&row<18):
+					gameBoard[row][col][6]="SandyBrown";
+					gameBoard[row][col][0]=19;
+					break;
+				case(col>20&&col<25&&row>12&&row<18):
+					gameBoard[row][col][6]="MediumSpringGreen";
+					gameBoard[row][col][0]=20;
+					break;
+				case(col>9&&col<16&&row>6&&row<12):
+					gameBoard[row][col][6]="DarkGrey";
+					gameBoard[row][col][0]=21;
+					break;
+				case(col<12&&row==0):
+					gameBoard[row][col][6]="LightGrey";
+					gameBoard[row][col][0]=22;
+					break;
+				case(col>13&&row==0):
+					gameBoard[row][col][6]="LightGrey";
+					gameBoard[row][col][0]=23;
+					break;
+				case(col<12&&row==18):
+					gameBoard[row][col][6]="LightGrey";
+					gameBoard[row][col][0]=24;
+					break;
+				case(col>13&&row==18):
+					gameBoard[row][col][6]="LightGrey";
+					gameBoard[row][col][0]=25;
+					break;
+				case(col==0&&row<9):
+					gameBoard[row][col][6]="LightGrey";
+					gameBoard[row][col][0]=26;
+					break;
+				case(col==0&&row>9):
+					gameBoard[row][col][6]="LightGrey";
+					gameBoard[row][col][0]=27;
+					break;
+				case(col==25&&row<9):
+					gameBoard[row][col][6]="LightGrey";
+					gameBoard[row][col][0]=28;
+					break;
+				case(col==25&&row>9):
+					gameBoard[row][col][6]="LightGrey";
+					gameBoard[row][col][0]=29;
+					break;
+				case(col<10&&row==9):
+					gameBoard[row][col][6]="LightGrey";
+					gameBoard[row][col][0]=30;
+					break;
+				case(col>15&&row==9):
+					gameBoard[row][col][6]="LightGrey";
+					gameBoard[row][col][0]=31;
+					break;
+				case(col>8&&col<17&&row==6):
+					gameBoard[row][col][6]="LightGrey";
+					gameBoard[row][col][0]=32;
+					break;
+				case(col>8&&col<17&&row==12):
+					gameBoard[row][col][6]="LightGrey";
+					gameBoard[row][col][0]=33;
+					break;
+				case(col>11&&col<14&&row<7):
+					gameBoard[row][col][6]="LightGrey";
+					gameBoard[row][col][0]=34;
+					break;
+				case(col>11&&col<14&&row>11):
+					gameBoard[row][col][6]="LightGrey";
+					gameBoard[row][col][0]=35;
+					break;
+				case(col==9&&row>6&&row<12):
+					gameBoard[row][col][6]="LightGrey";
+					gameBoard[row][col][0]=36;
+					break;
+				case(col==16&&row>6&&row<12):
+					gameBoard[row][col][6]="LightGrey";
+					gameBoard[row][col][0]=37;
+					break;
+				default:
+				//do nothing
+					break;
+			};
+
+			col+=1;
+		}
+		row+=1;
+	}
+}
+function roomInUse(roomNum){
+	//Returns true if room is in use, false otherwise
+	var inUse=false;
+	var startRow=getStartRow(roomNum);
+	var startCol=getStartCol(roomNum);
+
+	if(gameBoard[startRow][startCol][7]==0){
+		return false;
+	}else{
+		return true;
+	}
+
+
+	return inUse;
+}
+function showBoard(expandRoom=0){
+	var newGameBoard="<table id='boardTable'>";
+	var row=0;
+	var col=0;
+	var rowSpan=0;
+	var colSpan=0;
+	var skipTD=false;
+	//Loop through existing gameBoard array and set contents of td based on that.
+	//alert("showBoard");
+	colorBoard();
+	while(row<19){
+		newGameBoard+="<tr>";
+		col=0;
+
+		while(col<26){
+			skipTD=false;
+			colSpan=0;
+			rowSpan=0;
+			if(gameBoard[row][col][1].length>0){
+				if(gameBoard[row][col][1].substr(0,1)=="@"){
+					skipTD=false;//true;
+				}else{
+					if(gameBoard[row][col][1].substr(0,1)=="^"){
+						rowSpan=gameBoard[row][col][1].substr(1,1);
+						colSpan=gameBoard[row][col][1].substr(3,1);
+						//gameBoard[row][col][1]=gameBoard[row][col][1].substr(5,100);
+					}else{
+						//A regular td, as always.
+					}
+				}
+			}
+
+
+
+		//If skipTD=true here then skip over all of these TD parts below
+		//If colspan or rowspan>0 then add a rowspan or colspan to td
+
+				//newGameBoard+="<td style='background: red; ";
+				if(skipTD==true){
+					//no td at all, skip setInterval(function () {
+
+				}else{
+
+				newGameBoard+="<td ";
+
+		
+				newGameBoard+=" style='background: " + gameBoard[row][col][6] + "; ";
+
+				//Set borders for walls
+				if (gameBoard[row][col][2]==1){
+					newGameBoard+="border-left-width:2px;";
+				}
+				if (gameBoard[row][col][2]==2){
+					newGameBoard+="border-left-width:4px; border-left-color: red;";
+				}
+				if (gameBoard[row][col][3]==1){
+					newGameBoard+="border-right-width:2px;";
+				}
+				if (gameBoard[row][col][3]==2){
+					newGameBoard+="border-right-width:4px; border-right-color: red;";
+				}
+				if (gameBoard[row][col][4]==1){
+					newGameBoard+="border-top-width:2px;";
+				}
+				if (gameBoard[row][col][4]==2){
+					newGameBoard+="border-top-width:4px; border-top-color: red;";
+				}
+				if (gameBoard[row][col][5]==1){
+					newGameBoard+="border-bottom-width:2px;";
+				}
+				if (gameBoard[row][col][5]==2){
+					newGameBoard+="border-bottom-width:4px; border-bottom-color: red;";
+				}
+
+				var tempText=gameBoard[row][col][1]+" ";
+				if(tempText.includes("@")==true||tempText.includes("^")==true){
+					newGameBoard+="border-bottom-width:0px;border-top-width:0px;border-left-width:0px;border-right-width:0px;";
+				}
+
+				//Set background opacity to full for rooms that have been used;
+				if(roomInUse(gameBoard[row][col][0])==true){
+					newGameBoard+="opacity: 1;";
+				}
+
+				newGameBoard+="'>";
+
+				if(skipTD==true){
+
+				}else{
+
+				if(gameBoard[row][col][1]==0){
+					newGameBoard+="";
+				}else{
+						if(colSpan>0||rowSpan>0){
+							newGameBoard+=gameBoard[row][col][1].substr(5,3);
+							if(gameBoard[row][col][1].substr(5,3)=="Sta"){
+								
+								if(gameBoard[row][col][1].indexOf("&#8593")>0){
+									newGameBoard+= "&#8593"; 
+								}else{
+									if(gameBoard[row][col][1].indexOf("&#8595")>0){
+										newGameBoard+="&#8595";
+									}else{										
+										if(gameBoard[row][col][1].indexOf("&#8594")>0){
+											newGameBoard+="&#8594";
+										}else{
+											if(gameBoard[row][col][1].indexOf("&#8592")>0){
+												newGameBoard+="&#8592";
+											}
+										}
+									}	
+								}
+								
+							}
+						}else{
+							if(tempText.includes("@")==true){
+								//newGameBoard+=gameBoard[row][col][1].substr(1,3);
+							}else{
+								if(tempText.includes("Fire Demon")==true){
+									newGameBoard+="F D";
+								}else{
+									
+									//newGameBoard+=gameBoard[row][col][1].substr(0,3);
+									if(tempText.includes("Panda")==true){
+										newGameBoard+="<span style='font-size: .5rem;color:red !important;'>"+gameBoard[row][col][1].substr(0,3)+"-P</span>";
+									}else{
+										
+										newGameBoard+=gameBoard[row][col][1].substr(0,3);
+										
+									}
+								}
+							}
+						}
+				}
+			}
+		}
+			col+=1;
+
+		}
+		row+=1;
+		newGameBoard+="</tr>";
+	}
+	newGameBoard+="</table>";
+	if(expandRoom>0){
+		//alert("Roomnum "+ expandRoom+"is being zoomed in on.");
+		//Here is where we make the zoomed div visible and put a table showing the specified room on it.
+		
+		
+
+		
+		tempRows=getRoomRows(expandRoom)+2; //One space on each side of the room.
+		tempCols=getRoomCols(expandRoom)+2;
+		tempStartRow=getStartRow(expandRoom)-1; //Because I want to show 1 space around the room.
+		tempStartCol=getStartCol(expandRoom)-1;
+		tempTableName=document.getElementById('boardTable');
+		cellHeightWidth=0;
+		if(tempCols>tempRows){
+			cellHeightWidth=tempRows*10;
+		}else{
+			cellHeightWidth=tempCols*10;
+		}
+		if(cellHeightWidth>50){
+			//This is because of a glitch on phones with large rooms and I don't think it'll matter on desktop.
+			cellHeightWidth=50;
+		}
+
+		var tempGameBoard="<table style='width:" + cellHeightWidth +"%; height: " + cellHeightWidth +"%;'>";
+		//Loop through the spaces on gameBoard[row][col] that fall into this room(expandedRoom), including the bgcolor, border, and all contents. Also show 1 row around the room?
+		
+		for(i=tempStartRow; i<(tempStartRow+tempRows);i++){
+//			//Loop through rows
+			tempGameBoard+="<tr>";// style='height:10vh; width: 80%;'>";
+			for(j=tempStartCol;j<tempCols+tempStartCol;j++){
+//				//Loop through cols
+				tempGameBoard+="<td style=' "+ tempTableName.rows.item(i).cells.item(j).style.cssText +" font-size: 1.5rem; font-weight: bold; white-space: nowrap;'>";
+					
+				
+				//Add cell contents and close td
+				tempGameBoard+=tempTableName.rows.item(i).cells.item(j).innerHTML+"&nbsp";
+				
+				tempGameBoard+="</td>";
+			}
+			tempGameBoard+="</tr>";
+		}
+		tempGameBoard+="</table>";
+		
+		//Add a close button
+		tempGameBoard+="<div class=\"col-sm\" style=\"float:right; float:top;margin-right: 20px\"><button class=\"btn btn-rounded\" onclick=\"document.getElementById(\'zoomedView\').style.visibility=\'hidden\'\">Close</button></div></div>";
+
+		//Fill zoomedView div with the table for this room, which we created just above.
+		//alert(tempGameBoard);
+		document.getElementById("zoomedView").innerHTML=tempGameBoard;
+
+		document.getElementById("zoomedView").style.visibility='visible';
+	}else{
+		document.getElementById("gameBoard").innerHTML=newGameBoard;
+	}
+}
+
+function nextToMedOrLarge(checkRow,checkCol){
+	//check all around this space to make sure no large items or medium items already occupy those spaces
+	//if they do, return true;
+	//This must be checked in the check to fit phase, not the placement phase, or it'll find parts of itself
+	var isBeside=false;
+	if(gameBoard[checkRow][checkCol][0]==gameBoard[checkRow-1][checkCol][0]){
+		//Only check if they are in the same room, otherwise they can sit on adjacent spaces
+		let myString=gameBoard[checkRow-1][checkCol][1]+" ";
+		if(myString.includes("big furniture")==true){
+			isBeside=true;
+		}
+	}
+	if(gameBoard[checkRow][checkCol][0]==gameBoard[checkRow+1][checkCol][0]){
+		//Only check if they are in the same room, otherwise they can sit on adjacent spaces
+		myString=gameBoard[checkRow+1][checkCol][1]+" ";
+		if(myString.includes("big furniture")==true){
+			isBeside=true;
+		}
+	}
+	if(gameBoard[checkRow][checkCol][0]==gameBoard[checkRow][checkCol-1][0]){
+		//Only check if they are in the same room, otherwise they can sit on adjacent spaces
+		myString=gameBoard[checkRow][checkCol-1][1]+" ";
+		if(myString.includes("big furniture")==true){
+			isBeside=true;
+		}
+	}
+	if(gameBoard[checkRow][checkCol][0]==gameBoard[checkRow][checkCol+1][0]){
+		//Only check if they are in the same room, otherwise they can sit on adjacent spaces
+		myString=gameBoard[checkRow][checkCol+1][1]+" ";
+		if(myString.includes("big furniture")==true){
+			isBeside=true;
+		}
+	}
+
+	return isBeside;
+}
+
+function doorBlockedByFurniture(checkRow, checkCol){
+	//Essentially, you pass a space here and it checks to see if there is furniture on it. If so, can't put a door next to it.
+	var isBlocked=false;
+	let myString=gameBoard[checkRow][checkCol][1]+" ";
+	if(myString.includes("furniture")==true){
+		isBlocked=true;
+	}
+	return isBlocked;
+}
+
+function roomsShareADoor(room1,room2,roomSide,alreadyCompared=false){
+	var checkRow=0;
+	var checkCol=0;
+	var checkedList=room1+","+room2+"--";
+	var myLoc="";
+	
+
+	//Addded this june 7, 2022
+	//If first room is a hall and the other is the middle room, never add a door, so claim they already share one.
+
+	switch(room1){
+		case 30:
+		case 31:
+		case 34:
+		case 35:
+			if(room2==21){
+				//This is a hall that is trying to put a door at the end of it and into the center room. 
+				//Don't allow that. Instead, basically just report that there already is one.
+				return true;
+			}
+			break;
+		default:
+			//Do nothing here, not a hall with center room at end.
+			break;
+	}
+	//Also added this part, because there's no putting doors into already open rooms as of june 7, 2022
+	//Check to see if room2 is already open. Don't place a door if it is.
+	checkRow=getStartRow(room2);
+	checkCol=getStartCol(room2);
+	
+
+	if(gameBoard[checkRow][checkCol][7]!=0){
+		//The room is open, so don't place a door. Just say there already is one.
+		//alert("No door");
+		return true;
+	}
+	
+	
+	//Need to check to see if there exists a door in this room that borders that room
+	checkForDoor:{
+
+		switch(roomSide){
+			//This is just so we don't have to check every single wall to see if there are doors between these rooms.
+			case 2:
+				//Just loop along left side to see if there is a door and if so see if it opens to room2
+				checkRow=getStartRow(room1);
+				checkCol=getStartCol(room1);
+	
+				while(gameBoard[checkRow][checkCol][0]==room1){
+					checkedList+=gameBoard[checkRow][checkCol-1][0]+",";
+					if(gameBoard[checkRow][checkCol][2]==2){
+							if(gameBoard[checkRow][checkCol-1][0]==room2){
+							
+								return true;
+							}
+					}
+					checkRow++;
+				}
+				break;
+			case 3:
+				checkRow=getStartRow(room1);
+				checkCol=getStartCol(room1)+getRoomCols(room1)-1;
+			
+				while(gameBoard[checkRow][checkCol][0]==room1){
+					checkedList+=gameBoard[checkRow][checkCol+1][0]+",";
+					if(gameBoard[checkRow][checkCol][3]==2){
+						if(gameBoard[checkRow][checkCol+1][0]==room2){
+						
+							return true;
+						}
+					}
+					checkRow++;
+				}
+				break;
+			case 4:
+				checkRow=getStartRow(room1);
+				checkCol=getStartCol(room1);
+								 
+				while(gameBoard[checkRow][checkCol][0]==room1){
+					checkedList+=gameBoard[checkRow-1][checkCol][0]+",";
+			
+					if(gameBoard[checkRow][checkCol][4]==2){
+		
+						if(gameBoard[checkRow-1][checkCol][0]==room2){
+					
+							return true;
+						}
+					}
+					checkCol++;
+					
+					//And when I add this, it works. So I think it's just getting out of bounds. 
+					if(checkCol>=26){break;}
+				}
+				
+				
+				
+				
+		
+				break;
+			default:
+				checkRow=getStartRow(room1)+getRoomRows(room1)-1;
+				checkCol=getStartCol(room1);
+		
+				while(gameBoard[checkRow][checkCol][0]==room1){
+					checkedList+=gameBoard[checkRow+1][checkCol][0]+",";
+					if(gameBoard[checkRow][checkCol][5]==2){
+						if(gameBoard[checkRow+1][checkCol][0]==room2){
+					
+							return true;
+						}
+					}
+					checkCol++;
+					
+					//And when I add this, it works. So I think it's just getting out of bounds. 
+					if(checkCol>=26){break;}
+				}
+				break;
+		}
+	}
+	
+	
+	//09-25-22 Need to check the corners in the hall, because there is a space there where two halls border the same room along same wall, which
+	//can give us a problem
+	if(alreadyCompared==false){
+		//This is to prevent an infinite loop of calling itself
+		if(room1>21||room2>21){
+			//One of these is a hall, so we need to check corners
+			if (room1<room2){
+				switch(room1){
+					case 4:
+						if(room2==32){
+							if (roomsShareADoor(room1,36,roomSide,true)==true){
+								return true;
+							}
+						}else{							
+							if(room2==36){
+								if (roomsShareADoor(room1,32,roomSide,true)==true){
+									return true;
+								}
+							}
+						}		
+						break;
+					case 8:
+						if(room2==32){
+							if (roomsShareADoor(room1,37,roomSide,true)==true){
+								return true;
+							}
+						}else{							
+							if(room2==37){
+								if (roomsShareADoor(room1,32,roomSide,true)==true){
+									return true;
+								}
+							}
+						}		
+						break;
+					case 12:
+						if(room2==33){
+							if (roomsShareADoor(room1,36,roomSide,true)==true){
+								return true;
+							}
+						}else{							
+							if(room2==36){
+								if (roomsShareADoor(room1,33,roomSide,true)==true){
+									return true;
+								}
+							}
+						}		
+						break;
+					case 16:
+						if(room2==33){
+							if (roomsShareADoor(room1,37,roomSide,true)==true){
+								return true;
+							}
+						}else{							
+							if(room2==37){
+								if (roomsShareADoor(room1,33,roomSide,true)==true){
+									return true;
+								}
+							}
+						}		
+						break;
+				}
+			}
+		}
+	}
+	return false;
+}
+
+function checkTraps(){
+	//This function checks to see if a randomly selected trap is triggered and against which character
+	
+	//pit
+	//falling block
+	//Spear
+	//rat
+	//skull
+	
+	//Currently, just select a trap 5% of the time.
+	
+	var trapNum=0;
+	var charNum=0;
+	trapNum=Math.floor(Math.random()*80)+1;
+	charNum=Math.floor(Math.random()*4)+1;
+	
+	
+	//alert(trapNum + "  " + charNum);
+	switch(charNum){
+		case 1:
+			charNum="first";
+			break;
+		case 2:
+			charNum="second";
+			break;
+		case 3:
+			charNum="third";
+			break;
+		case 4:
+			charNum="fourth";
+			break;
+	}
+	switch(trapNum){
+		case 10:
+			//Pit trap
+			alert("A pit opens in the floor underneath the character who moves " + charNum + " and they take one damage. If this is the character who opened the door their turn ends. From now on, any player crossing that space must jump over it to pass. To try to jump a pit you must have enough on your roll to move onto the square past it. Then roll one combat die. If you roll a skull, you fall into the pit and take one damage and end your turn. Otherwise, you succeed and can continue the turn as usual.");
+			break;
+		case 20:
+			//falling block
+			alert("The ceiling of the dungeon crumbles and falls upon the character who moves " + charNum + ". Roll 3 combat dice and take one damage for each skull rolled. Place a block on this tile and roll a die to randomly choose which side of the block you must move to. If this is the character who opened the door, their turn ends.");
+			break;			
+		case 30:
+			//Spear
+			alert("A spear suddenly shoots from a nearby wall, striking the character who moves " + charNum + ". Roll 1 combat die and suffer one damage if a skull is rolled.");
+			break;
+		case 40:
+			//Rat
+			alert("A horde of rats appear and immediately attacks the character who moves " + charNum + ".");
+			break;
+		case 50:
+			//Skull
+			alert("A net hanging from the ceiling bursts open and spills a pile of skulls onto the character who moves " + charNum + ". Roll 1 combat dies and suffer one damage if a skull is rolled. From now on all players must use two moves to pass this square because of the poor footing.");
+			break;		
+	}
+	
+}
+
+function getStartRow(checkRoom){
+	//This returns the starting column for a room
+
+	var startRow=0;
+	switch(checkRoom){
+		case 0:
+			startRow= 1;
+			break;
+		case 1:
+			startRow= 1;
+			break;
+		case 2:
+			startRow= 1;
+			break;
+		case 3:
+			startRow= 4;
+			break;
+		case 4:
+			startRow= 4;
+			break;
+		case 5:
+			startRow= 1;
+			break;
+		case 6:
+			startRow= 1;
+			break;
+		case 7:
+			startRow= 1;
+			break;
+		case 8:
+			startRow= 5;
+			break;
+		case 9:
+			startRow= 5;
+			break;
+		case 10:
+			startRow= 10;
+			break;
+		case 11:
+			startRow= 10;
+			break;
+		case 12:
+			startRow= 10;
+			break;
+		case 13:
+			startRow= 14;
+			break;
+		case 14:
+			startRow= 13;
+			break;
+		case 15:
+			startRow= 13;
+			break;
+		case 16:
+			startRow= 10;
+			break;
+		case 17:
+			startRow= 10;
+			break;
+		case 18:
+			startRow= 13;
+			break;
+		case 19:
+			startRow= 14;
+			break;
+		case 20:
+			startRow= 14;
+			break;
+		case 21:
+			startRow= 7;
+			break;
+		case 22:
+			startRow= 0;
+			break;
+		case 23:
+			startRow= 0;
+			break;
+		case 24:
+			startRow= 18;
+			break;
+		case 25:
+			startRow= 18;
+			break;
+		case 26:
+			startRow= 1;
+			break;
+		case 27:
+			startRow= 10;
+			break;
+		case 28:
+			startRow= 1;
+			break;
+		case 29:
+			startRow= 10;
+			break;
+		case 30:
+			startRow= 9;
+			break;
+		case 31:
+			startRow= 9;
+			break;
+		case 32:
+			startRow=6;
+			break;
+		case 33:
+			startRow= 12
+			break;
+		case 34:
+			startRow= 0;
+			break;
+		case 35:
+			startRow=12;
+			break;
+		case 36:
+			startRow= 7;
+			break;
+		case 37:
+			startRow= 7;
+			break;
+	}
+	return startRow;
+}
+function getStartCol(checkRoom){
+	//This returns the starting row for a room
+
+	var startCol=100;
+	switch(checkRoom){
+
+		case 0:
+			startCol=1;
+			break;
+		case 1:
+			startCol=5;
+			break;
+		case 2:
+			startCol=9;
+			break;
+		case 3:
+			startCol=1;
+			break;
+		case 4:
+			startCol=5;
+			break;
+		case 5:
+			startCol=14;
+			break;
+		case 6:
+			startCol=17;
+			break;
+		case 7:
+			startCol=21;
+			break;
+		case 8:
+			startCol=17;
+			break;
+		case 9:
+			startCol=21;
+			break;
+		case 10:
+			startCol=1;
+			break;
+		case 11:
+			startCol=5;
+			break;
+		case 12:
+			startCol=7;
+			break;
+		case 13:
+			startCol=1;
+			break;
+		case 14:
+			startCol=5;
+			break;
+		case 15:
+			startCol=9;
+			break;
+		case 16:
+			startCol=17;
+			break;
+		case 17:
+			startCol=21;
+			break;
+		case 18:
+			startCol=14;
+			break;
+		case 19:
+			startCol=18;
+			break;
+		case 20:
+			startCol=21;
+			break;
+		case 21:
+			startCol=10;
+			break;
+		case 22:
+			startCol=0;
+			break;
+		case 23:
+			startCol=14;
+			break;
+		case 24:
+			startCol=0;
+			break;
+		case 25:
+			startCol=14;
+			break;
+		case 26:
+			startCol=0;
+			break;
+		case 27:
+			startCol=0;
+			break;
+		case 28:
+			startCol=25;
+			break;
+		case 29:
+			startCol=25;
+			break;
+		case 30:
+			startCol=0;
+			break;
+		case 31:
+			startCol=16;
+			break;
+		case 32:
+			startCol=9;
+			break;
+		case 33:
+			startCol=9;
+			break;
+		case 34:
+			startCol=12;
+			break;
+		case 35:
+			startCol=12;
+			break;
+		case 36:
+			startCol=9;
+			break;
+		case 37:
+			startCol=16;
+			break;
+	}
+	return startCol;
+}
+function getRoomCols(checkRoom){
+	//This returns the number of columns in a room
+	var numCols=0;
+	switch(checkRoom){
+
+		case 0:
+			numCols=4;
+			break;
+		case 1:
+			numCols=4;
+			break;
+		case 2:
+			numCols=3;
+			break;
+		case 3:
+			numCols=4;
+			break;
+		case 4:
+			numCols=4;
+			break;
+		case 5:
+			numCols=3;
+			break;
+		case 6:
+			numCols=4;
+			break;
+		case 7:
+			numCols=4;
+			break;
+		case 8:
+			numCols=4;
+			break;
+		case 9:
+			numCols=4;
+			break;
+		case 10:
+			numCols=4;
+			break;
+		case 11:
+			numCols=2;
+			break;
+		case 12:
+			numCols=2;
+			break;
+		case 13:
+			numCols=4;
+			break;
+		case 14:
+			numCols=4;
+			break;
+		case 15:
+			numCols=3;
+			break;
+		case 16:
+			numCols=4;
+			break;
+		case 17:
+			numCols=4;
+			break;
+		case 18:
+			numCols=4;
+			break;
+		case 19:
+			numCols=3;
+			break;
+		case 20:
+			numCols=4;
+			break;
+		case 21:
+			numCols=6;
+			break;
+		case 22:
+			numCols=12;
+			break;
+		case 23:
+			numCols=12;
+			break;
+		case 24:
+			numCols=12;
+			break;
+		case 25:
+			numCols=12;
+			break;
+		case 26:
+			numCols=1;
+			break;
+		case 27:
+			numCols=1;
+			break;
+		case 28:
+			numCols=1;
+			break;
+		case 29:
+			numCols=1;
+			break;
+		case 30:
+			numCols=10;
+			break;
+		case 31:
+			numCols=10;
+			break;
+		case 32:
+			numCols=8;
+			break;
+		case 33:
+			numCols=8;
+			break;
+		case 34:
+			numCols=2;
+			break;
+		case 35:
+			numCols=2;
+			break;
+		case 36:
+			numCols=1;
+			break;
+		case 37:
+			numCols=1;
+			break;
+	}
+	return numCols;
+}
+function getRoomRows(checkRoom){
+	//This returns the number of rows in a room
+	var numRows;
+	switch(checkRoom){
+
+		case 0:
+			numRows=3;
+			break;
+		case 1:
+			numRows=3;
+			break;
+		case 2:
+			numRows=5;
+			break;
+		case 3:
+			numRows=5;
+			break;
+		case 4:
+			numRows=5;
+			break;
+		case 5:
+			numRows=5;
+			break;
+		case 6:
+			numRows=4;
+			break;
+		case 7:
+			numRows=4;
+			break;
+		case 8:
+			numRows=4;
+			break;
+		case 9:
+			numRows=4;
+			break;
+		case 10:
+			numRows=4;
+			break;
+		case 11:
+			numRows=3;
+			break;
+		case 12:
+			numRows=3;
+			break;
+		case 13:
+			numRows=4;
+			break;
+		case 14:
+			numRows=5;
+			break;
+		case 15:
+			numRows=5;
+			break;
+		case 16:
+			numRows=4;
+			break;
+		case 17:
+			numRows=4;
+			break;
+		case 18:
+			numRows=5;
+			break;
+		case 19:
+			numRows=4;
+			break;
+		case 20:
+			numRows=4;
+			break;
+		case 21:
+			numRows=5;
+			break;
+		case 22:
+			numRows=1;
+			break;
+		case 23:
+			numRows=1;
+			break;
+		case 24:
+			numRows=1;
+			break;
+		case 25:
+			numRows=1;
+			break;
+		case 26:
+			numRows=8;
+			break;
+		case 27:
+			numRows=8;
+			break;
+		case 28:
+			numRows=8;
+			break;
+		case 29:
+			numRows=8;
+			break;
+		case 30:
+			numRows=1;
+			break;
+		case 31:
+			numRows=1;
+			break;
+		case 32:
+			numRows=1;
+			break;
+		case 33:
+			numRows=1;
+			break;
+		case 34:
+			numRows=6;
+			break;
+		case 35:
+			numRows=6;
+			break;
+		case 36:
+			numRows=5;
+			break;
+		case 37:
+			numRows=5;
+			break;
+	}
+	return numRows;
+}
+function listRoomContents(roomNum,curTime){
+	var newDescription="";
+	var checkRow=getStartRow(roomNum);
+	var checkCol=getStartCol(roomNum);
+	var numRows=getRoomRows(roomNum);
+	var numCols=getRoomCols(roomNum);
+	var roomContents="";
+	var pos=100;
+
+	//alert(roomNum);
+	//alert(numRows);
+	
+	switch(roomNum){
+		case 26:
+		case 28:
+			numRows=17;
+			checkRow=getStartRow(26);
+			break;
+		case 27:
+		case 29:
+			numRows=17;
+			checkRow=getStartRow(26);
+			break;
+		case 22:
+		case 24:
+			numCols=26;	
+			checkCol=getStartCol(22);
+			break;
+		case 23:
+		case 25:
+			numCols=26;	
+			checkCol=getStartCol(22);
+			break;
+	}
+	//alert(numRows);
+
+	for(let x=0;x<numRows;x++){
+		for(let y=0;y<numCols;y++){
+			roomContents=gameBoard[checkRow+x][checkCol+y][1]+"";
+
+			//1-26-25 I added this so we can avoid that one little notch in room 16
+			if(roomNum==16&&(checkRow+x==13)&&(checkCol+y==17)){
+				//Do nothing and show nothing,this is that weird little notch and isn't actually a part of that room.
+				continue;
+			}
+
+			if(roomContents.includes("furniture")==true){
+				
+				if(roomContents.includes("furniture")==true){
+					pos=roomContents.search("big furniture")-1;
+				}else{
+					pos=roomContents.search("furniture")-1;
+				}
+				
+				if(roomContents.includes("small furniture")==true){
+					pos=roomContents.search("small furniture")-1;				
+				}
+
+				
+				if(roomContents.substr(0,1)=="^"){ 
+					newDescription+="\n"+roomContents.substr(5,pos-5);					
+				}else{
+									
+
+					if(roomContents.substr(0,1)=="@"){
+						//don't list here, only on first entry for this furniture item, which is at the ^ entry.						
+					}else{
+						newDescription+="\n"+roomContents.substr(0,pos);
+					}
+				}
+			}else{
+				if(roomContents!=0){
+					newDescription+="\n"+gameBoard[checkRow+x][checkCol+y][1];
+					switch(roomContents){
+						case "S I":
+							newDescription+=": Search Item";
+							break;
+						case "BLK":
+							newDescription+=": Block";
+							break;
+						default:
+							break;
+					}
+				}
+			}
+		}
+	}
+
+	document.getElementById("results").value="("+curTime+" Room " +roomNum +")"+newDescription;
+}
+
+function reduceDoorCount(numOfDoors=0,roomNumber){
+	
+	var doorCount=numOfDoors;
+	var reductionNum=0;
+	var zeroChance=0;
+	let questLevel=(parseInt(document.getElementById("questLevel").value,10))
+	
+	
+	
+	if(doorCount>0){
+	
+		if(roomNumber>21){
+			//this is a hall, do nothing
+		}else{
+		
+			zeroChance=Math.floor(Math.random()*100)+1;
+			
+			if(zeroChance<questLevel){
+				//alert("zeroChance");
+				//alert("Reduced doorcounts to 0--Originally "+numOfDoors );
+				//doorcount=0;	
+				//Changed this to just reduce the doorcount by 2 on 10-11-2022 because we were getting way too few rooms.
+				//This gives us a chance at having some doors, at least.
+				doorCount=doorCount-2;
+				
+				return doorCount;
+			}
+			
+			reductionNum=Math.floor(Math.random()*100)+1;
+			if(reductionNum>30 && reductionNum<46){
+				//Initially this was only going to be 10% of the time, but I realized we already don't place some of these doors anyway, because
+				//they are going between rooms that already share a door.
+				doorCount=doorCount-1;
+				//alert("We reduced the doorcount by 1");
+			}
+		}
+	}
+	return doorCount;
+}
+function updateMissedRoom(roomNum){
+	//This will check to see if the companion to this hall is has been opened as well.
+	//alert(roomNum);
+	switch(roomNum){
+		case 22:
+			if(roomInUse(23)==false){
+				openRoomVisually(23);
+			}
+			break;
+		case 23:
+			if(roomInUse(22)==false){
+				openRoomVisually(22);
+			}
+			break;
+		case 24:
+			if(roomInUse(25)==false){
+				openRoomVisually(25);
+			}
+			break;
+		case 25:
+			if(roomInUse(24)==false){
+				openRoomVisually(24);
+			}
+			break;
+		case 26:
+			if(roomInUse(27)==false){
+				openRoomVisually(27);
+			}
+			break;
+		case 27:
+			if(roomInUse(26)==false){
+				openRoomVisually(26);
+			}
+			break;
+		case 28:
+			if(roomInUse(29)==false){
+				openRoomVisually(29);
+			}
+			break;
+		case 29:
+			if(roomInUse(28)==false){
+				openRoomVisually(28);
+			}
+			break;
+	}
+}
+
+function addDoors(roomNum, isLastRoom){
+
+	var startRow=0;
+	var startCol=0;
+	var checkRow=0;
+	var checkCol=0;
+	var numCols=0;
+	var numRows=0;
+	var randomChance=0;
+	var numItems=0;
+	
+	
+	startRow=getStartRow(roomNum);
+	startCol=getStartCol(roomNum);
+	numCols=getRoomCols(roomNum);
+	numRows=getRoomRows(roomNum);
+	
+	
+	
+	if(isLastRoom==0){		
+	//Last room (exit) gets no doors because it is already open
+	
+		//Place Doors in the room
+		numItems=Math.floor(Math.random()*4)+1;
+		
+		//Up to 4 doors in a room, one on each side
+		//But if the room is not a hall, decrease the number by a small percentage
+		
+		numItems=reduceDoorCount(numItems, roomNum);
+
+		while(numItems>0){
+			//Find out which side of the room we're trying to place this on
+			randomChance=Math.floor(Math.random()*4);
+			//This is to take care of hallways--can't place a door on the outside edge of the Board
+			
+	
+		
+			switch(randomChance){
+				case 0:
+					if(startCol==0){
+						//This is one of the halls on the left of the board, so it can't be on the left of this hall.
+						//Switch to right side instead.
+						randomChance++;
+					}
+					break;
+				case 1:
+					if(startCol==25){
+						//This is one of the halls on the right of the board, so it can't be on the right of this hall.
+						//Switch to left side instead.
+						randomChance--;
+					}
+					break;
+				case 2:
+					if(startRow==0){
+						//This is one of the halls on the top of the board, so it can't be on the top of this hall.
+						//Switch to bottom side instead.
+						randomChance++;
+					}
+					break;
+				case 3:
+					if(startRow==18){
+						//This is one of the halls on the bottom of the board, so it can't be on the bottom of this hall.
+						//Switch to top side instead.
+						randomChance--;
+					}
+					break;
+				default:
+					break;
+			}
+			
+			randomChance+=2;//This is because left edge is position 2 in the array, so we add 2. So a 0 gets 2 added to become position 2 in array and will be left side. 1 gets 2 added to become position 3 in the array and is the right side, etc.
+			//Now check to see if the room already has a door on that side and skip if it does.
+			tryDoor:{
+				checkCol=startCol;
+				checkRow=startRow;
+
+				//Check halls to make sure we aren't trying to put a door on the outside edge of the board.
+					
+					if(randomChance==2||randomChance==3){
+						
+						checkRow=Math.floor(Math.random()*numRows);
+						checkRow=checkRow+(startRow);
+						if(randomChance==2){
+							//Left side of room
+							//Check to make sure the place we are placing it is not an open hall space, where there is no wall
+							if(gameBoard[checkRow][startCol][randomChance]!=0){
+								//Before placing door in a hall, double check to make sure there isn't a door between this room and the hall already
+								//This is only necessary because we don't limit the number of doors in a hall
+								
+								if(roomsShareADoor(roomNum,gameBoard[checkRow][startCol-1][0],2)==false){
+									if(doorBlockedByFurniture(checkRow,startCol-1)==false){					
+										gameBoard[checkRow][startCol][randomChance]=2;
+											//Also set corresponding space in room to left
+										gameBoard[checkRow][startCol-1][randomChance+1]=2;									
+									}
+								}
+							}
+						}else{
+			
+							//Right side of room
+							//Check to make sure the place we are placing it is not an open hall space, where there is no wall
+							if(gameBoard[checkRow][startCol+(numCols-1)][randomChance]!=0){
+								if(roomsShareADoor(roomNum,gameBoard[checkRow][startCol+(numCols)][0],3)==false){
+									if(doorBlockedByFurniture(checkRow,startCol+(numCols))==false){
+										gameBoard[checkRow][startCol+(numCols-1)][randomChance]=2;
+										//Also set corresponding space in room to right
+										gameBoard[checkRow][startCol+(numCols)][randomChance-1]=2;
+									}
+								}
+							}
+						}
+					}else{
+						
+						checkCol=Math.floor(Math.random()*numCols);
+						checkCol=checkCol+(startCol);
+						
+						if(randomChance==4){
+					
+							//Top side of room
+							//Check to make sure the place we are placing it is not an open hall space, where there is no wall
+							if(gameBoard[startRow][checkCol][randomChance]!=0){
+								
+								
+								if(roomsShareADoor(roomNum,gameBoard[startRow-1][checkCol][0],4)==false){
+						
+									if(doorBlockedByFurniture(startRow-1,checkCol)==false){
+							
+										gameBoard[startRow][checkCol][randomChance]=2;
+										//also set corresponding space in room above setInterval(function () {
+										gameBoard[startRow-1][checkCol][randomChance+1]=2;
+									}
+								}
+							}
+						}else{
+						
+							//Bottom side of room
+							//Check to make sure the place we are placing it is not an open hall space, where there is no wall
+							if(gameBoard[startRow+(numRows-1)][checkCol][randomChance]!=0){
+							
+								if(roomsShareADoor(roomNum,gameBoard[startRow+(numRows)][checkCol][0],5)==false){
+								
+									if(doorBlockedByFurniture(startRow+(numRows),checkCol)==false){
+									
+										gameBoard[startRow+(numRows-1)][checkCol][randomChance]=2;
+										//Also set corresponding space in room below it
+										gameBoard[startRow+(numRows)][checkCol][randomChance-1]=2;
+									}
+								}
+							}
+						}
+						
+					}
+					
+			}
+	
+			showBoard();
+			numItems--;
+		}
+		
+	}
+	return;
+	
+}
+
+
+
+function addCreatures(roomNum,isLastRoom){
+	var numItems=0;
+	var randomRow=0;
+	var randomCol=0;
+	var tempFurn=0;
+	var startCol=0;
+	var startRow=0;
+	let questLevel=(parseInt(document.getElementById("questLevel").value,10))
+	var randomChance=0;
+
+	startRow=getStartRow(roomNum);
+	startCol=getStartCol(roomNum);
+	numCols=getRoomCols(roomNum);
+	numRows=getRoomRows(roomNum);
+
+	randomChance=Math.floor(Math.random()*21);
+
+	if(roomNum>21){
+		//This is a hall, so limit the number of creatures to 3 at most.
+		switch(randomChance){
+			case 0:
+			case 1:
+			case 2:
+				numItems=1;
+				break;
+			case 3:
+			case 4:
+			case 5:
+				numItems=2;
+				break;
+			case 6:
+			case 7:
+			case 8:
+				numItems=3;
+				break;
+			default:
+				numItems=0;
+				break;
+		}
+	}else{
+		//This is a room, so move along as normal
+		switch(randomChance){
+			case 0:
+			case 1:
+			case 2:
+			case 3:
+				numItems=1;
+				break;
+			case 4:
+			case 5:
+			case 6:
+				numItems=2;
+				break;
+			case 7:
+			case 8:
+			case 9:
+				numItems=3;
+				break;
+			case 10:
+			case 11:
+			case 12:
+				numItems=4;
+				break;
+			case 13:
+			case 14:
+			case 15:
+					numItems=5;
+					break;
+			case 16:
+			case 17:
+					numItems=6;
+					break;
+			case 18:
+			case 19:
+					numItems=7;
+					break;
+			case 20:
+					numItems=8;
+					break;
+			default:
+				numItems=0;
+				break;
+		}
+		//Also, make sure the numItems is no larger than 1/3 of the floorspace of a room. This is mostly because of the two smaller rooms becoming so packed with 
+		//creatures that it is ridiculous. 10-6-2024
+		if(numItems>((numRows*numCols)/3)){
+			numItems=((numRows*numCols)/3);
+		}
+
+	}
+	switch(true){
+		case (questLevel<5):
+			//First reduce the number of creatures by 2 if above 3, or by one if above 1
+			if(numItems>3){
+				numItems-=2;
+			}else{
+				if(numItems>1){
+					numItems--;
+				}
+			}
+			//Max number of creatures in a room is 3 unless it's the last room, then 4
+			if(isLastRoom==0){
+				if(numItems>3){
+					numItems=3;
+				}
+			}else{
+				//In last room we'll allow up to 4
+				if(numItems>4){
+					numItems=4;
+				}
+			}
+			break;
+		case(questLevel<10):
+			//Reduce the number of creatures by 1 if it's above 1
+			if(numItems>1){
+				numItems--;
+			}
+			//Max number of creatures in a room is 4 unless it's the last room, then 5
+			if(isLastRoom==0){
+				if(numItems>4){
+					numItems=4;
+				}
+			}else{
+				//In last room we'll allow up to 5
+				if(numItems>5){
+					numItems=5;
+				}
+			}
+			break;
+		case(questLevel<15):
+			//Max number of creatures in a room is 5 except for last roomMax
+			if(isLastRoom==0){
+				if(numItems>5){
+					numItems=5;
+				}else{
+					//Last room we'll allow up to 6
+					if(numItems>6){
+						numItems=6;
+					}
+				}
+			}
+			break;
+		default:
+			//Do nothing, let it get up to 7 creatures as usual
+			break;
+	}
+	if (isLastRoom>0){
+		//Added this 10-6-2024 to make final room slightly more difficult.
+		if((Math.floor(Math.random()*4))==1){
+			//I in 4 chance of getting an additional creature in final room?
+			numItems=numItems+1;
+			//alert("Added one!")
+		}						
+	} else if(roomNum==21){
+		//This is the middle room, but it is at the start. Limit creatures to two.
+		if(numItems>2){
+			numItems=2;
+		}
+	}
+	while(numItems>0){
+		//First get a creature
+		tempFurn=getMonster();
+		//Then generate a random location
+		randomRow=Math.floor(Math.random()*numRows);
+		randomCol=Math.floor(Math.random()*numCols);
+		randomCol+=startCol;
+		randomRow+=startRow;
+		if(gameBoard[randomRow][randomCol][1]==0){
+			if(roomNum==16&&randomCol==17&&randomRow==13){
+				//Do nothing, this is that weird notch in the one room
+			}else{
+				gameBoard[randomRow][randomCol][1]=tempFurn;
+			}
+		}else{
+			//If that space is full, give a second chance at a new location
+			randomRow=Math.floor(Math.random()*numRows);
+			randomCol=Math.floor(Math.random()*numCols);
+			randomCol+=startCol;
+			randomRow+=startRow;
+			if(gameBoard[randomRow][randomCol][1]==0){
+				if(roomNum==16&&randomCol==17&&randomRow==13){
+					//Do nothing, this is that weird notch in the one room
+				}else{
+					gameBoard[randomRow][randomCol][1]=tempFurn;
+				}
+			}else{
+				//If that doesn't work, skip this creature and move on to the next one
+			}
+		}
+		numItems--;
+	}
+	
+	
+	return
+}
+function addItems(roomNum, isLastRoom){
+	var numItems=0;
+	var randomRow=0;
+	var randomCol=0;
+	var tempFurn=0;
+	var startCol=0;
+	var startRow=0;
+	//let questLevel=(parseInt(document.getElementById("questLevel").value,10))
+	var randomChance=0;
+
+	startRow=getStartRow(roomNum);
+	startCol=getStartCol(roomNum);
+	numCols=getRoomCols(roomNum);
+	numRows=getRoomRows(roomNum);
+	
+		
+	if(isLastRoom==0){
+	//Place Search Items
+	randomChance=Math.floor(Math.random()*21);
+	
+
+	if(roomNum>21){
+		//This is a hall, so limit the number of Search items to 1 at most, and that will become a block
+		switch(randomChance){
+			case 0:
+			case 1:
+			case 2:
+			case 4:
+				numItems=1;
+				break;
+			default:
+				//Anything not directly above falls through to here, where we get the default of 0 items.
+				numItems=0;
+				break;
+		}
+	}else{
+		//This is a room, so move along as normal
+		switch(randomChance){
+			case 0:
+			case 1:			
+			case 6:
+			case 7:
+				numItems=1;
+				break;
+			case 8:
+			case 9:			
+				numItems=2;
+				break;
+			case 15:
+					numItems=3;
+					break;
+			case 20:
+					numItems=4;
+					break;
+			default:
+				//Anything not directly above falls through to here, where we get the default of 0 items.
+				numItems=0;
+				break;
+		}		
+	}
+	
+	if (roomNum<21){
+		//As of 10-6-2024 I want to slightly increase the chance for more search items.
+		if(Math.floor(Math.random()*10)==1){
+			//alert("Got to this place!")
+			numItems=numItems+1;
+		}
+	}
+
+	while(numItems>0){
+		if(roomNum>21){
+			//this is a hall, so the item becomes a block
+			
+			randomRow=Math.floor(Math.random()*8);
+			
+			switch(randomRow){
+				case 5:
+				case 6:
+					tempFurn="S I";
+					break;
+				case 2:
+				case 4:
+				case 7:
+				case 1:
+					tempFurn="BLK";
+					break;
+				default:
+					//do nothing
+			}
+			
+		}else{
+			tempFurn="S I";//"Search Item";
+		}
+		//Then generate a random location
+		randomRow=Math.floor(Math.random()*numRows);
+		randomCol=Math.floor(Math.random()*numCols);
+		randomCol+=startCol;
+		randomRow+=startRow;
+		if(gameBoard[randomRow][randomCol][1]==0){
+			//This is a block if it's in a hall, so check to make sure it isn't next to a door if in hall
+			if(roomNum>21&&(gameBoard[randomRow][randomCol][2]==2||gameBoard[randomRow][randomCol][3]==2||gameBoard[randomRow][randomCol][4]==2||gameBoard[randomRow][randomCol][5]==2)){
+				//Do nothing, this is a block in front of a door and can't be placed
+			}else{
+				if(roomNum==16&&randomCol==17&&randomRow==13){
+					//Do nothing, this is that weird notch in one room and we place nothing.
+				}else{
+					
+					if(roomNum==34||roomNum==35){
+						//This is actually a block, and this is the wide hall, so it needs to place both blocks
+						if(randomCol==startCol){
+								//Check to make sure there is no door on either side first, through
+								if(gameBoard[randomRow][randomCol][2]==2||gameBoard[randomRow][randomCol+1][3]==2){
+									//Don't place the blocks
+								}else{
+									gameBoard[randomRow][randomCol+1][1]=tempFurn;
+									gameBoard[randomRow][randomCol][1]=tempFurn;
+								}
+						}else {
+							if(gameBoard[randomRow][randomCol-1][2]==2||gameBoard[randomRow][randomCol][3]==2){
+								//Don't place the blocks
+							}else{
+								gameBoard[randomRow][randomCol-1][1]=tempFurn;
+								gameBoard[randomRow][randomCol][1]=tempFurn;
+							}
+						}
+					}else{
+						gameBoard[randomRow][randomCol][1]=tempFurn;
+					}
+				}
+			}
+		}else{
+			//If that space is full, give a second chance at a new location
+			randomRow=Math.floor(Math.random()*numRows);
+			randomCol=Math.floor(Math.random()*numCols);
+			randomCol+=startCol;
+			randomRow+=startRow;
+			if(gameBoard[randomRow][randomCol][1]==0){
+				//This is a block if it's in a hall, so check to make sure it isn't next to a door if in hall
+				if(roomNum>21&&(gameBoard[randomRow][randomCol][2]==2||gameBoard[randomRow][randomCol][3]==2||gameBoard[randomRow][randomCol][4]==2||gameBoard[randomRow][randomCol][5]==2)){
+					//Do nothing, this is a block in front of a door and can't be placed
+				}else{
+					if(roomNum==16&&randomCol==17&&randomRow==13){
+						//Do nothing, this is that weird notch in one room and we place nothing.
+					}else{
+						gameBoard[randomRow][randomCol][1]=tempFurn;
+					}
+					if(roomNum==34||roomNum==35){
+						//This is actually a block, and this is the wide hall, so it needs to place both blocks
+						if(randomCol==startCol){
+							gameBoard[randomRow][randomCol+1][1]=tempFurn;
+						}else {
+							gameBoard[randomRow][randomCol-1][1]=tempFurn;
+						}
+					}
+				}
+			}else{
+				//If that doesn't work, skip this item and move on to the next one
+			}
+		}
+		numItems--;
+	}
+	}
+
+
+	return;
+}
+
+function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
+
+	
+	var startRow=0;
+	var startCol=0;
+	
+	const d = new Date();
+	let curTime = d.toLocaleTimeString();
+	let roomMax=(parseInt(document.getElementById("maxRooms").value,10))
+	
+	
+	//Check to make sure they set a quest level
+	if(document.getElementById("questLevel").value.length<=0){
+		alert( " Please select the quest level");
+		return;
+	}
+
+
+	if(isLastRoom==0&&roomNum<21){ //Can still be hall or exit room
+		if(roomCount==roomMax-1){
+			alert("((Last Room))");
+
+		}else{
+			if(roomCount>=roomMax){
+			alert("((Exceeds Max Room Count))");
+			return;
+			}
+		}
+	}
+
+
+	//loop through to blank out creatureCount array
+	/*var myCounter=0;
+	while(myCounter<20){
+		creatureCount[myCounter]=0;
+		myCounter+=1;
+	}*/
+	for(x=0;x<creatureList.length;x++){
+		creatureList[x][7]=0;
+	}
+
+
+	startRow=getStartRow(roomNum);
+	startCol=getStartCol(roomNum);
+	
+	
+
+	//Now check to see if this room is already marked as being in use
+	if(roomInUse(roomNum)&&isLastRoom==0){
+		if(roomNum>21&&roomNum<30){
+			updateMissedRoom(roomNum);
+		}
+		showBoard();
+		listRoomContents(roomNum,curTime);
+		return;
+	}else{
+		checkTraps();
+	}
+	
+		
+	backupTable("M");
+	
+	
+
+	//Add in any doors, unless they already have been placed.
+	addDoors(roomNum, isLastRoom);
+	
+	
+
+
+	//Add in any furniture, unless the room has already been opened.
+	addFurniture(roomNum, isLastRoom);
+	
+	
+	//Place Creatures
+	addCreatures(roomNum, isLastRoom);
+
+	//Place items
+	addItems(roomNum,isLastRoom);
+
+	
+
+	roomCount++;	
+	
+	//Added this 12-3-2022 to add a one-off creature possibility
+	if (chkPanda.checked && pandaCount==0){			
+		getPanda(roomNum);		
+	}
+	
+	
+	gameBoard[startRow][startCol][7]=1;
+
+	listRoomContents(roomNum,curTime);
+	
+	if (roomNum>21&&roomNum<30){
+
+		switch(roomNum){
+			case 22:
+			case 24:
+			case 26:
+			case 28:
+				if(roomInUse(roomNum+1)==false){
+					updateMissedRoom(roomNum);
+				}
+				break;
+			case 23:
+			case 25:
+			case 27:
+			case 29:
+				if(roomInUse(roomNum-1)==false){
+					updateMissedRoom(roomNum);
+				}
+				break;
+			
+		}
+	}
+}
+
+
+document.querySelector('#gameBoard')
+  .addEventListener('click', (ev) => {
+	var roomNum=100;
+
+	
+	if(ev.target.parentElement.rowIndex==undefined||ev.target.cellIndex==undefined){
+		exit;
+	}else{
+		//Here I need to add a call to a function that looks up the room and fills it with objects
+		roomNum=gameBoard[ev.target.parentElement.rowIndex][ev.target.cellIndex][0];
+
+		
+			switch(roomNum){
+				case 21:
+					//alert(roomNum);
+					
+					//remove creatures placed at start so we only have stairs and doors. 
+					clearStartCreatures();
+					openRoomVisually(roomNum,true,1);
+					
+					showFinalReward();
+					break;
+				default:
+					openRoomVisually(roomNum,true);
+					break;
+			};
+			
+
+		showBoard();
+	}
+  });
+
+  document.querySelector("#gameBoard").addEventListener("contextmenu", (ev)=>{
+	
+		ev.preventDefault();
+		//alert("right click");
+
+		var roomNum=100;
+
+		if(ev.target.parentElement.rowIndex==undefined||ev.target.cellIndex==undefined){
+			exit;
+		}else{
+			//Here I need to add a call to a function that looks up the room and fills it with objects
+			roomNum=gameBoard[ev.target.parentElement.rowIndex][ev.target.cellIndex][0];
+			//This is where I would trigger an overlay of the specific room clicked, showing just that room zoomed in.
+			if(roomInUse(roomNum)==true){ //Don't call this here if the room hasn't actually been opened.
+				showBoard(roomNum);
+			}
+		}
+  });
+ 
+
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+</body>
+</html>
