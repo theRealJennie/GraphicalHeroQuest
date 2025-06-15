@@ -1994,6 +1994,14 @@ function roomsShareADoor(room1,room2,roomSide,alreadyCompared=false){
 	//09-25-22 Need to check the corners in the hall, because there is a space there where two halls border the same room along same wall, which
 	//can give us a problem
 	if(alreadyCompared==false){
+		//Added this 6-15-25 because the next section depends on the room1 being the room, not the hall, for some reason. Don't know my previous reasoning, so I'll just put this here.
+		//I do know that this is part of the reason I can sometimes get a second door into a room in the corner. It just doesn't compare correctly, and it depends on which hall I open first to trigger this. 
+		if(room2<room1){
+			let tempRoomBlah=room1;
+			room1=room2;
+			room2=tempRoomBlah;
+		}
+		
 		//This is to prevent an infinite loop of calling itself
 		if(room1>21||room2>21){
 			//One of these is a hall, so we need to check corners
