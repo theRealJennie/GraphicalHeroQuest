@@ -374,5 +374,23 @@ const furnitureSet=[
 	"P D",
 	"Potion Display (There is a plaque here stating 'These are the first tubes created by High Mage Mielicene. Each is embued with the power to convert plain water, over a period of 3 days, into a potion to enable a hobbled person to walk normally for a short time. While these early examples only work for a small number of people (each a different person), they laid important groundwork for later development in aiding those with ambulatory difficulties.' These tubes contain a potion that allows a user to re-roll their movement dice once per quest. Roll to see which character get the tube. Cannot be given or traded away.)",
 	0,
+	0,
+	
+	"Bedroll",
+	3,
+	2,
+	1,
+	"BeR",
+	"Bedroll",
+	0,
+	0,
+	
+	"Runic Calendar",
+	1,
+	2,
+	2,
+	"RuC",
+	"Runic Calendar",
+	0,
 	0
 ];*/
