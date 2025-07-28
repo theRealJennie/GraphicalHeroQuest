@@ -49,9 +49,11 @@
 <div class="row">
 <div class="col-8">
 
-	<div class="row"style="line-height: 0;padding:10px;max-width:28.5rem;" id="gameBoard">
-
+	<div id="gameBoardContainer" style="width:700px; height:500px; max-width:40rem; overflow:auto; border:1px solid #333;">
+		<div id="gameBoard"></div>
 	</div>
+
+	
 	<div id="zoomedView" style="overflow-y:auto; left: 3%; top: 3%; padding-left: 3%; padding-top: 3%; width: 90%; height: 90%; position: fixed; background-color: antiquewhite; border-color: black; border-width: 3px; border-style: double; visibility: hidden;">
 	<!--Here is where I"ll put the zoom in area.-->
 		<div class="col-sm" style="float:right; padding-right: 20px">	
@@ -80,6 +82,11 @@
 </div>
 <div class="row">
 	<div class="col-sm">
+		<button class="btn btn-rounded" onclick="generateBlankBoard()">Generate Blank Board</button>
+	</div>
+</div>
+<div class="row">
+	<div class="col-sm">
 		<button class="btn btn-rounded" onclick="openSearch()">Open Search Item</button>
 	</div>	
 	<div class="col-sm">
@@ -94,10 +101,18 @@
 </div>
 <div class="row">
 	<div class="col-sm">
-		<button class="btn btn-rounded" onclick="generateBlankBoard()">Generate Blank Board</button>
+		<button class="btn btn-rounded" onclick="backupTable('U'); showBoard();">Undo Opening Room</button>
 	</div>
 	<div class="col-sm">
-		<button class="btn btn-rounded" onclick="backupTable('U'); showBoard();">Undo</button>
+		<button class="btn btn-rounded" onclick="setBoardZoom(boardZoom * 1.2)">Zoom In</button>
+	</div>
+</div>
+<div class="row">
+	<div class="col-sm">
+		<!--<button class="btn btn-rounded" onclick="setBoardZoom(boardZoom * 1.2)">Zoom In</button>-->
+	</div>
+	<div class="col-sm">
+		<button class="btn btn-rounded" onclick="setBoardZoom(boardZoom / 1.2);">Zoom Out</button>
 	</div>
 </div>
 <div class="row">
@@ -106,9 +121,7 @@
 		<input type="checkbox" id="chkPanda" name="chkPanda" >
 		<label for="chkPanda"> Include Panda</label>
 	</div>
-	<div class="col-sm">
-		Right-Click (Hold on Mobile) To Zoom
-	</div>
+
 </div>
 </div>
 </div>
@@ -189,6 +202,8 @@ var itemCount=new Array(20);
 var creatureCount=new Array(20);
 var pandaCount=0;
 var mouseTimer;
+var boardZoom=1.0;
+
 
 //gameBoard position definitions:
 //0-room number
@@ -206,6 +221,14 @@ for(i=0;i<gameBoard.length;i++){
 		gameBoard[i][j]=new Array(8).fill(0);
 		gameBoardBackup[i][j]=new Array(8).fill(0);
 	}
+}
+
+
+function setBoardZoom(newZoom) {
+	//Added this 7-28-25... copied from Perplexity.ai to save time
+  boardZoom = Math.max(0.2, Math.min(newZoom, 4)); // clamp between 0.2x and 4x
+  document.getElementById('gameBoard').style.transform = "scale(" + boardZoom + ")";
+  document.getElementById('gameBoard').style.transformOrigin = "top left";
 }
 
 
@@ -1821,6 +1844,10 @@ function showBoard(expandRoom=0){
 	}else{
 		document.getElementById("gameBoard").innerHTML=newGameBoard;
 	}
+	
+	document.getElementById('gameBoard').style.transform = "scale(" + boardZoom + ")";
+	document.getElementById('gameBoard').style.transformOrigin = "top left";
+
 }
 
 function nextToMedOrLarge(checkRow,checkCol){
@@ -1876,6 +1903,7 @@ function roomsShareADoor(room1,room2,roomSide,alreadyCompared=false){
 	var checkedList=room1+","+room2+"--";
 	var myLoc="";
 	
+	//alert("in roomsShareADoor");
 
 	//Addded this june 7, 2022
 	//If first room is a hall and the other is the middle room, never add a door, so claim they already share one.
@@ -1994,6 +2022,7 @@ function roomsShareADoor(room1,room2,roomSide,alreadyCompared=false){
 	//09-25-22 Need to check the corners in the hall, because there is a space there where two halls border the same room along same wall, which
 	//can give us a problem
 	if(alreadyCompared==false){
+	
 		//Added this 6-15-25 because the next section depends on the room1 being the room, not the hall, for some reason. Don't know my previous reasoning, so I'll just put this here.
 		//I do know that this is part of the reason I can sometimes get a second door into a room in the corner. It just doesn't compare correctly, and it depends on which hall I open first to trigger this. 
 		if(room2<room1){
@@ -2002,12 +2031,13 @@ function roomsShareADoor(room1,room2,roomSide,alreadyCompared=false){
 			room2=tempRoomBlah;
 		}
 		
+		
 		//This is to prevent an infinite loop of calling itself
 		if(room1>21||room2>21){
 			//One of these is a hall, so we need to check corners
 			if (room1<room2){
 				switch(room1){
-					case 4:
+					case 4:						
 						if(room2==32){
 							if (roomsShareADoor(room1,36,roomSide,true)==true){
 								return true;
@@ -3336,6 +3366,7 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 	let curTime = d.toLocaleTimeString();
 	let roomMax=(parseInt(document.getElementById("maxRooms").value,10))
 	
+
 	
 	//Check to make sure they set a quest level
 	if(document.getElementById("questLevel").value.length<=0){
@@ -3343,6 +3374,7 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 		return;
 	}
 
+	//alert(roomNum);
 
 	if(isLastRoom==0&&roomNum<21){ //Can still be hall or exit room
 		if(roomCount==roomMax-1){
