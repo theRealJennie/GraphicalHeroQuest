@@ -114,7 +114,7 @@ const creatureSet=[ //This is formatted like this for simplicity purposes, makin
 	4,
 	5,
 	"DW",
-	" Dread Spells drawn from deck. Select randomly when casting.)",
+	" Dread Spells drawn from deck. Select randomly when casting. If a Dread Warrior can reach heroes and has the option to cast spells or attack, roll a die and attack if odd, cast spell if even.)",
 	0,
 	0,
 
