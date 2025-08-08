@@ -8,7 +8,7 @@
 	selectionUpperRange
 	inUseCount
 */
-
+/*
 const furnitureSet=[
 
 	"Throne",
@@ -137,9 +137,9 @@ const furnitureSet=[
 	0,
 	0
 ];
+*/
 
 
-/*
 const furnitureSet=[
 
 	"Throne",
@@ -420,4 +420,5 @@ const furnitureSet=[
 	"Runic Calendar",
 	0,
 	0
-];*/
+];
+
