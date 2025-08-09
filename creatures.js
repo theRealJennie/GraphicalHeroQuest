@@ -10,7 +10,7 @@
 	"inUseCount"*/
 
 
-
+/*
 const creatureSet=[ //This is formatted like this for simplicity purposes, making it easy to work with when changing in the future. 
 	"Ghoul",
 	0,
@@ -149,7 +149,7 @@ const creatureSet=[ //This is formatted like this for simplicity purposes, makin
 ];
 
 
-/*
+*/
 
 const creatureSet=[ //This is formatted like this for simplicity purposes, making it easy to work with when changing in the future. 
 	"Ghoul",
@@ -224,11 +224,11 @@ const creatureSet=[ //This is formatted like this for simplicity purposes, makin
 	0,
 	0,
 		
-	"Ogre"
+	"Ogre",
 	0,
 	4,
 	0,
-	"Ogr"
+	"Ogr",
 	"Ogre(6 move, 3 attack, 3 defense. 3 body, 1 mind)",
 	0,
 	0,
@@ -323,7 +323,8 @@ const creatureSet=[ //This is formatted like this for simplicity purposes, makin
 	0,
 	0
 ]
-*/
+
+
 
 
 
