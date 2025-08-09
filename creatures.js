@@ -229,7 +229,7 @@ const creatureSet=[ //This is formatted like this for simplicity purposes, makin
 	4,
 	0,
 	"Ogr"
-	"Ogre(6 move, 3 attack, 3 defense. 3 body, 1 mind)"
+	"Ogre(6 move, 3 attack, 3 defense. 3 body, 1 mind)",
 	0,
 	0,
 	
@@ -323,5 +323,6 @@ const creatureSet=[ //This is formatted like this for simplicity purposes, makin
 	0,
 	0
 ]
+
 
 
