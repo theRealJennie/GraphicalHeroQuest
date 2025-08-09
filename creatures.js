@@ -8,7 +8,7 @@
 	"Description":	",
 	"selectionUpperRange",
 	"inUseCount"*/
-/*
+
 
 
 const creatureSet=[ //This is formatted like this for simplicity purposes, making it easy to work with when changing in the future. 
@@ -324,6 +324,7 @@ const creatureSet=[ //This is formatted like this for simplicity purposes, makin
 	0
 ]
 */
+
 
 
 
