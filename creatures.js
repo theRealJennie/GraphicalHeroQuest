@@ -221,6 +221,15 @@ const creatureSet=[ //This is formatted like this for simplicity purposes, makin
 	"Draugr(4 move, 2 attack, 3 defense. 2 body, 0 mind -- These take the place of Zombies for spells.)",
 	0,
 	0,
+		
+	"Ogre"
+	0,
+	4,
+	0,
+	"Ogr"
+	"Ogre(6 move, 3 attack, 3 defense. 3 body, 1 mind)"
+	0,
+	0,
 	
 	"Basilisk",
 	0,
@@ -312,3 +321,4 @@ const creatureSet=[ //This is formatted like this for simplicity purposes, makin
 	0,
 	0
 ]
+
