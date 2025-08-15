@@ -285,6 +285,15 @@ const furnitureSet=[
 	"Bear Trap",
 	0,
 	0,
+
+	"Toilet",
+	1,
+	1,
+	1,
+	"Tlt",
+	"Toilet",
+	0,
+	0,
 	
 	"Torture Chair",
 	2,
@@ -421,4 +430,5 @@ const furnitureSet=[
 	0,
 	0
 ];
+
 
