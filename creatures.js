@@ -268,6 +268,16 @@ const creatureSet=[ //This is formatted like this for simplicity purposes, makin
 	"Tendril(0 move, 4 attack, 0 defense, 3 body, 0 mind -- A tendril attacks a random hero within the same room or on the space just outside a door or to either side.)",
 	0,
 	0,
+
+	
+	"Great White Orc",
+	0,
+	1,
+	0,
+	"GWO",
+	"Great White Orc (Moby) (8 move, 3 attack, 2 defense. 2 body, 1 mind) Moby, the Great White Orc, can attack twice each turn. This must be against two different targets.",
+	0,
+	0,
 	
 	"Werewolf",
 	0,
@@ -323,6 +333,7 @@ const creatureSet=[ //This is formatted like this for simplicity purposes, makin
 	0,
 	0
 ]
+
 
 
 
