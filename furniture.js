@@ -351,10 +351,10 @@ const furnitureSet=[
 	
 	"Dark Altar",
 	1,
-	1,
+	2,
 	2,
 	"DaA",
-	"Dark Altar - Any hero in the same room as dark altar or the square outside the door and to either side of it can only move at half their rolled distance and may only attack at half power because of its dark influence.",
+	"Dark Altar - Any hero within 10 spaces as dark altar and not blocked by closed doorway or solid wall(so even in next room, if door is open) can only move at half their rolled distance and may only attack at half power because of its dark influence.",
 	0,
 	0,
 	
@@ -430,5 +430,6 @@ const furnitureSet=[
 	0,
 	0
 ];
+
 
 
