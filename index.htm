@@ -5,14 +5,12 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
 <style>
 	textarea{
-	//	font-size: 2.5rem !important;
+	
 	}
 	div{
-		//font-size: 2.5rem !important;
 		padding-bottom: 5px !important;
 	}
 	button{
-		//font-size: 2.5rem !important;
 		background-color: lightgray !important;
 	}
 	table{
@@ -27,8 +25,7 @@
 		min-width: 1.5rem;
 		opacity: .40;
 
-	//Never put this inline-block, it breaks td width and row sizing
-	//	display: inline-block;
+
 		border-width:1px;
 		border-color: black;
 		border-style: solid;
@@ -48,7 +45,6 @@
 <div class="container">
 <div class="row">
 <div class="col-8">
-
 	<div id="gameBoardContainer" style="width:800px; height:500px; max-width:60rem; overflow:auto; border:1px solid #333;">
 		<div id="gameBoard"></div>
 	</div>
@@ -132,18 +128,7 @@
 </textarea>
 </div>
 
-<h2>
-Your Mission
-</h2>
-<p>
-Small kingdoms once covered the land from sea to sea. These kingdoms, numbering in the dozens, existed side by side, often in a state of war for resources and land. Until A century ago, when King Dunong The Mighty conquered the kingdoms, uniting all people of the land into one strong realm.
-</p>
-<p>It has existed in this form ever since, with a governor having direct control over each territory that made up the lesser kingdoms. Each of these kingdoms had castles, but over time the underground levels of these castles became infested with evil monsters of all kinds.
-</p>
-<p>Recently, these monsters have found their way out, attacking innocent civilians nearby before returning to their underground base. King Filbon The Kind has hired you, a small band of intrepid heroes, to clean out these lairs so they can be used by the local governors for the good of the people and to protect the people from these vile creatures.
-</p>
-<p>
-You must enter each lair and clear out all the monsters that you can reach. If you leave even one monster alive, it could escape and attack the public! Kill off all the monsters before you exit, and be heralded by the town as heroes of the realm.
+
 <h2>
 Additional Rules
 </h2>
@@ -203,7 +188,7 @@ var creatureCount=new Array(20);
 var pandaCount=0;
 var mouseTimer;
 var boardZoom=1.0;
-
+var startRoom=21; //Defaults to middle
 
 //gameBoard position definitions:
 //0-room number
@@ -1034,7 +1019,7 @@ function showFinalReward(){
 			note+="5"
 			break;
 	}
-	note+=" gold by King Filbon as a show of His Majesty's gratitude.";
+	note+=" gold.";
 	alert(note);
 }
 function wanderingMonster(){
@@ -1343,7 +1328,149 @@ function generateBlankBoard(){
 	createStartRoom();
 	showBoard();
 }
+
+
 function createStartRoom(){
+	//This will set up the basic start we use in this type of game.
+
+	
+	
+	var x=0;
+	var y=0;
+	var numDoors=Math.floor(Math.random()*6)+1; //Yes, this will sometimes give us more than 4 doors, but that will be taken care of shortly.
+	var selectSide=0;
+	var lSide=0;
+	var rSide=0;
+	var tSide=0;
+	var bSide=0;
+	//var roomNum=0;
+	var startRow=0;
+	var startCol=0;
+	var numRows=0;
+	var numCols=0;
+	
+	
+	
+	//Randomly select starting room number.
+	startRoom=Math.floor(Math.random()*21)+1;
+	
+	startRow=getStartRow(startRoom);
+	startCol=getStartCol(startRoom);
+	numRows=getRoomRows(startRoom);
+	numCols=getRoomCols(startRoom);
+	
+	//Mark entire room as in use
+	//gameBoard[7][10][7]=1;
+	gameBoard[startRow][startCol][7]=1;
+	
+	
+	
+	for(let doorCounter=0;doorCounter<=numDoors;doorCounter++){
+		selectSide=Math.floor(Math.random()*4);
+		switch (selectSide){
+			case 0:
+				if(lSide==0){
+					//Place a door along left side of the room
+					/*y=Math.floor(Math.random()*5)+7;
+					gameBoard[y][9][3]=2;	//left
+					gameBoard[y][10][2]=2;
+					lSide=1;*/
+					y=Math.floor(Math.random()*numRows)+startRow;
+					gameBoard[y][startCol-1][3]=2;	//left
+					gameBoard[y][startCol][2]=2;
+					lSide=1;
+				}
+				break;
+			case 1:
+				if(rSide==0){
+					//Place a door along right side of the room
+					y=Math.floor(Math.random()*numRows)+startRow;
+					gameBoard[y][startCol+numCols-1][3]=2;	//right
+					gameBoard[y][startCol+numCols][2]=2;
+					rSide=1;
+				}
+				break;
+			case 2:
+				if(tSide==0){
+					//Place a door along top side of the room
+					/*y=Math.floor(Math.random()*6)+10;
+					gameBoard[6][y][5]=2; //top
+					gameBoard[7][y][4]=2;
+					tSide=1;*/
+					y=Math.floor(Math.random()*numCols)+startCol;
+					gameBoard[startRow-1][y][5]=2; //top
+					gameBoard[startRow][y][4]=2;
+					tSide=1;
+				}
+				break;
+			default:
+				if(bSide==0){
+					//Place a door along bottom side of the room
+					y=Math.floor(Math.random()*numCols)+startCol;
+					gameBoard[startRow+numRows-1][y][5]=2; //bottom
+					gameBoard[startRow+numRows][y][4]=2;
+					bSide=1;
+				}
+				break;
+		}
+	}
+	
+	
+	
+	//Place stairs @ 12,9. Treat like furniture, because essentially they are
+	//Now randomly place stairs
+	//x=Math.floor(Math.random()*4)+7;
+	//y=Math.floor(Math.random()*5)+10;
+
+	//As of 3-22-25 I now want at least one space between the stairs and walls.
+	//x=Math.floor(Math.random()*2)+8;
+	//y=Math.floor(Math.random()*3)+11;
+	if(numRows>3){
+		//alert("Got this far 1" + " " + numRows);
+		x=Math.floor(Math.random()*(numRows-3))+startRow+1;
+	}else{
+		x=Math.round(Math.random()*(numRows-2))+startRow;
+	}
+	
+	//alert("Got this far");
+	
+	if(numCols>3){
+		y=Math.floor(Math.random()*(numCols-3))+startCol+1;
+	}else{
+		y=Math.round(Math.random()*(numCols-2))+startCol;
+	}
+		
+								
+	
+	gameBoard[x][y][1]="^2^2^Stairs(furniture)";
+	gameBoard[x][y+1][1]="@Stairs(furniture)";
+	gameBoard[x+1][y][1]="@Stairs(furniture)";
+	gameBoard[x+1][y+1][1]="@Stairs(furniture)";
+	
+	//Added this here 3-26-2025 to try to fix issue where stair direction changes because it is randomly selected at visual time. I'll now do it here.
+	var stairDirection=0;
+	stairDirection=Math.floor(Math.random()*4);
+	switch(stairDirection){
+		case 1:
+			gameBoard[x][y][1]+= "&#8593"; 
+			break;
+		case 2:
+			gameBoard[x][y][1]+="&#8595";
+			break;
+		case 3:
+			gameBoard[x][y][1]+="&#8594";
+			break;
+		default:
+			gameBoard[x][y][1]+="&#8592";
+			break;
+	}
+	
+	//As of 3-22-25 we also now allow creatures in starting room.
+	addCreatures(startRoom,false);
+	
+}
+
+function createStartRoomOld(){
 	//This will set up the basic start we use in this type of game.
 
 	
@@ -1443,12 +1570,34 @@ function createStartRoom(){
 
 function clearStartCreatures(){
 	//This will clear out the starting room creatures so that we only have the stairs and doors. This is so we can place creatures at the beginning but they won't still show at end.
-	var x=7;
-	var y=10;	
-	while(y<16){
+	//var x=7;
+	//var y=10;	
+	var x=getStartRow(startRoom);
+	var y=getStartCol(startRoom);
+	var startRow=x;
+	var startCol=y;
+	var numCols=getRoomCols(startRoom);
+	var numRows=getRoomRows(startRoom);
+	/*while(y<16){
 		x=7;
 		while(x<12){
 			
+			if(gameBoard[x][y][1].length>1){			
+				if (gameBoard[x][y][1].indexOf('Stairs')<=0){
+					//Not a stairs space
+					gameBoard[x][y][1]="";
+				}
+			}			
+			x=x+1;
+		}
+		y=y+1;
+	}	
+	*/
+	
+	while(y<startCol+numCols){
+		//x=7;
+		x=getStartRow(startRoom)
+		while(x<startRow+numRows-1){
 			if(gameBoard[x][y][1].length>1){			
 				if (gameBoard[x][y][1].indexOf('Stairs')<=0){
 					//Not a stairs space
@@ -1772,9 +1921,8 @@ function showBoard(expandRoom=0){
 									//newGameBoard+=gameBoard[row][col][1].substr(0,3);
 									if(tempText.includes("Panda")==true){
 										newGameBoard+="<span style='font-size: .5rem;color:red !important;'>"+gameBoard[row][col][1].substr(0,3)+"-P</span>";
-									}else{
-										
-										newGameBoard+=gameBoard[row][col][1].substr(0,3);
+									}else{										
+										newGameBoard+=gameBoard[row][col][1].substr(0,3);					
 										
 									}
 								}
@@ -3147,7 +3295,7 @@ function addCreatures(roomNum,isLastRoom){
 			numItems=numItems+1;
 			//alert("Added one!")
 		}						
-	} else if(roomNum==21){
+	} else if(roomNum==startRoom){//(roomNum==21){
 		//This is the middle room, but it is at the start. Limit creatures to two.
 		if(numItems>2){
 			numItems=2;
@@ -3366,7 +3514,7 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 	let curTime = d.toLocaleTimeString();
 	let roomMax=(parseInt(document.getElementById("maxRooms").value,10))
 	
-
+	
 	
 	//Check to make sure they set a quest level
 	if(document.getElementById("questLevel").value.length<=0){
@@ -3490,11 +3638,13 @@ document.querySelector('#gameBoard')
 
 		
 			switch(roomNum){
-				case 21:
+				case startRoom:
 					//alert(roomNum);
 					
 					//remove creatures placed at start so we only have stairs and doors. 
+					
 					clearStartCreatures();
+					
 					openRoomVisually(roomNum,true,1);
 					
 					showFinalReward();
@@ -3534,4 +3684,3 @@ document.querySelector('#gameBoard')
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
 </body>
 </html>
-
