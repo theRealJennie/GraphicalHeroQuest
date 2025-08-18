@@ -292,7 +292,7 @@ const creatureSet=[ //This is formatted like this for simplicity purposes, makin
 	4,
 	5,
 	"Wit",
-	"Witch(4 move, 3 attack, 4 defense, 3 body, 5 mind -- A witch has the choice to try to turn all heroes into frogs for one turn. If she does so, each hero may break the spell by rolling an odd number on a red die.)",
+	"Witch Dread Spells(4 move, 3 attack, 4 defense, 3 body, 5 mind -- A witch has the choice to try to turn all heroes into frogs for one turn. If she does so, each hero may break the spell by rolling an odd number on a red die.)",
 	0,
 	0,
 	
@@ -301,7 +301,7 @@ const creatureSet=[ //This is formatted like this for simplicity purposes, makin
 	4,
 	5,
 	"Vam",
-	"Vampire(10 move, 4 attack, 5 defense, 3 body, 4 mind -- Any hero damaged by a vampire cannot attack on their next turn unless they roll a 1 or a 6.)",
+	"Vampire Dread Spells(10 move, 4 attack, 5 defense, 3 body, 4 mind -- Any hero damaged by a vampire cannot attack on their next turn unless they roll a 1 or a 6.)",
 	0,
 	0,
 	
@@ -323,6 +323,7 @@ const creatureSet=[ //This is formatted like this for simplicity purposes, makin
 	0,
 	0
 ]
+
 
 
 
