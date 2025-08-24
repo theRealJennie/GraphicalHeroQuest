@@ -303,7 +303,13 @@ function getMonster(isWandering=0,questLevel=0, isHall=0, retryCount=0){
 	
 	//Before we go any farther, let's check to make sure we don't have too many of this creature and retry if we do.
 	if(creatureList[creatureType][7]>=creatureList[creatureType][2] && retryCount<3){
-		creatureType=getMonster(isWandering,questLevel,isHall,retryCount+1);
+		//Added this check on special (creatureList[creatureType][1]) 8-24-25 so we can set an absolute limit that is never breached for some creatures. 
+		//Should never really be needed, but it's a backup just in case. 
+		if((creatureList[creatureType][1]+" ").includes("Observe Max")==true){			
+			creatureType=getMonster(isWandering,questLevel,isHall,0);
+		}else{
+			creatureType=getMonster(isWandering,questLevel,isHall,retryCount+1);
+		}
 	}else{
 		creatureList[creatureType][7]+=1; //Increment the count in use.
 	}
@@ -3544,7 +3550,14 @@ function openRoomVisually(roomNum=100, inUse=true,isLastRoom=0){
 		myCounter+=1;
 	}*/
 	for(x=0;x<creatureList.length;x++){
-		creatureList[x][7]=0;
+		//Added this 8-24-25. It is intended to allow me to set an absolute max number of times this creature can show up in a quest, not
+		//limited to just the number in a room, which is how it was working before this.
+		if((creatureList[x][1]+" ").includes("Observe Max")==true){	
+			//Don't blank this one, leave it intact.
+			//alert("Got to this part where we don't blank it.");
+		}else{
+			creatureList[x][7]=0;
+		}
 	}
 
 
@@ -3684,3 +3697,4 @@ document.querySelector('#gameBoard')
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
 </body>
 </html>
+
