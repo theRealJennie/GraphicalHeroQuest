@@ -269,15 +269,6 @@ const creatureSet=[ //This is formatted like this for simplicity purposes, makin
 	0,
 	0,
 	
-	"Great White Orc",
-	0,
-	1,
-	0,
-	"GWO",
-	"Great White Orc (Moby) (8 move, 3 attack, 2 defense. 2 body, 1 mind) Moby, the Great White Orc, can attack twice each turn. This must be against two different targets.",
-	0,
-	0,
-	
 	"Werewolf",
 	0,
 	4,
@@ -302,6 +293,15 @@ const creatureSet=[ //This is formatted like this for simplicity purposes, makin
 	3,
 	"Wit",
 	"Witch Dread Spells(4 move, 3 attack, 4 defense, 3 body, 5 mind -- A witch has the choice to try to turn all heroes into frogs for one turn. If she does so, each hero may break the spell by rolling an odd number on a red die.)",
+	0,
+	0,
+	
+	"Great White Orc",
+	"Observe Max", /*This should limit it to a max of 1 of these per entire quest.*/
+	1,
+	0,
+	"GWO",
+	"Great White Orc (Moby) (8 move, 3 attack, 2 defense. 2 body, 1 mind) Moby, the Great White Orc, can attack twice each turn. This must be against two different targets.",
 	0,
 	0,
 	
@@ -332,6 +332,7 @@ const creatureSet=[ //This is formatted like this for simplicity purposes, makin
 	0,
 	0
 ]
+
 
 
 
