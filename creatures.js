@@ -292,7 +292,7 @@ const creatureSet=[ //This is formatted like this for simplicity purposes, makin
 	4,
 	3,
 	"Wit",
-	"Witch Dread Spells(4 move, 3 attack, 4 defense, 3 body, 5 mind -- A witch has the choice to try to turn all heroes into frogs for one turn. If she does so, each hero may break the spell by rolling an odd number on a red die.)",
+	"Witch Dread Spells(4 move, 3 attack, 4 defense, 3 body, 5 mind -- A witch has the choice to try to turn all heroes into frogs instead of casting a spell or attacking. If she does so, each hero may break the spell by rolling an odd number on a red die immediately or on a future turn.)",
 	0,
 	0,
 	
@@ -332,6 +332,7 @@ const creatureSet=[ //This is formatted like this for simplicity purposes, makin
 	0,
 	0
 ]
+
 
 
 
