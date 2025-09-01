@@ -345,7 +345,7 @@ const furnitureSet=[
 	1,
 	1,
 	"See",
-	"Seeing Stone",
+	"Seeing Stone (When a character ends their move under the gaze of seeing stone for the first time, roll 1 red die. 1: Hero must reveal a secret before moving again. 2: Hero falls asleep and cannot defend. May roll a 1 or 6 immediately or on future turn to wake. 3: Hero feels weak under the gaze of the eye, and gets 1 less defense die until leaving the room. 4: Hero feels inspired and can attack with an extra die until leaving the room. 5: Hero loses next turn, but can still defend. 6: Hero must immediately reroll, running from the room. The hero must leave the room, and must continue to roll and add to this until they accomplish that. The hero must complete that move and move as far away as possible.",
 	0,
 	0,
 	
@@ -430,6 +430,7 @@ const furnitureSet=[
 	0,
 	0
 ];
+
 
 
 
