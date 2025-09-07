@@ -283,7 +283,7 @@ const creatureSet=[ //This is formatted like this for simplicity purposes, makin
 	4,
 	0,
 	"Nec",
-	"Necromancer(4 move, 0 attack, 4 defense, 3 body, 4 mind -- Necromancers have the ability to summon a Terror, Zombie Rat, or Draugr each turn, chosen randomly. Roll 1 red die divided by 2 (rounded up) to see how many.)",
+	"Necromancer(4 move, 0 attack, 4 defense, 3 body, 4 mind -- Necromancers have the ability to summon a Terror, Zombie Rat, or Draugr each turn, chosen randomly. Roll 1 red die divided by 2 (rounded up) to see how many. Necromancer can have a maximum of 3 summoned creatures active at any time.)",
 	0,
 	0,
 	
@@ -332,6 +332,7 @@ const creatureSet=[ //This is formatted like this for simplicity purposes, makin
 	0,
 	0
 ]
+
 
 
 
