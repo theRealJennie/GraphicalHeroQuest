@@ -408,7 +408,7 @@ const furnitureSet=[
 	1,
 	1,
 	"P D",
-	"Potion Display (There is a plaque here stating 'These are the first tubes created by High Mage Mielicene. They were essential to the development of future, life-saving potions later on. Roll a die to see which potion. 1 or 2: Potion of Grace(reroll your movement dice), 3 or 4: Upon reaching for this potion, instantly heal to max life, 5: Upon reaching for this vial you are instantly turned into a frog and must remain in frog form for 3 turns, 6: Alacrity- add 2 to attack or defense)", into a potion to enable a hobbled person to walk normally for a short time. While these early examples only work for a small number of people (each a different person), they laid important groundwork for later development in aiding those with ambulatory difficulties.' These tubes contain a potion that allows a user to re-roll their movement dice once per quest. Roll to see which character get the tube. Cannot be given or traded away.)",
+	"Potion Display (There is a plaque here stating 'These are the first tubes created by High Mage Mielicene. They were essential to the development of future, life-saving potions later on. Roll a die to see which potion. 1 or 2: Potion of Grace(reroll your movement dice), 3 or 4: Upon reaching for this potion, instantly heal to max life, 5: Upon reaching for this vial you are instantly turned into a frog and must remain in frog form for 3 turns, 6: Alacrity- add 2 to attack or defense)",
 	0,
 	0,
 	
@@ -430,6 +430,7 @@ const furnitureSet=[
 	0,
 	0
 ];
+
 
 
 
