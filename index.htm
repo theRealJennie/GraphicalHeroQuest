@@ -1175,7 +1175,33 @@ function openSearch(isHall=false){
 			myList+=" a secret door. (If not against an outside wall this becomes 25 gold. If in a corner, opens to wall farthest from entering doorway)";
 			break;
 		default:
-			myList+= " a heal potion. (heals up to 4 body points)";
+			//myList+=" treasure!";
+			randomTotal=Math.floor(Math.random()*12);
+			//Added this part 12-1-2025 to reduce chance of heal potion.
+			//Leave the same before level 5, but reduce to 3/4 as many before 10,
+			//half as many after level 10.
+			let questLevel=(parseInt(document.getElementById("questLevel").value,10))			
+			
+			if(questLevel<5){
+				myList+= " a heal potion. (heals up to 4 body points)";
+			}else{
+				if(questLevel<10){
+					if(randomTotal<3){
+						myList+=" treasure!";
+					}else{
+						myList+= " a heal potion. (heals up to 4 body points)";
+					}
+				}else{
+					if(randomTotal<6){
+						myList+=" treasure!";
+					}else{
+						myList+= " a heal potion. (heals up to 4 body points)";
+					}
+				}
+			}
+			
+			//Down here is all I had before 12-1-2025.
+			//myList+= " a heal potion. (heals up to 4 body points)";
 			break;
 	}
 
@@ -3697,4 +3723,5 @@ document.querySelector('#gameBoard')
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
 </body>
 </html>
+
 
