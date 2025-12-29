@@ -315,7 +315,7 @@ const furnitureSet=[
 	
 	"Dark Altar",
 	1,
-	1,
+	2,
 	2,
 	"DaA",
 	"Dark Altar - Any hero within the same room as Dark Altar and 2 spaces beyond open doorways can only move at half their rolled distance and may only attack at half power because of its dark influence.",
@@ -393,4 +393,5 @@ const furnitureSet=[
 	"Runic Calendar",
 	0,
 	0
+
 ];
