@@ -1338,7 +1338,8 @@ function notInRoomOrBlocked(roomNum, checkRow, checkCol, onlyCheckNotInRoom=fals
 
 function createStartRoom(){
 	//This will set up the basic start we use in this type of game.
-
+	const d = new Date();
+	let curTime = d.toLocaleTimeString();
 	
 	var x=0;
 	var y=0;
@@ -1407,6 +1408,9 @@ function createStartRoom(){
 	
 	//Mark entire room as in use
 	extRoomSet[startRoom][9]=1;
+
+	//Added this 2-2-2026
+	listRoomContents(startRoom,curTime);
 }
 
 function placeStairs(roomNum){
@@ -2802,3 +2806,4 @@ document.querySelector('#gameBoard')
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
 </body>
 </html>
+
