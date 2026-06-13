@@ -215,6 +215,15 @@ const creatureSet=[ //This is formatted like this for simplicity purposes, makin
 	0,
 	0,
 
+	"Crypt Hound",
+	0,
+	6,
+	0,
+	"CH",
+	"Crypt Hound(10 move, 4 attack, 3 defense, 3 body, 2 mind -- Crypt Hound gets +1 on attack if another crypt hound is also next to hero being attacked. They attack in a pack, meaning if a hero is being attacked by a Crypt Hound, other Crypt Hounds will attack that hero if possible.)",
+	0,
+	0,
+
 	"Necromancer",
 	0,
 	4,
