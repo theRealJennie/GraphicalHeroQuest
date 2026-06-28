@@ -372,7 +372,7 @@ const furnitureSet=[
 	1,
 	1,
 	"P D",
-	"Potion Display (There is a plaque here stating 'These are the first tubes created by High Mage Mielicene. They were essential to the development of future, life-saving potions later on. Roll a die to see which potion. Odd: Upon reaching for this potion, instantly heal to max life, Even: Hero is compelled to drink a potion that turns them into a wandering monster. They retain their health, but now have the attack and defence of the creature they become, and cannot cast spells.)",
+	"Potion Display (There is a plaque here stating 'These are the first tubes created by High Mage Mielicene. They were essential to the development of future, life-saving potions later on. Roll a die to see which potion. Odd: Upon reaching for this potion, instantly heal to max life, Even: Hero is compelled to drink a potion that turns them into a wandering monster. They retain their health, but now have the attack and defense of the creature they become, and cannot cast spells.)",
 	0,
 	0,
 	
