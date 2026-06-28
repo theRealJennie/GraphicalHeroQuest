@@ -292,7 +292,7 @@ const creatureSet=[ //This is formatted like this for simplicity purposes, makin
 	4,
 	0,
 	"CS",
-	"Cinder Sneak(8 move, 3 attack, 3 defense, 3 body, 2 mind -- Instead of a regular attack, Cinder Sneak may choose to throw a flask of flaming liquid up to 6 spaces. Upon landing, the flask explodes. Roll 3 attack dice against every hero next to on on the space the flask lands.)",
+	"Cinder Sneak(8 move, 3 attack, 3 defense, 3 body, 2 mind -- Instead of a regular attack, Cinder Sneak may choose to throw a flask of flaming liquid up to 6 spaces. Upon landing, the flask explodes. Roll 3 attack dice against every hero next to or on the space the flask lands.)",
 	0,
 	0,
 
