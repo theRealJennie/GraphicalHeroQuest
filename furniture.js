@@ -92,42 +92,6 @@ const furnitureSet=[
 	0,
 	0,
 	
-	"Small Bed",
-	3,
-	1,
-	2,
-	"Sbd",
-	"Small Bed",
-	0,
-	0,
-	
-	"Large Bed",
-	4,
-	2,
-	2,
-	"Lbd",
-	"Large Bed",
-	0,
-	0,
-	
-	"Bench",
-	4,
-	1,
-	3,
-	"Ben",
-	"Bench",
-	0,
-	0,
-	
-	"Small Table",
-	3,
-	1,
-	1,
-	"Stb",
-	"Small Table",
-	0,
-	0,
-	
 	"Bookshelf",
 	9,
 	1,
@@ -224,7 +188,7 @@ const furnitureSet=[
 	0,
 	
 	"Small Bed",
-	3,
+	1,
 	1,
 	2,
 	"Sbd",
@@ -285,7 +249,7 @@ const furnitureSet=[
 	"Bear Trap (A character may try to jump the bear trap. If doing so, must roll enough to move one space beyond and roll a combat die as they pass over the trap. If they roll a skull, they set the trap off and take one damage and stop their movement. Bear trap is removed from the board after being set off by a hero)",
 	0,
 	0,
-
+	
 	"Toilet",
 	1,
 	1,
@@ -345,7 +309,7 @@ const furnitureSet=[
 	1,
 	1,
 	"See",
-	"Seeing Stone (When a character ends their move under the gaze of seeing stone for the first time, roll 1 red die. 1: Hero must reveal a secret before moving again. 2: Hero falls asleep and cannot defend. May roll a 1 or 6 immediately or on future turn to wake. 3: Hero feels weak under the gaze of the eye, and gets 1 less defense die until leaving the room. 4: Hero feels inspired and can attack with an extra die until leaving the room. 5: Hero loses next turn, but can still defend. 6: Hero must immediately reroll, running from the room. The hero must leave the room, and must continue to roll and add to this until they accomplish that. The hero must complete that move and move as far away as possible.",
+	"Seeing Stone (When a character ends their move under the gaze of seeing stone for the first time, roll 1 red die. Odd: Hero must reveal a secret before moving again. Even: Hero falls in love with the next monster they see. They may not attack it or cast spells against it, but can defend if it attacks them. Spell is broken once creature dies.",
 	0,
 	0,
 	
@@ -354,7 +318,7 @@ const furnitureSet=[
 	2,
 	2,
 	"DaA",
-	"Dark Altar - Any hero within the same room as dark altar and 2 spaces beyond open doorways can only move at half their rolled distance and may only attack at half power because of its dark influence.",
+	"Dark Altar - Any hero within the same room as Dark Altar and 2 spaces beyond open doorways can only move at half their rolled distance and may only attack at half power because of its dark influence.",
 	0,
 	0,
 	
@@ -366,8 +330,8 @@ const furnitureSet=[
 	"Cauldron",
 	0,
 	0,
-
- 	"Workbench",
+	
+	"Workbench",
 	3,
 	2,
 	1,
@@ -376,16 +340,7 @@ const furnitureSet=[
 	0,
 	0,
 	
-	"Bookshelf",
-	6,
-	1,
-	3,
-	"Bks",
-	"Bookshelf.",
-	0,
-	0,
-
- 	"Crate",
+	"Crate",
 	2,
 	1,
 	1,
@@ -393,8 +348,8 @@ const furnitureSet=[
 	"Crate",
 	0,
 	0,
-
- 	"Floor Candle",
+	
+	"Floor Candle",
 	2,
 	1,
 	1,
@@ -403,12 +358,21 @@ const furnitureSet=[
 	0,
 	0,
 	
+	"Bookshelf",
+	6,
+	1,
+	3,
+	"Bks",
+	"Bookshelf",
+	0,
+	0,
+	
 	"Potion Display",
 	1,
 	1,
 	1,
 	"P D",
-	"Potion Display (There is a plaque here stating 'These are the first tubes created by High Mage Mielicene. They were essential to the development of future, life-saving potions later on. Roll a die to see which potion. 1 or 2: Potion of Grace(reroll your movement dice), 3 or 4: Upon reaching for this potion, instantly heal to max life, 5: Upon reaching for this vial you are instantly turned into a frog and must remain in frog form for 3 turns, 6: Alacrity- add 2 to attack or defense)",
+	"Potion Display (There is a plaque here stating 'These are the first tubes created by High Mage Mielicene. They were essential to the development of future, life-saving potions later on. Roll a die to see which potion. Odd: Upon reaching for this potion, instantly heal to max life, Even: Hero is compelled to drink a potion that turns them into a wandering monster. They retain their health, but now have the attack and defence of the creature they become, and cannot cast spells.)",
 	0,
 	0,
 	
@@ -425,15 +389,9 @@ const furnitureSet=[
 	1,
 	2,
 	2,
-	"RuC",
+	"RC",
 	"Runic Calendar",
 	0,
 	0
+
 ];
-
-
-
-
-
-
-
