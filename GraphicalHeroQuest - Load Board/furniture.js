@@ -309,7 +309,7 @@ const furnitureSet=[
 	1,
 	1,
 	"See",
-	"Seeing Stone (When a character ends their move under the gaze of seeing stone for the first time, roll 1 red die. 1: Hero must reveal a secret before moving again. 2: Hero falls asleep and cannot defend. May roll a 1 or 6 immediately or on future turn to wake. 3: Hero feels weak under the gaze of the eye, and gets 1 less defense die until leaving the room. 4: Hero feels inspired and can attack with an extra die until leaving the room. 5: Hero loses next turn, but can still defend. 6: Hero must immediately reroll, running from the room. The hero must leave the room, and must continue to roll and add to this until they accomplish that. The hero must complete that move and move as far away as possible.",
+	"Seeing Stone (When a character ends their move under the gaze of seeing stone for the first time, roll 1 red die. Odd: Hero must reveal a secret before moving again. Even: Hero falls in love with the next monster they see. They may not attack it or cast spells against it, but can defend if it attacks them. Spell is broken once creature dies.",
 	0,
 	0,
 	
@@ -372,7 +372,7 @@ const furnitureSet=[
 	1,
 	1,
 	"P D",
-	"Potion Display (There is a plaque here stating 'These are the first tubes created by High Mage Mielicene. They were essential to the development of future, life-saving potions later on. Roll a die to see which potion. 1 or 2: Potion of Grace(reroll your movement dice), 3 or 4: Upon reaching for this potion, instantly heal to max life, 5: Upon reaching for this vial you are instantly turned into a frog and must remain in frog form for 3 turns, 6: Alacrity- add 2 to attack or defense)",
+	"Potion Display (There is a plaque here stating 'These are the first tubes created by High Mage Mielicene. They were essential to the development of future, life-saving potions later on. Roll a die to see which potion. Odd: Upon reaching for this potion, instantly heal to max life, Even: Hero is compelled to drink a potion that turns them into a wandering monster. They retain their health, but now have the attack and defence of the creature they become, and cannot cast spells.)",
 	0,
 	0,
 	
