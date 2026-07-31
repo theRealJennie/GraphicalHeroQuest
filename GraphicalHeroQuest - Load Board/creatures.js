@@ -274,7 +274,7 @@ const creatureSet=[ //This is formatted like this for simplicity purposes, makin
 	1,
 	0,
 	"Ice",
-	"Ice Demon(5 move, 4 attack, 5 defend, 4 body, 4 mind -- An Ice Demon may use a freeze attack in place of a regular attack. A freeze attack randomly targets one hero in their site and sprays an icy blast at them, doing 3 damage and freezing them and any hero or monster along the path. A frozen hero or monster may try to shake off the cold (defend) to reduce the damage.)",
+	"Ice Demon(5 move, 4 attack, 5 defend, 4 body, 4 mind -- An Ice Demon may use a freeze attack in place of a regular attack. A freeze attack randomly targets one hero in their sight and sprays an icy blast at them, doing 3 damage and freezing them and any hero or monster along the path. A frozen hero or monster may try to shake off the cold (defend) to reduce the damage.)",
 	0,
 	0,
 	
