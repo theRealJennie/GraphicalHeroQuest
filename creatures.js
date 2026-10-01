@@ -296,6 +296,15 @@ const creatureSet=[ //This is formatted like this for simplicity purposes, makin
 	0,
 	0,
 
+	"Dread Pua Shaman",
+	0,
+	4,
+	0,
+	"DPS",
+	"Dread Pua Shaman(6 move, 3 attack, 4 defense, 3 body, 4 mind -- Dread Pua a cursed effigy that can be randomly assigned to any hero in the same room or just outside the door or on either side of the door (1 space). Any chosen hero for the cursed effigy immediately has 3 att. dice rolled against them and cannot block. This does not count as an attack. Any hero within the same room of Dread Pua gets 1 less attack die. Any hero within the same room at the start of their turn may only move on odd numbered rolls.)",
+	0,
+	0,
+
 	"Necromancer",
 	0,
 	4,
@@ -320,6 +329,15 @@ const creatureSet=[ //This is formatted like this for simplicity purposes, makin
 	0,
 	"GWO",
 	"Great White Orc (Moby) (8 move, 3 attack, 2 defense. 2 body, 1 mind) Moby, the Great White Orc, can attack twice each turn. This must be against two different targets.",
+	0,
+	0,
+
+	"Golem",
+	0,
+	4,
+	0,
+	"Glm",
+	"Golem (4 move, 4 attack, 5 defense, 4 body, 2 mind -- Immune to fire spells. Cannot be put to sleep. Ranged attacks vs. golem are at half strength rounded up.)",
 	0,
 	0,
 	
