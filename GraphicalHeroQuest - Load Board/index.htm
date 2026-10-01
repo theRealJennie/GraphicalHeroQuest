@@ -2799,7 +2799,14 @@ document.querySelector('#gameBoard')
 			}
 		}
   });
- 
+
+	 window.addEventListener('beforeunload', (event) => {
+    // Cancel the event as stated by the standard.
+    event.preventDefault();
+
+    // Chrome and older browsers require returnValue to be set.
+    event.returnValue = '';
+	});
 
 </script>
 
